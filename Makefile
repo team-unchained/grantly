@@ -9,7 +9,7 @@ initialize: application certs
 	@yarn install
 
 application:
-	@brew install mkcert nss mysql traefik node watchman corepack || true
+	@brew install mkcert nss mysql traefik gradle ktlint node watchman corepack || true
 	@npm install -g yarn || true
 
 # install

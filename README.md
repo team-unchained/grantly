@@ -7,3 +7,15 @@
 ```shell
 make initialize
 ```
+
+## Run
+
+```shell
+yarn dev
+```
+
+## API
+
+```shell
+curl https://api.grantly.work/users
+```

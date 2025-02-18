@@ -13,8 +13,13 @@
   "scripts": {
     "install": "husky install",
     "dev": "concurrently -c \"bgGreen.bold,bgMagenta.bold,bgYellow.bold,bgBlue.bold\" \"yarn:run-*\"",
-    "run-traefik": "cd docs/infra/local/traefik && traefik --configFile=traefik.toml > /dev/null"
+    "run-traefik": "cd docs/infra/local/traefik && traefik --configFile=traefik.toml > /dev/null",
+    "run-api": "cd src/api && ./gradlew bootRun"
   },
-  "lint-staged": {},
+  "lint-staged": {
+    "src/api/**/*.kt": [
+      "ktlint --format"
+    ]
+  },
   "packageManager": "yarn@4.5.1"
 }
