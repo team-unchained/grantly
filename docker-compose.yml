@@ -1,0 +1,40 @@
+services:
+  grantly-mysql:
+    image: mysql/mysql-server:8.0
+    container_name: grantly-mysql
+    restart: always
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./.tmp/mysql:/var/lib/mysql
+      - ./docs/local/init.sql/:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: grantly
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: test
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --innodb-deadlock-detect=1 --lower_case_table_names=1 --max-allowed-packet=67108864 --sql-mode=""
+
+  grantly-redis:
+    image: redis:7
+    container_name: grantly-redis
+    restart: always
+    ports:
+      - '6379:6379'
+
+  grantly-localstack:
+    image: localstack/localstack:0.14.5
+    container_name: grantly-localstack
+    restart: always
+    ports:
+      - '4563-4599:4563-4599'
+      - '8055:8080'
+    environment:
+      - DATA_DIR=/tmp/localstack/data
+      - DEBUG=1
+      - SERVICES=s3
+      - AWS_DEFAULT_REGION=ap-northeast-2
+      - HOST_TMP_FOLDER=/tmp/localstack
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .tmp/localstack:/tmp/localstack

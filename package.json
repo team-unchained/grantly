@@ -1,0 +1,20 @@
+{
+  "name": "grantly",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": []
+  },
+  "devDependencies": {
+    "concurrently": "9.1.2",
+    "husky": "9.1.7",
+    "lint-staged": "15.4.3"
+  },
+  "scripts": {
+    "install": "husky install",
+    "dev": "concurrently -c \"bgGreen.bold,bgMagenta.bold,bgYellow.bold,bgBlue.bold\" \"yarn:run-*\"",
+    "run-traefik": "cd docs/infra/local/traefik && traefik --configFile=traefik.toml > /dev/null"
+  },
+  "lint-staged": {},
+  "packageManager": "yarn@4.5.1"
+}
