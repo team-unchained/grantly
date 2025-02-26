@@ -9,27 +9,30 @@ import grantly.user.domain.User
 
 @UseCase
 class UserService(
-    private val userRepository: UserRepository
-): SignUpUseCase, FindUserQuery, EditProfileUseCase {
-
-    override fun signUp(email: String, password: String, name: String): User {
-        return userRepository.createUser(email, password, name)
-    }
+    private val userRepository: UserRepository,
+) : SignUpUseCase,
+    FindUserQuery,
+    EditProfileUseCase {
+    override fun signUp(
+        email: String,
+        password: String,
+        name: String,
+    ): User = userRepository.createUser(email, password, name)
 
     override fun findUserById(id: Long): User {
-        val user = try {
-            userRepository.getUser(id)
-        } catch (e: RuntimeException) {
-            throw Exception("User not found")
-        }
+        val user =
+            try {
+                userRepository.getUser(id)
+            } catch (e: RuntimeException) {
+                throw Exception("User not found")
+            }
         return user
     }
 
-    override fun findAllUsers(): List<User> {
-        return userRepository.getAllUsers()
-    }
+    override fun findAllUsers(): List<User> = userRepository.getAllUsers()
 
-    override fun update(id: Long, name: String): User {
-        return userRepository.updateUser(id, name)
-    }
+    override fun update(
+        id: Long,
+        name: String,
+    ): User = userRepository.updateUser(id, name)
 }

@@ -14,5 +14,5 @@ annotation class PersistenceAdapter(
      * @return the suggested component name, if any (or empty String otherwise)
      */
     @get:AliasFor(annotation = Component::class)
-    val value: String = ""
+    val value: String = "",
 )

@@ -10,7 +10,11 @@ fun <T : Any> T.entityToString(vararg properties: KProperty1<T, *>): String {
 }
 
 // equals() 자동 생성 함수
-fun <T : Any> T.entityEquals(other: Any?, idProperty: KProperty1<T, *>, vararg properties: KProperty1<T, *>): Boolean {
+fun <T : Any> T.entityEquals(
+    other: Any?,
+    idProperty: KProperty1<T, *>,
+    vararg properties: KProperty1<T, *>,
+): Boolean {
     if (this === other) return true
     if (other == null || this::class != other::class) return false
 
@@ -20,9 +24,9 @@ fun <T : Any> T.entityEquals(other: Any?, idProperty: KProperty1<T, *>, vararg p
     val otherId = idProperty.get(otherObj)
 
     return if (thisId != null && otherId != null) {
-        thisId == otherId  // ID가 있으면 ID만 비교
+        thisId == otherId // ID가 있으면 ID만 비교
     } else {
-        properties.all { it.get(this) == it.get(otherObj) }  // ID가 없으면 모든 필드 비교
+        properties.all { it.get(this) == it.get(otherObj) } // ID가 없으면 모든 필드 비교
     }
 }
 

@@ -5,11 +5,15 @@ import grantly.user.application.port.out.UserRepository
 import grantly.user.domain.User
 
 @PersistenceAdapter
-class UserPersistenceAdapter (
+class UserPersistenceAdapter(
     private val springDataUserRepository: SpringDataUserRepository,
-    private val userMapper: UserMapper
-): UserRepository {
-    override fun createUser(email: String, password: String, name: String): User {
+    private val userMapper: UserMapper,
+) : UserRepository {
+    override fun createUser(
+        email: String,
+        password: String,
+        name: String,
+    ): User {
         val userEntity = springDataUserRepository.save(UserJpaEntity(email = email, password = password, name = name))
         return userMapper.toDomain(userEntity)
     }
@@ -27,7 +31,10 @@ class UserPersistenceAdapter (
         return users.map { userMapper.toDomain(it) }
     }
 
-    override fun updateUser(userId: Long, name: String): User {
+    override fun updateUser(
+        userId: Long,
+        name: String,
+    ): User {
         val optionalUser = springDataUserRepository.findById(userId)
         if (optionalUser.isEmpty) {
             throw RuntimeException("User not found")

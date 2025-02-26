@@ -22,7 +22,7 @@ class UserJpaEntity(
     val password: String,
     @Column(length = 255, nullable = false)
     var name: String,
-): BaseEntity() {
+) : BaseEntity() {
     override fun toString() = entityToString(*toStringProperties)
 
     override fun equals(other: Any?) = entityEquals(other, UserJpaEntity::id, *equalsAndHashCodeProperties)
