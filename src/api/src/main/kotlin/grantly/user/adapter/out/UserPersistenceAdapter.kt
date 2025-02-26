@@ -6,7 +6,7 @@ import grantly.user.domain.User
 
 @PersistenceAdapter
 class UserPersistenceAdapter(
-    private val springDataUserRepository: SpringDataUserRepository,
+    private val userJpaRepository: UserJpaRepository,
     private val userMapper: UserMapper,
 ) : UserRepository {
     override fun createUser(
@@ -14,12 +14,12 @@ class UserPersistenceAdapter(
         password: String,
         name: String,
     ): User {
-        val userEntity = springDataUserRepository.save(UserJpaEntity(email = email, password = password, name = name))
+        val userEntity = userJpaRepository.save(UserJpaEntity(email = email, password = password, name = name))
         return userMapper.toDomain(userEntity)
     }
 
     override fun getUser(id: Long): User {
-        val userEntity = springDataUserRepository.findById(id)
+        val userEntity = userJpaRepository.findById(id)
         if (userEntity.isEmpty) {
             throw RuntimeException("User not found")
         }
@@ -27,7 +27,7 @@ class UserPersistenceAdapter(
     }
 
     override fun getAllUsers(): List<User> {
-        val users = springDataUserRepository.findAll()
+        val users = userJpaRepository.findAll()
         return users.map { userMapper.toDomain(it) }
     }
 
@@ -35,13 +35,13 @@ class UserPersistenceAdapter(
         userId: Long,
         name: String,
     ): User {
-        val optionalUser = springDataUserRepository.findById(userId)
+        val optionalUser = userJpaRepository.findById(userId)
         if (optionalUser.isEmpty) {
             throw RuntimeException("User not found")
         }
         var userEntity = optionalUser.get()
         userEntity.name = name
-        userEntity = springDataUserRepository.save(userEntity)
+        userEntity = userJpaRepository.save(userEntity)
         return userMapper.toDomain(userEntity)
     }
 }
