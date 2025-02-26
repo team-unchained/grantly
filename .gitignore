@@ -145,3 +145,4 @@ yarn-error.log
 __pycache__
 
 .DS_Store
+.husky
