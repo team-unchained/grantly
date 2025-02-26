@@ -17,5 +17,5 @@ class UserMapper : IsMapper<UserJpaEntity, User> {
         )
 
     override fun toEntity(domain: User): UserJpaEntity =
-        UserJpaEntity(id = domain.id, email = domain.email, name = domain.name, password = domain.hashPassword())
+        UserJpaEntity(id = if (domain.id == 0L) null else domain.id, email = domain.email, name = domain.name, password = domain.password)
 }
