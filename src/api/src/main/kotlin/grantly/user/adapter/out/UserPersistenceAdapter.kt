@@ -9,12 +9,8 @@ class UserPersistenceAdapter(
     private val userJpaRepository: UserJpaRepository,
     private val userMapper: UserMapper,
 ) : UserRepository {
-    override fun createUser(
-        email: String,
-        password: String,
-        name: String,
-    ): User {
-        val userEntity = userJpaRepository.save(UserJpaEntity(email = email, password = password, name = name))
+    override fun createUser(user: User): User {
+        val userEntity = userJpaRepository.save(userMapper.toEntity(user))
         return userMapper.toDomain(userEntity)
     }
 

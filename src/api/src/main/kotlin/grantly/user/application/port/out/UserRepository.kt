@@ -3,11 +3,7 @@ package grantly.user.application.port.out
 import grantly.user.domain.User
 
 interface UserRepository {
-    fun createUser(
-        email: String,
-        password: String,
-        name: String,
-    ): User
+    fun createUser(user: User): User
 
     fun getUser(id: Long): User
 

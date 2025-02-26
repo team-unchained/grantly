@@ -4,6 +4,7 @@ import grantly.common.annotations.UseCase
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.SignUpUseCase
+import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.port.out.UserRepository
 import grantly.user.domain.User
 
@@ -13,11 +14,11 @@ class UserService(
 ) : SignUpUseCase,
     FindUserQuery,
     EditProfileUseCase {
-    override fun signUp(
-        email: String,
-        password: String,
-        name: String,
-    ): User = userRepository.createUser(email, password, name)
+    override fun signUp(params: SignUpParams): User {
+        val user = User(email = params.email, name = params.name, password = params.password)
+        user.hashPassword()
+        return userRepository.createUser(user)
+    }
 
     override fun findUserById(id: Long): User {
         val user =

@@ -5,6 +5,7 @@ import grantly.user.adapter.`in`.dto.UpdateUserRequest
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.SignUpUseCase
+import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.domain.User
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -32,17 +33,11 @@ class UserController(
     @PostMapping
     fun signUp(
         @RequestBody body: SignUpRequest,
-    ): User {
-        val newUser = signUpUseCase.signUp(body.email, body.password, body.name)
-        return newUser
-    }
+    ): User = signUpUseCase.signUp(SignUpParams(body.email, body.name, body.password))
 
     @PatchMapping("/{userId}")
     fun update(
         @PathVariable userId: Long,
         @RequestBody body: UpdateUserRequest,
-    ): User {
-        val newUser = editProfileUseCase.update(userId, body.name)
-        return newUser
-    }
+    ): User = editProfileUseCase.update(userId, body.name)
 }
