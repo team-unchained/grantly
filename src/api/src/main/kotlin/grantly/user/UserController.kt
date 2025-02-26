@@ -4,9 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class UserController(
-    private val repository: UserRepository,
-) {
+class UserController {
     @GetMapping("/users")
     fun findAll() =
         listOf(

@@ -46,3 +46,9 @@ tasks.named<BootBuildImage>("bootBuildImage") {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    archiveBaseName.set("api")
+    archiveVersion.set("1.0.0")
+    archiveClassifier.set("")
+}

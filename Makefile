@@ -1,4 +1,4 @@
-.PHONY: initialize application certs help
+.PHONY: initialize application certs help api-build api-run build-api-prod run-api-prod
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -30,3 +30,12 @@ docker-down:
 	@docker compose down
 
 docker-restart: docker-down docker-up
+
+build-api:
+	@$(MAKE) -C src/api build
+
+run-api:
+	@$(MAKE) -C src/api dev
+
+start-api:
+	@$(MAKE) -C src/api start

@@ -14,7 +14,7 @@
     "install": "husky install",
     "dev": "concurrently -c \"bgGreen.bold,bgMagenta.bold,bgYellow.bold,bgBlue.bold\" \"yarn:run-*\"",
     "run-traefik": "cd docs/infra/local/traefik && traefik --configFile=traefik.toml > /dev/null",
-    "run-api": "cd src/api && ./gradlew bootRun"
+    "run-api": "make run-api"
   },
   "lint-staged": {
     "src/api/**/*.kt": [
