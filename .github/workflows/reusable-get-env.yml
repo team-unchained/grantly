@@ -19,3 +19,5 @@ jobs:
       NODE_VERSION: 22
       JAVA_VERSION: 17
       PYTHON_VERSION: 3.11
+    steps:
+      - run: echo "start"
