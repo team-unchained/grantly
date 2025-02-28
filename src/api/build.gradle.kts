@@ -15,7 +15,7 @@ allOpen {
 }
 
 group = "grantly"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 
 java {
     toolchain {
@@ -54,10 +54,4 @@ tasks.named<BootBuildImage>("bootBuildImage") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-    archiveBaseName.set("api")
-    archiveVersion.set("1.0.0")
-    archiveClassifier.set("")
 }
