@@ -84,7 +84,6 @@ web_modules/
 
 # Next.js build output
 .next
-out
 
 # Nuxt.js build / generate output
 .nuxt
@@ -146,3 +145,4 @@ yarn-error.log
 __pycache__
 
 .DS_Store
+.husky

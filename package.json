@@ -11,10 +11,13 @@
     "lint-staged": "15.4.3"
   },
   "scripts": {
-    "install": "husky install",
+    "install": "yarn install",
+    "postinstall": "yarn husky init && echo 'yarn lint' > .husky/pre-commit",
     "dev": "concurrently -c \"bgGreen.bold,bgMagenta.bold,bgYellow.bold,bgBlue.bold\" \"yarn:run-*\"",
     "run-traefik": "cd docs/infra/local/traefik && traefik --configFile=traefik.toml > /dev/null",
-    "run-api": "make run-api"
+    "run-api": "make run-api",
+    "lint": "lint-staged",
+    "prepare": "husky"
   },
   "lint-staged": {
     "src/api/**/*.kt": [
