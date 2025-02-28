@@ -1,0 +1,33 @@
+name: Lint Api
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      isChanged: ${{ steps.filter.outputs.isChanged }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            isChanged:
+              - "src/api/**"
+              - ".github/workflows/reusable-lint-api.yml"
+
+  lint:
+    needs: [ changes ]
+    if: ${{ needs.changes.outputs.isChanged == 'true' }}
+    timeout-minutes: 30
+    runs-on: [large-github-runner-ubuntu]
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: make lint-api

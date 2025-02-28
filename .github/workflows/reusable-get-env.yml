@@ -1,0 +1,19 @@
+# Reusable Workflow 에서는 caller의 env에 callee가 접근할 수 없다.
+# See https://docs.github.com/en/actions/using-workflows/reusing-workflows#limitations
+# VERSION 등 전역적으로 동일한 값을 사용하는 설정값을 여기에 두고 필요한 곳에서 추출해서 사용할 수 있도록 한다.
+on:
+  workflow_call:
+    outputs:
+      NODE_VERSION:
+        value: ${{ jobs.get-env.outputs.NODE_VERSION }}
+      JAVA_VERSION:
+        value: ${{ jobs.get-env.outputs.JAVA_VERSION }}
+
+jobs:
+  get-env:
+    name: Env
+    runs-on: ubuntu-latest
+    outputs:
+      NODE_VERSION: 22
+      JAVA_VERSION: 17
+      PYTHON_VERSION: 3.11
