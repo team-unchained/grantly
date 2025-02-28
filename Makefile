@@ -39,3 +39,6 @@ run-api:
 
 start-api:
 	@$(MAKE) -C src/api start
+
+lint-api:
+	@$(MAKE) -C src/api lint

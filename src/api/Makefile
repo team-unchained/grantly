@@ -8,3 +8,6 @@ start:
 
 dev:
 	@./gradlew bootRun
+
+lint:
+	ktlint --format
