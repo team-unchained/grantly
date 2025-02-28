@@ -19,8 +19,8 @@ jobs:
         with:
           filters: |
             isChanged:
-              - "src/app/ios/**"
-              - ".github/workflows/reusable-lint-ios.yml"
+              - "src/api/**"
+              - ".github/workflows/reusable-lint-api.yml"
 
   lint:
     needs: [ changes ]
