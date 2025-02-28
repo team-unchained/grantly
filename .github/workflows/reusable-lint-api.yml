@@ -3,7 +3,7 @@ name: Lint Api
 on:
   workflow_call:
     inputs:
-      node-version:
+      java-version:
         required: true
         type: string
 
@@ -13,21 +13,35 @@ jobs:
     outputs:
       isChanged: ${{ steps.filter.outputs.isChanged }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: dorny/paths-filter@v2
-        id: filter
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
         with:
           filters: |
-            isChanged:
+            src:
               - "src/api/**"
               - ".github/workflows/reusable-lint-api.yml"
 
   lint:
     needs: [ changes ]
-    if: ${{ needs.changes.outputs.isChanged == 'true' }}
+    if: steps.changes.outputs.src == 'true'
     timeout-minutes: 30
     runs-on: [large-github-runner-ubuntu]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: 'adopt'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - run: make lint-api

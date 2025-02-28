@@ -8,6 +8,8 @@ on:
         value: ${{ jobs.get-env.outputs.NODE_VERSION }}
       JAVA_VERSION:
         value: ${{ jobs.get-env.outputs.JAVA_VERSION }}
+      PYTHON_VERSION:
+        value: ${{ jobs.get-env.outputs.PYTHON_VERSION }}
 
 jobs:
   get-env:
