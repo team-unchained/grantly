@@ -47,4 +47,4 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - run: make lint-api
+      - run: cd src/api && ktlint
