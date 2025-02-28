@@ -9,6 +9,7 @@ class Application {
     private val log = LoggerFactory.getLogger(Application::class.java)
 }
 
+
 fun main() {
     runApplication<Application>()
 }
