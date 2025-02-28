@@ -1,0 +1,14 @@
+name: PR Lint and Test
+
+on: pull_request
+
+jobs:
+  get-env:
+    uses: ./.github/workflows/reusable-get-env.yml
+
+  lint-api:
+    needs: [ get-env ]
+    uses: ./.github/workflows/reusable-lint-api.yml
+    with:
+      java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
+    secrets: inherit

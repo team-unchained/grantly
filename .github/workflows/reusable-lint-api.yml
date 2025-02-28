@@ -1,0 +1,50 @@
+name: Lint Api
+
+on:
+  workflow_call:
+    inputs:
+      java-version:
+        required: true
+        type: string
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      isChanged: ${{ steps.filter.outputs.isChanged }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            isChanged:
+              - "src/api/**"
+              - ".github/workflows/reusable-lint-api.yml"
+
+  lint:
+    needs: [ changes ]
+    if: ${{ needs.changes.outputs.isChanged == 'true' }}
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ inputs.java-version }}
+          distribution: 'adopt'
+
+      - name: "Install ktlint"
+        uses: nbadal/action-ktlint-setup@v1
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - run: cd src/api && ktlint
