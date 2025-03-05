@@ -4,7 +4,7 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "src/grantly-front"
+      "src/frontend"
     ]
   },
   "devDependencies": {
@@ -17,14 +17,18 @@
     "postinstall": "yarn husky init && echo 'yarn lint' > .husky/pre-commit",
     "dev": "concurrently -c \"bgGreen.bold,bgMagenta.bold,bgYellow.bold,bgBlue.bold\" \"yarn:run-*\"",
     "run-traefik": "cd docs/infra/local/traefik && traefik --configFile=traefik.toml > /dev/null",
-    "run-front": "yarn workspace @grantly/front dev",
     "run-api": "make run-api",
     "lint": "lint-staged",
+    "run-frontend": "yarn workspace @grantly/frontend dev",
+    "lint-frontend": "yarn workspace @grantly/frontend lint && yarn workspace @grantly/frontend ts-check && echo web done",
     "prepare": "husky"
   },
   "lint-staged": {
     "src/api/**/*.kt": [
       "ktlint --format"
+    ],
+    "src/frontend/**/*.{js,jsx,ts,tsx}": [
+      "yarn lint-frontend"
     ]
   },
   "packageManager": "yarn@4.5.1"
