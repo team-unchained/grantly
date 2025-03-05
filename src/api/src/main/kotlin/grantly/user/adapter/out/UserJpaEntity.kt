@@ -23,8 +23,6 @@ class UserJpaEntity(
     val password: String? = null,
     @Column(length = 255, nullable = false)
     var name: String,
-    @Column(length = 255, nullable = true)
-    var profileImgUrl: String? = null,
     @Column(nullable = true)
     var lastLoginAt: OffsetDateTime? = null,
 ) : BaseEntity() {

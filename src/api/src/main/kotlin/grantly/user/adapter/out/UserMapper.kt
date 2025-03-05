@@ -12,7 +12,6 @@ class UserMapper : IsMapper<UserJpaEntity, User> {
             email = entity.email,
             name = entity.name,
             password = entity.password,
-            profileImgUrl = entity.profileImgUrl,
             lastLoginAt = entity.lastLoginAt,
             createdAt = entity.createdAt,
             modifiedAt = entity.modifiedAt,
@@ -24,7 +23,6 @@ class UserMapper : IsMapper<UserJpaEntity, User> {
             email = domain.email,
             name = domain.name,
             password = domain.password,
-            profileImgUrl = domain.profileImgUrl,
             lastLoginAt = domain.lastLoginAt,
         )
 }
