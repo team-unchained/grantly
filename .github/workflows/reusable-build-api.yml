@@ -1,0 +1,38 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      java-version:
+        required: true
+        type: string
+
+jobs:
+  build-alpine:
+    timeout-minutes: 30
+    name: Build WAS docker image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build, tag, and push image to GitHub Packages
+        run: |
+          make build-api
+          DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME \
+            -f ./docs/infra/$ENVIRONMENT/Dockerfile .
+          docker push $IMAGE_NAME
+          docker builder prune -f
+        env:
+          IMAGE_NAME: ghcr.io/${{ github.repository }}/grantly:${{ github.sha }}
+          ENVIRONMENT: ${{ inputs.environment }}

@@ -2,8 +2,8 @@ name: Build And Deploy
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
 
   workflow_dispatch:
 
@@ -15,5 +15,13 @@ jobs:
     needs: [ get-env ]
     uses: ./.github/workflows/reusable-lint-api.yml
     with:
+      java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
+    secrets: inherit
+
+  build-api:
+    needs: [ get-env ]
+    uses: ./.github/workflows/reusable-build-api.yml
+    with:
+      environment: prod
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
