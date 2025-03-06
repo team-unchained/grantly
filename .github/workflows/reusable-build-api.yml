@@ -34,5 +34,5 @@ jobs:
           docker push $IMAGE_NAME
           docker builder prune -f
         env:
-          IMAGE_NAME: ghcr.io/${{ github.repository }}/grantly:${{ github.sha }}
+          IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ inputs.environment }}:${{ github.sha }}
           ENVIRONMENT: ${{ inputs.environment }}
