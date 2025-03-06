@@ -9,7 +9,24 @@ on:
         type: string
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      isChanged: ${{ steps.filter.outputs.isChanged }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            isChanged:
+              - "src/api/**"
+              - "docs/infra/${{ inputs.environment }}/Dockerfile"
+              - ".github/workflows/reusable-build-api.yml"
+
   build-alpine:
+    needs: [ changes ]
+    if: ${{ needs.changes.outputs.isChanged == 'true' }}
     timeout-minutes: 30
     name: Build WAS docker image
     runs-on: ubuntu-latest
