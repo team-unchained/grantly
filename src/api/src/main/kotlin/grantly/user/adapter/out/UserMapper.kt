@@ -12,10 +12,17 @@ class UserMapper : IsMapper<UserJpaEntity, User> {
             email = entity.email,
             name = entity.name,
             password = entity.password,
+            lastLoginAt = entity.lastLoginAt,
             createdAt = entity.createdAt,
             modifiedAt = entity.modifiedAt,
         )
 
     override fun toEntity(domain: User): UserJpaEntity =
-        UserJpaEntity(id = if (domain.id == 0L) null else domain.id, email = domain.email, name = domain.name, password = domain.password)
+        UserJpaEntity(
+            id = if (domain.id == 0L) null else domain.id,
+            email = domain.email,
+            name = domain.name,
+            password = domain.password,
+            lastLoginAt = domain.lastLoginAt,
+        )
 }
