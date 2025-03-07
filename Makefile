@@ -42,3 +42,6 @@ start-api:
 
 lint-api:
 	@$(MAKE) -C src/api lint
+
+build-api-alpine: build-api
+	docker build -t grantly:latest -f docs/infra/local/Dockerfile .
