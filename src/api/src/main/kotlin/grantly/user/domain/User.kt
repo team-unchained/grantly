@@ -1,5 +1,6 @@
 package grantly.user.domain
 
+import org.springframework.security.crypto.password.PasswordEncoder
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 
@@ -13,8 +14,7 @@ data class User(
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
     var modifiedAt: OffsetDateTime? = null,
 ) {
-    fun hashPassword() {
-        // TODO: 실제 해싱 알고리즘 적용
-        password = "hashed"
+    fun hashPassword(passwordEncoder: PasswordEncoder) {
+        password = passwordEncoder.encode(password)
     }
 }

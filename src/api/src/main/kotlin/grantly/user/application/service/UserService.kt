@@ -9,10 +9,12 @@ import grantly.user.application.port.out.UserRepository
 import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.domain.User
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.security.crypto.password.PasswordEncoder
 
 @UseCase
 class UserService(
     private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder,
 ) : SignUpUseCase,
     FindUserQuery,
     EditProfileUseCase {
@@ -23,7 +25,7 @@ class UserService(
         } catch (e: EntityNotFoundException) {
             // 유저 생성
             val user = User(email = params.email, name = params.name, password = params.password)
-            user.hashPassword()
+            user.hashPassword(passwordEncoder)
             return userRepository.createUser(user)
         }
     }
