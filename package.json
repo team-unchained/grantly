@@ -3,7 +3,9 @@
   "license": "MIT",
   "private": true,
   "workspaces": {
-    "packages": []
+    "packages": [
+      "src/frontend"
+    ]
   },
   "devDependencies": {
     "concurrently": "9.1.2",
@@ -17,11 +19,16 @@
     "run-traefik": "cd docs/infra/local/traefik && traefik --configFile=traefik.toml > /dev/null",
     "run-api": "make run-api",
     "lint": "lint-staged",
+    "run-frontend": "yarn workspace @grantly/frontend dev",
+    "lint-frontend": "yarn workspace @grantly/frontend lint && yarn workspace @grantly/frontend ts-check && echo web done",
     "prepare": "husky"
   },
   "lint-staged": {
     "src/api/**/*.kt": [
       "ktlint --format"
+    ],
+    "src/frontend/**/*.{js,jsx,ts,tsx}": [
+      "yarn lint-frontend"
     ]
   },
   "packageManager": "yarn@4.5.1"
