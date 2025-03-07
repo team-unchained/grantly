@@ -17,3 +17,11 @@ jobs:
     with:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
+
+  build-api:
+    needs: [ get-env ]
+    uses: ./.github/workflows/reusable-build-api.yml
+    with:
+      environment: prod
+      java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
+    secrets: inherit
