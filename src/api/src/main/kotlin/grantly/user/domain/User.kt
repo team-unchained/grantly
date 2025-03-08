@@ -1,7 +1,7 @@
 package grantly.user.domain
 
-import org.springframework.security.crypto.password.PasswordEncoder
 import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.OffsetDateTime
 
 @Schema(description = "사용자 도메인 모델")
