@@ -57,6 +57,7 @@ tasks.named<BootBuildImage>("bootBuildImage") {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    jvmArgs("-Xshare:off")
 }
 
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
