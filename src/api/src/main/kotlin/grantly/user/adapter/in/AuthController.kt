@@ -1,6 +1,7 @@
 package grantly.user.adapter.`in`
 
 import grantly.common.exceptions.ConflictException
+import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.utils.HttpUtil
 import grantly.common.utils.TimeUtil
 import grantly.user.adapter.`in`.dto.SignUpRequest
@@ -9,6 +10,11 @@ import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.domain.User
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,9 +26,27 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @ResponseBody
 @RequestMapping("/v1/auth")
+@Tag(name = "인증", description = "인증 관련 API")
 class AuthController(
     private val signUpUseCase: SignUpUseCase,
 ) {
+    @Operation(
+        summary = "이메일을 이용한 회원가입",
+        responses = [
+            ApiResponse(responseCode = "201", description = "회원가입 성공"),
+            ApiResponse(
+                responseCode = "409",
+                description = "이미 존재하는 이메일로 회원가입을 시도할 경우",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpExceptionResponse::class),
+                        ),
+                    ),
+            ),
+        ],
+    )
     @PostMapping("/signup")
     fun signUp(
         @Valid @RequestBody body: SignUpRequest,
