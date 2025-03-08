@@ -4,7 +4,7 @@ import grantly.common.exceptions.ConflictException
 import grantly.common.utils.HttpUtil
 import grantly.common.utils.TimeUtil
 import grantly.user.adapter.`in`.dto.SignUpRequest
-import grantly.user.adapter.`in`.dto.UserResponse
+import grantly.user.adapter.out.dto.UserResponse
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.service.exceptions.DuplicateEmailException

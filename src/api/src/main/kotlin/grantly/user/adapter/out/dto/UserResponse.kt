@@ -1,4 +1,4 @@
-package grantly.user.adapter.`in`.dto
+package grantly.user.adapter.out.dto
 
 data class UserResponse(
     val id: Long,
