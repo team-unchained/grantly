@@ -7,6 +7,7 @@ import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.domain.User
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "사용자 API", description = "사용자 관련 API")
 class UserController(
     private val signUpUseCase: SignUpUseCase,
     private val findUserQuery: FindUserQuery,

@@ -21,3 +21,17 @@ management:
     web:
       exposure:
         include: health,info
+
+# Swagger UI 설정
+springdoc:
+  swagger-ui:
+    path: /docs/swagger-ui.html
+    groups-order: DESC
+    operationsSorter: method
+    tagsSorter: alpha
+    disable-swagger-default-url: true
+  api-docs:
+    path: /docs/api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
