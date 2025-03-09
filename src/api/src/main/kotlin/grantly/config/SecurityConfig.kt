@@ -7,12 +7,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import java.security.SecureRandom
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig {
     @Bean
-    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12, SecureRandom())
 
     @Bean
     fun securityFilterChainDSL(http: HttpSecurity): SecurityFilterChain {
