@@ -1,6 +1,6 @@
 package grantly.user.adapter.`in`
 
-import grantly.common.exceptions.ConflictException
+import grantly.common.exceptions.HttpConflictException
 import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.utils.HttpUtil
 import grantly.common.utils.TimeUtil
@@ -55,7 +55,7 @@ class AuthController(
         try {
             user = signUpUseCase.signUp(SignUpParams(body.email, body.name, body.password))
         } catch (e: DuplicateEmailException) {
-            throw ConflictException(e.message ?: "Email already exists")
+            throw HttpConflictException(e.message ?: "Email already exists")
         }
         return ResponseEntity.created(HttpUtil.buildLocationURI("/users/me")).body(
             UserResponse(
