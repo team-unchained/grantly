@@ -57,7 +57,7 @@ class AuthController(
         } catch (e: DuplicateEmailException) {
             throw HttpConflictException(e.message ?: "Email already exists")
         }
-        return ResponseEntity.created(HttpUtil.buildLocationURI("/users/me")).body(
+        return ResponseEntity.created(HttpUtil.buildLocationURI("/v1/users/me")).body(
             UserResponse(
                 id = user.id,
                 email = user.email,

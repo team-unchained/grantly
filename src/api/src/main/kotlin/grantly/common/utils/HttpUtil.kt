@@ -6,20 +6,16 @@ import java.net.URI
 class HttpUtil {
     companion object {
         fun buildLocationURI(location: String): URI {
-            val currentPath = ServletUriComponentsBuilder.fromCurrentRequestUri().build().path
-            // 현재 버전이 나타난 부분 추출 /v1/
-            val versionPath = currentPath?.let { Regex("/v\\d+/").find(it)?.value } ?: "/v1/"
-            val newPath: String =
-                if (location.startsWith("/")) {
-                    versionPath + location.substring(1)
-                } else {
-                    versionPath + location
-                }
-            return ServletUriComponentsBuilder
-                .fromCurrentRequestUri()
-                .replacePath(newPath)
-                .build()
-                .toUri()
+            val re = Regex("/v[0-9]+/.*")
+            if (!re.matches(location)) {
+                throw Exception("location must include version information")
+            } else {
+                return ServletUriComponentsBuilder
+                    .fromCurrentRequestUri()
+                    .path(location)
+                    .build()
+                    .toUri()
+            }
         }
     }
 }
