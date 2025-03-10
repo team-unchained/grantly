@@ -3,6 +3,7 @@ package grantly.user.adapter.out
 import grantly.common.annotations.PersistenceAdapter
 import grantly.user.application.port.out.UserRepository
 import grantly.user.domain.User
+import jakarta.persistence.EntityNotFoundException
 
 @PersistenceAdapter
 class UserPersistenceAdapter(
@@ -17,7 +18,15 @@ class UserPersistenceAdapter(
     override fun getUser(id: Long): User {
         val userEntity = userJpaRepository.findById(id)
         if (userEntity.isEmpty) {
-            throw RuntimeException("User not found")
+            throw EntityNotFoundException("User not found")
+        }
+        return userMapper.toDomain(userEntity.get())
+    }
+
+    override fun getUserByEmail(email: String): User {
+        val userEntity = userJpaRepository.findByEmail(email)
+        if (userEntity.isEmpty) {
+            throw EntityNotFoundException("User not found")
         }
         return userMapper.toDomain(userEntity.get())
     }
@@ -33,7 +42,7 @@ class UserPersistenceAdapter(
     ): User {
         val optionalUser = userJpaRepository.findById(userId)
         if (optionalUser.isEmpty) {
-            throw RuntimeException("User not found")
+            throw EntityNotFoundException("User not found")
         }
         var userEntity = optionalUser.get()
         userEntity.name = name
