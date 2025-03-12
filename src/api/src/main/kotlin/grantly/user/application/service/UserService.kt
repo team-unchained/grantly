@@ -6,29 +6,33 @@ import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.port.out.UserRepository
+import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.domain.User
+import jakarta.persistence.EntityNotFoundException
+import org.springframework.security.crypto.password.PasswordEncoder
 
 @UseCase
 class UserService(
     private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder,
 ) : SignUpUseCase,
     FindUserQuery,
     EditProfileUseCase {
     override fun signUp(params: SignUpParams): User {
-        val user = User(email = params.email, name = params.name, password = params.password)
-        user.hashPassword()
-        return userRepository.createUser(user)
+        try {
+            findUserByEmail(params.email)
+            throw DuplicateEmailException()
+        } catch (e: EntityNotFoundException) {
+            // 유저 생성
+            val user = User(email = params.email, name = params.name, password = params.password)
+            user.hashPassword(passwordEncoder)
+            return userRepository.createUser(user)
+        }
     }
 
-    override fun findUserById(id: Long): User {
-        val user =
-            try {
-                userRepository.getUser(id)
-            } catch (e: RuntimeException) {
-                throw Exception("User not found")
-            }
-        return user
-    }
+    override fun findUserById(id: Long) = userRepository.getUser(id)
+
+    override fun findUserByEmail(email: String): User = userRepository.getUserByEmail(email)
 
     override fun findAllUsers(): List<User> = userRepository.getAllUsers()
 
