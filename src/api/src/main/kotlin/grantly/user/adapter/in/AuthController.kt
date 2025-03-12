@@ -46,6 +46,17 @@ class AuthController(
                         ),
                     ),
             ),
+            ApiResponse(
+                responseCode = "422",
+                description = "요청 본문의 유효성 검사에 실패하는 경우",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpExceptionResponse::class),
+                        ),
+                    ),
+            ),
         ],
     )
     @PostMapping("/signup")
