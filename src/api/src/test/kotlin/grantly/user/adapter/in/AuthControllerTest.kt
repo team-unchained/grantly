@@ -50,8 +50,9 @@ class AuthControllerTest(
     @DisplayName("회원가입 성공")
     fun `should return 201 when sign up is successful`() {
         // given
+        val userEmail = "test2@email.com"
         val jsonBody =
-            objectMapper.writeValueAsString(SignUpRequest("test2@email.com", "test2", "test123!"))
+            objectMapper.writeValueAsString(SignUpRequest(userEmail, "test2", "test123!"))
 
         // when & then
         mockMvc
@@ -61,5 +62,21 @@ class AuthControllerTest(
                     .content(jsonBody),
             ).andExpect(status().isCreated)
             .andExpect(jsonPath("$.user").exists())
+            .andExpect(jsonPath("$.user.email").value(userEmail))
+    }
+
+    @Test
+    @DisplayName("회원가입 유효성 검사 실패: 이메일 형식이 아닌 경우")
+    fun `should return 422 when email is invalid`() {
+        // given
+        val jsonBody = objectMapper.writeValueAsString(SignUpRequest("invalid-email", "test", "test123!"))
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/signup")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonBody),
+            ).andExpect(status().isUnprocessableEntity)
     }
 }
