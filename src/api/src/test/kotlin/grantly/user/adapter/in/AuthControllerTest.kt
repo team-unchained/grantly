@@ -14,6 +14,7 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @ActiveProfiles("test")
@@ -59,5 +60,6 @@ class AuthControllerTest(
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isCreated)
+            .andExpect(jsonPath("$.user").exists())
     }
 }

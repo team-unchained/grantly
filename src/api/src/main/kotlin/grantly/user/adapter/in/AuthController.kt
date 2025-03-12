@@ -5,6 +5,7 @@ import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.utils.HttpUtil
 import grantly.common.utils.TimeUtil
 import grantly.user.adapter.`in`.dto.SignUpRequest
+import grantly.user.adapter.out.dto.SignUpResponse
 import grantly.user.adapter.out.dto.UserResponse
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.SignUpParams
@@ -50,7 +51,7 @@ class AuthController(
     @PostMapping("/signup")
     fun signUp(
         @Valid @RequestBody body: SignUpRequest,
-    ): ResponseEntity<UserResponse> {
+    ): ResponseEntity<SignUpResponse> {
         val user: User
         try {
             user = signUpUseCase.signUp(SignUpParams(body.email, body.name, body.password))
@@ -58,12 +59,15 @@ class AuthController(
             throw HttpConflictException(e.message ?: "Email already exists")
         }
         return ResponseEntity.created(HttpUtil.buildLocationURI("/v1/users/me")).body(
-            UserResponse(
-                id = user.id,
-                email = user.email,
-                name = user.name,
-                createdAt = TimeUtil.toRFC3339(user.createdAt),
-                modifiedAt = user.modifiedAt?.let { TimeUtil.toRFC3339(it) },
+            SignUpResponse(
+                user =
+                    UserResponse(
+                        id = user.id,
+                        email = user.email,
+                        name = user.name,
+                        createdAt = TimeUtil.toRFC3339(user.createdAt),
+                        modifiedAt = user.modifiedAt?.let { TimeUtil.toRFC3339(it) },
+                    ),
             ),
         )
     }
