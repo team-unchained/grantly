@@ -8,6 +8,7 @@ import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.domain.User
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -24,8 +25,15 @@ class UserController(
     private val findUserQuery: FindUserQuery,
     private val editProfileUseCase: EditProfileUseCase,
 ) {
+    private val log = LoggerFactory.getLogger(this::class.java)
+
     @GetMapping
-    fun findAll(): List<User> = findUserQuery.findAllUsers()
+    fun findAll(): List<User> {
+        log.info("사용자 전체 목록을 조회합니다")
+        val users = findUserQuery.findAllUsers()
+        log.debug("조회된 사용자 수: {}", users.size)
+        return users
+    }
 
     @GetMapping("/{userId}")
     fun findById(
