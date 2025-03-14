@@ -8,6 +8,16 @@ plugins {
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     id("org.hibernate.orm") version "6.6.8.Final"
+    id("org.flywaydb.flyway") version "11.4.0"
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.flywaydb:flyway-mysql:11.4.0")
+    }
 }
 
 allOpen {
@@ -38,15 +48,33 @@ dependencies {
     implementation("com.mysql:mysql-connector-j")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-mysql")
 
     testImplementation("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
+//buildscript {
+//    repositories {
+//        maven {
+//            "https://plugins.gradle.org/m2/"
+//        }
+//    }
+//    dependencies {
+//        classpath("gradle.plugin.com.boxfuse.client:flyway-release:4.0.3")
+//    }
+//}
 
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
+}
+
+flyway {
+    url = "jdbc:mysql://localhost:3306/grantly?useSSL=false"
+    user = "admin"
+    password = "test"
 }
 
 tasks.named<BootBuildImage>("bootBuildImage") {
