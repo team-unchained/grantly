@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+private val log = KotlinLogging.logger {}
+
 @RestController
 @RequestMapping("/users")
 @Tag(name = "사용자 API", description = "사용자 관련 API")
@@ -25,10 +27,6 @@ class UserController(
     private val findUserQuery: FindUserQuery,
     private val editProfileUseCase: EditProfileUseCase,
 ) {
-    companion object {
-        private val log = KotlinLogging.logger {}
-    }
-
     @GetMapping
     fun findAll(): List<User> {
         log.info { "사용자 전체 목록을 조회합니다" }
