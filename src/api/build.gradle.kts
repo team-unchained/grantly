@@ -38,6 +38,7 @@ dependencies {
     implementation("com.mysql:mysql-connector-j")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
     testImplementation("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
