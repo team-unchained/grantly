@@ -25,7 +25,9 @@ class UserController(
     private val findUserQuery: FindUserQuery,
     private val editProfileUseCase: EditProfileUseCase,
 ) {
-    private val log = LoggerFactory.getLogger(this::class.java)
+    companion object {
+        val log = LoggerFactory.getLogger(this::class.java)
+    }
 
     @GetMapping
     fun findAll(): List<User> {
