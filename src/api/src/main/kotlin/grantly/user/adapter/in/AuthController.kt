@@ -2,20 +2,29 @@ package grantly.user.adapter.`in`
 
 import grantly.common.exceptions.HttpConflictException
 import grantly.common.exceptions.HttpExceptionResponse
+import grantly.common.exceptions.HttpUnauthorizedException
 import grantly.common.utils.HttpUtil
 import grantly.common.utils.TimeUtil
+import grantly.user.adapter.`in`.dto.LoginRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
+import grantly.user.adapter.out.dto.LoginResponse
 import grantly.user.adapter.out.dto.SignUpResponse
 import grantly.user.adapter.out.dto.UserResponse
+import grantly.user.application.port.`in`.LoginUseCase
 import grantly.user.application.port.`in`.SignUpUseCase
+import grantly.user.application.port.`in`.dto.LoginParams
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.service.exceptions.DuplicateEmailException
+import grantly.user.application.service.exceptions.PasswordMismatchException
+import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -30,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "인증", description = "인증 관련 API")
 class AuthController(
     private val signUpUseCase: SignUpUseCase,
+    private val loginUseCase: LoginUseCase,
 ) {
     @Operation(
         summary = "이메일을 이용한 회원가입",
@@ -69,6 +79,7 @@ class AuthController(
         } catch (e: DuplicateEmailException) {
             throw HttpConflictException(e.message ?: "Email already exists")
         }
+        // TODO: 토큰 발급 및 응답에 포함
         return ResponseEntity.created(HttpUtil.buildLocationURI("/v1/users/me")).body(
             SignUpResponse(
                 user =
@@ -81,5 +92,24 @@ class AuthController(
                     ),
             ),
         )
+    }
+
+    @PostMapping("/token")
+    fun login(
+        @Valid @RequestBody body: LoginRequest,
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): ResponseEntity<LoginResponse> {
+        // ip 와 user agent 를 가져옴
+        val ip = request.remoteAddr
+        val userAgent = request.getHeader("User-Agent")
+
+        val session: AuthSession
+        try {
+            session = loginUseCase.login(LoginParams(body.email, body.password, ip, userAgent), response)
+        } catch (e: PasswordMismatchException) {
+            throw HttpUnauthorizedException(e.message)
+        }
+        return ResponseEntity.ok(session.token?.let { LoginResponse(token = it) })
     }
 }
