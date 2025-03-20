@@ -25,3 +25,6 @@ spring:
   h2:
     console:
       enabled: true
+grantly:
+  cookie:
+    domain: localhost
