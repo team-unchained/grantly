@@ -94,6 +94,23 @@ class AuthController(
         )
     }
 
+    @Operation(
+        summary = "이메일을 이용한 로그인",
+        responses = [
+            ApiResponse(responseCode = "200", description = "로그인 성공. session_token 키로 쿠키 설정"),
+            ApiResponse(
+                responseCode = "401",
+                description = "비밀번호 불일치",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpExceptionResponse::class),
+                        ),
+                    ),
+            ),
+        ],
+    )
     @PostMapping("/token")
     fun login(
         @Valid @RequestBody body: LoginRequest,
