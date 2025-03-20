@@ -1,6 +1,7 @@
 package grantly.common.exceptions
 
 import jakarta.validation.ConstraintViolationException
+import mu.KotlinLogging
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import java.lang.Exception
+
+private val log = KotlinLogging.logger {}
 
 @RestControllerAdvice
 class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
@@ -105,7 +108,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
                 500,
                 httpError.message,
             )
-        // TODO: 실제로 발생한 Runtime exception 에 대한 로깅을 추가해야함
+        log.error { exception.message }
         return ResponseEntity(exceptionResponse, httpError.httpStatus)
     }
 }

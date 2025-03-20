@@ -100,7 +100,6 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<LoginResponse> {
-        // ip 와 user agent 를 가져옴
         val ip = request.remoteAddr
         val userAgent = request.getHeader("User-Agent")
 
@@ -110,6 +109,7 @@ class AuthController(
         } catch (e: PasswordMismatchException) {
             throw HttpUnauthorizedException(e.message)
         }
+        loginUseCase.setSessionCookie(response, session)
         return ResponseEntity.ok(session.token?.let { LoginResponse(token = it) })
     }
 }

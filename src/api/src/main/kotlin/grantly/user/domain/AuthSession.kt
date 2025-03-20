@@ -42,4 +42,6 @@ data class AuthSession(
 
         return token as String
     }
+
+    fun isValid(): Boolean = expiresAt?.isAfter(OffsetDateTime.now()) ?: false
 }

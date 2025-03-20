@@ -3,6 +3,7 @@ package grantly.user.adapter.out
 import grantly.common.annotations.PersistenceAdapter
 import grantly.user.application.port.out.AuthSessionRepository
 import grantly.user.domain.AuthSession
+import jakarta.persistence.EntityNotFoundException
 
 @PersistenceAdapter
 class AuthSessionPersistenceAdapter(
@@ -13,5 +14,13 @@ class AuthSessionPersistenceAdapter(
         session.generateToken()
         val userEntity = authSessionJpaRepository.save(authSessionMapper.toEntity(session))
         return authSessionMapper.toDomain(userEntity)
+    }
+
+    override fun getSessionByUserId(userId: Long): AuthSession {
+        val sessionEntity = authSessionJpaRepository.findByUserId(userId)
+        if (sessionEntity.isEmpty) {
+            throw EntityNotFoundException("AuthSession not found")
+        }
+        return authSessionMapper.toDomain(sessionEntity.get())
     }
 }

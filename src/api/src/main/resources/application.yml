@@ -33,7 +33,12 @@ springdoc:
   show-actuator: true
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
-
+grantly:
+  auth:
+    token:
+      key: session_token
+  cookie:
+    domain: .grantly.work
 ---
 spring:
   config:
@@ -42,7 +47,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
+grantly:
+  cookie:
+    domain: api.grantly.work
 ---
 spring:
   config:
@@ -51,3 +58,4 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
