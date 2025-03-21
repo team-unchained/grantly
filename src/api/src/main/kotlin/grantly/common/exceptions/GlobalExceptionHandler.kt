@@ -88,7 +88,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         statusCode: HttpStatusCode,
         request: WebRequest,
     ): ResponseEntity<Any>? {
-        println(ex.message)
         val exceptionResponse =
             HttpExceptionResponse(
                 statusCode.value(),
