@@ -6,4 +6,6 @@ interface AuthSessionRepository {
     fun createAuthSession(session: AuthSession): AuthSession
 
     fun getSessionByUserId(userId: Long): AuthSession
+
+    fun getSessionByToken(token: String): AuthSession
 }

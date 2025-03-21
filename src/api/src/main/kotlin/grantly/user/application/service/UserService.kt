@@ -1,6 +1,7 @@
 package grantly.user.application.service
 
 import grantly.common.annotations.UseCase
+import grantly.common.constants.AuthConstants
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.LoginUseCase
@@ -11,16 +12,20 @@ import grantly.user.application.port.out.AuthSessionRepository
 import grantly.user.application.port.out.UserRepository
 import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.application.service.exceptions.PasswordMismatchException
+import grantly.user.application.service.exceptions.TokenGenerationException
 import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
+import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.Duration
 import java.time.OffsetDateTime
+import java.util.UUID
+
+private val log = KotlinLogging.logger {}
 
 @UseCase
 class UserService(
@@ -64,29 +69,63 @@ class UserService(
             }
         } catch (e: EntityNotFoundException) {
             // 세션이 없으면 새로 생성
-            var session = AuthSession(userId = user.id, ip = params.ip, userAgent = params.userAgent)
-            while (true) {
-                try {
-                    validSession = authSessionRepository.createAuthSession(session)
-                    break
-                } catch (e: DataIntegrityViolationException) {
-                    session.generateToken()
-                }
-            }
+            val token = generateToken()
+            val csrfToken = UUID.randomUUID().toString()
+            val session =
+                AuthSession(
+                    userId = user.id,
+                    ip = params.ip,
+                    userAgent = params.userAgent,
+                    token = token,
+                    csrfToken = csrfToken,
+                    expiresAt = OffsetDateTime.now().plusSeconds(AuthConstants.TOKEN_EXPIRATION),
+                )
+            validSession = authSessionRepository.createAuthSession(session)
         }
+        setSession(response, validSession)
         return validSession
     }
 
-    override fun setSessionCookie(
+    fun generateToken(): String {
+        val retries = 3
+        for (i in 1..retries) {
+            val token = UUID.randomUUID().toString()
+            try {
+                authSessionRepository.getSessionByToken(token)
+            } catch (e: EntityNotFoundException) {
+                return token
+            }
+        }
+
+        log.error { "Failed to generate token" }
+        throw TokenGenerationException()
+    }
+
+    fun setSession(
         response: HttpServletResponse,
         session: AuthSession,
     ) {
-        val cookie = Cookie("session_token", session.token)
-        var secondsBeforeExpiration = Duration.between(OffsetDateTime.now(), session.expiresAt).seconds
-        cookie.maxAge = secondsBeforeExpiration.toInt()
-        cookie.domain = cookieDomain
-        cookie.secure = true
+        val secondsBeforeExpiration = Duration.between(OffsetDateTime.now(), session.expiresAt).seconds
+        // 세션 쿠키 설정
+        val cookie =
+            Cookie(AuthConstants.SESSION_COOKIE_NAME, session.token).apply {
+                maxAge = secondsBeforeExpiration.toInt()
+                domain = cookieDomain
+                secure = true
+                isHttpOnly = true
+                setAttribute("SameSite", "Strict")
+            }
         response.addCookie(cookie)
+        // CSRF 토큰 쿠키 설정
+        val csrfCookie =
+            Cookie(AuthConstants.CSRF_COOKIE_NAME, session.csrfToken).apply {
+                maxAge = secondsBeforeExpiration.toInt()
+                domain = cookieDomain
+                secure = true
+                isHttpOnly = false
+                setAttribute("SameSite", "Strict")
+            }
+        response.addCookie(csrfCookie)
     }
 
     override fun findUserById(id: Long) = userRepository.getUser(id)

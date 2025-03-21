@@ -9,9 +9,4 @@ interface LoginUseCase {
         params: LoginParams,
         response: HttpServletResponse,
     ): AuthSession
-
-    fun setSessionCookie(
-        response: HttpServletResponse,
-        session: AuthSession,
-    )
 }
