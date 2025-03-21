@@ -26,8 +26,8 @@ jobs:
           username: ${{ secrets.SERVER_SSH_USER }}
           key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
           script: |
-            cd ~/projects/team-unchained/grantly
-            sudo docker pull ghcr.io/${{ github.repository }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
+            cd ~/projects/team-unchanined/grantly
+            sudo docker pull ghcr.io/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
             sudo docker stop ${inputs.docker_image_name} || true
             sudo docker rm ${inputs.docker_image_name} || true
             sudo docker run -d --name ${inputs.docker_image_name} -p 80:8080 ghcr.io/${{ github.repository }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}

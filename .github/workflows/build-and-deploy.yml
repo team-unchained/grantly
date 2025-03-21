@@ -24,6 +24,6 @@ jobs:
     uses: ./.github/workflows/reusable-deploy.yml
     with:
       environment: prod
-      docker_image_name: api
+      docker_image_name: team-unchained/grantly/prod
       docker_image_tag: ${{ github.sha }}
     secrets: inherit
