@@ -26,3 +26,4 @@ jobs:
       environment: prod
       docker_image_name: api
       docker_image_tag: ${{ github.sha }}
+    secrets: inherit
