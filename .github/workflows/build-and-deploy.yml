@@ -1,8 +1,11 @@
 name: Build And Deploy
 
-
-on: pull_request
-
+on:
+  push:
+    branches:
+      - main
+      - feature/*
+  workflow_dispatch:
 
 jobs:
   get-env:
