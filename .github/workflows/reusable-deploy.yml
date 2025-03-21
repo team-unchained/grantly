@@ -4,9 +4,6 @@ on:
       environment:
         required: true
         type: string
-      java-version:
-        required: true
-        type: string
       docker_image_name:
         required: true
         type: string
