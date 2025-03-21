@@ -13,22 +13,20 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import jakarta.persistence.UniqueConstraint
 import java.time.OffsetDateTime
 
 @Entity
 @Table(
     name = "auth_session",
-    uniqueConstraints = [
-        UniqueConstraint(name = "uq_user_id_token", columnNames = ["user_id", "token"]),
-    ],
 )
 class AuthSessionJpaEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, unique = true, length = 50)
     val token: String,
-    @Column(nullable = true, length = 100)
+    @Column(nullable = false, length = 50)
+    val csrfToken: String,
+    @Column(nullable = true, length = 255)
     val userAgent: String? = null,
     @Column(nullable = true, length = 45)
     val ip: String? = null,
@@ -42,20 +40,12 @@ class AuthSessionJpaEntity(
 ) : BaseEntity() {
     override fun toString() = entityToString(*toStringProperties)
 
-    override fun equals(other: Any?) = entityEquals(other, AuthSessionJpaEntity::id, *equalsAndHashCodeProperties)
+    override fun equals(other: Any?) = entityEquals(other, AuthSessionJpaEntity::id)
 
-    override fun hashCode() = entityHashCode(AuthSessionJpaEntity::id, *equalsAndHashCodeProperties)
+    override fun hashCode() = entityHashCode(AuthSessionJpaEntity::id)
 
     companion object {
-        val toStringProperties = arrayOf(AuthSessionJpaEntity::id, AuthSessionJpaEntity::userId, AuthSessionJpaEntity::token)
-        val equalsAndHashCodeProperties =
-            arrayOf(
-                AuthSessionJpaEntity::id,
-                AuthSessionJpaEntity::userId,
-                AuthSessionJpaEntity::token,
-                AuthSessionJpaEntity::userAgent,
-                AuthSessionJpaEntity::ip,
-                AuthSessionJpaEntity::expiresAt,
-            )
+        val toStringProperties =
+            arrayOf(AuthSessionJpaEntity::id, AuthSessionJpaEntity::userId, AuthSessionJpaEntity::token)
     }
 }

@@ -12,24 +12,21 @@ class AuthSessionMapper : IsMapper<AuthSessionJpaEntity, AuthSession> {
             userId = entity.userId,
             ip = entity.ip,
             token = entity.token,
+            csrfToken = entity.csrfToken,
             userAgent = entity.userAgent,
             expiresAt = entity.expiresAt,
             createdAt = entity.createdAt,
             modifiedAt = entity.modifiedAt,
         )
 
-    override fun toEntity(domain: AuthSession): AuthSessionJpaEntity {
-        // TODO: 다른 exception?
-        val token = domain.token ?: throw IllegalArgumentException("Token cannot be null")
-        val expiresAt = domain.expiresAt ?: throw IllegalArgumentException("ExpiresAt cannot be null")
-
-        return AuthSessionJpaEntity(
+    override fun toEntity(domain: AuthSession): AuthSessionJpaEntity =
+        AuthSessionJpaEntity(
             id = if (domain.id == 0L) null else domain.id,
             userId = domain.userId,
+            token = domain.token,
+            csrfToken = domain.csrfToken,
             ip = domain.ip,
-            token = token,
-            expiresAt = expiresAt,
             userAgent = domain.userAgent,
+            expiresAt = domain.expiresAt,
         )
-    }
 }
