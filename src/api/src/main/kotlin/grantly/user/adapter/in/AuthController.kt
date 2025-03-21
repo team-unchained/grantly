@@ -2,12 +2,12 @@ package grantly.user.adapter.`in`
 
 import grantly.common.exceptions.HttpConflictException
 import grantly.common.exceptions.HttpExceptionResponse
+import grantly.common.exceptions.HttpInternalServerErrorException
 import grantly.common.exceptions.HttpUnauthorizedException
 import grantly.common.utils.HttpUtil
 import grantly.common.utils.TimeUtil
 import grantly.user.adapter.`in`.dto.LoginRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
-import grantly.user.adapter.out.dto.LoginResponse
 import grantly.user.adapter.out.dto.SignUpResponse
 import grantly.user.adapter.out.dto.UserResponse
 import grantly.user.application.port.`in`.LoginUseCase
@@ -16,7 +16,7 @@ import grantly.user.application.port.`in`.dto.LoginParams
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.application.service.exceptions.PasswordMismatchException
-import grantly.user.domain.AuthSession
+import grantly.user.application.service.exceptions.TokenGenerationException
 import grantly.user.domain.User
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -98,7 +98,7 @@ class AuthController(
     @Operation(
         summary = "이메일을 이용한 로그인",
         responses = [
-            ApiResponse(responseCode = "200", description = "로그인 성공. session_token 키로 쿠키 설정"),
+            ApiResponse(responseCode = "204", description = "로그인 성공. session_token 키로 쿠키 설정"),
             ApiResponse(
                 responseCode = "401",
                 description = "비밀번호 불일치",
@@ -112,24 +112,24 @@ class AuthController(
             ),
         ],
     )
-    @PostMapping("/token")
+    @PostMapping("/login")
     fun login(
         @Valid @RequestBody body: LoginRequest,
         request: HttpServletRequest,
         response: HttpServletResponse,
-    ): ResponseEntity<LoginResponse> {
+    ): ResponseEntity<Void> {
         val ip = request.remoteAddr
         val userAgent = request.getHeader("User-Agent")
 
-        val session: AuthSession
         try {
-            session = loginUseCase.login(LoginParams(body.email, body.password, ip, userAgent), response)
+            loginUseCase.login(LoginParams(body.email, body.password, ip, userAgent), response)
         } catch (e: EntityNotFoundException) {
             throw HttpUnauthorizedException(e.message)
         } catch (e: PasswordMismatchException) {
             throw HttpUnauthorizedException(e.message)
+        } catch (e: TokenGenerationException) {
+            throw HttpInternalServerErrorException(e.message)
         }
-        loginUseCase.setSessionCookie(response, session)
-        return ResponseEntity.ok(session.token?.let { LoginResponse(token = it) })
+        return ResponseEntity.noContent().build()
     }
 }
