@@ -24,6 +24,7 @@ jobs:
     uses: ./.github/workflows/reusable-deploy.yml
     with:
       environment: prod
-      docker_image_name: team-unchained/grantly/prod
+      docker_image_path: team-unchained/grantly/prod
+      docker_image_name: grantly-api
       docker_image_tag: ${{ github.sha }}
     secrets: inherit

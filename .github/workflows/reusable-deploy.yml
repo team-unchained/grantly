@@ -4,6 +4,9 @@ on:
       environment:
         required: true
         type: string
+      docker_image_path:
+        required: true
+        type: string
       docker_image_name:
         required: true
         type: string
@@ -28,8 +31,8 @@ jobs:
           script: |
             cd ~/projects/team-unchanined/grantly
             echo "${{ secrets.PACKAGE_READ }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            sudo docker pull ghcr.io/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
+            sudo docker pull ghcr.io/${{ inputs.docker_image_path }}:${{ inputs.docker_image_tag }}
             sudo docker stop ${{ inputs.docker_image_name }} || true
             sudo docker rm ${{ inputs.docker_image_name }} || true
-            sudo docker run -d --name ${{ inputs.docker_image_name }} -p 8080:8080 --env-file .env ghcr.io/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
+            sudo docker run -d --name ${{ inputs.docker_image_name }} -p 8080:8080 --env-file .env ghcr.io/${{ inputs.docker_image_path }}:${{ inputs.docker_image_tag }}
             sudo docker image prune -a
