@@ -26,7 +26,7 @@ jobs:
           username: ${{ secrets.SERVER_SSH_USER }}
           key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
           script: |
-            cd /path/to/your/project
+            cd ~/projects/team-unchained/grantly
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker pull ghcr.io/${{ github.repository }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
             docker stop ${inputs.docker_image_name} || true
