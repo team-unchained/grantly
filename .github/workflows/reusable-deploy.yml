@@ -7,15 +7,6 @@ on:
       java-version:
         required: true
         type: string
-      server_ip:
-        required: true
-        type: string
-      ssh_private_key:
-        required: true
-        type: string
-      ssh_user:
-        required: true
-        type: string
       docker_image_name:
         required: true
         type: string
@@ -34,9 +25,9 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ inputs.server_ip }}
-          username: ${{ inputs.ssh_user }}
-          key: ${{ inputs.ssh_private_key }}
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_SSH_USER }}
+          key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
           script: |
             cd /path/to/your/project
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
