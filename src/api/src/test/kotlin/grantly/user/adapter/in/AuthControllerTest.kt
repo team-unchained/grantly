@@ -128,6 +128,21 @@ class AuthControllerTest(
             ).andExpect(status().isUnauthorized)
     }
 
+    @Test
+    @DisplayName("로그인 실패: 존재하지 않는 유저")
+    fun `should return 401 when user does not exist`() {
+        // given
+        val jsonBody = objectMapper.writeValueAsString(LoginRequest("invalid@email.com", "somepassword1234!"))
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/token")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonBody),
+            ).andExpect(status().isUnauthorized)
+    }
+
     fun createTestUser(
         email: String,
         name: String,
