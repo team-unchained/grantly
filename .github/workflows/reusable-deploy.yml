@@ -29,7 +29,7 @@ jobs:
             cd ~/projects/team-unchanined/grantly
             echo "${{ secrets.PACKAGE_READ }}" | sudo -S docker login ghcr.io -u ${{ github.actor }} --password-stdin
             sudo docker pull ghcr.io/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
-            sudo docker stop ${inputs.docker_image_name} || true
-            sudo docker rm ${inputs.docker_image_name} || true
-            sudo docker run -d --name ${inputs.docker_image_name} -p 80:8080 --env-file .env.production ghcr.io/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
+            sudo docker stop api || true
+            sudo docker rm api || true
+            sudo docker run -d --name api -p 80:8080 ghcr.io/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
             sudo docker image prune -a
