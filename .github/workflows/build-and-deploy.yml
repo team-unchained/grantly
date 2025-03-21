@@ -25,3 +25,15 @@ jobs:
       environment: prod
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
+
+  deploy:
+    needs: [ build-api ]
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: prod
+      server_ip: ${{ secrets.SERVER_IP }}
+      ssh_user: ${{ secrets.SSH_USER }}
+      ssh_private_key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+      docker_image_name: api
+      docker_image_tag: ${{ github.sha }}
+    secrets: inherit

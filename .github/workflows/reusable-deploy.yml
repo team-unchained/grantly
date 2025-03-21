@@ -1,0 +1,47 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      java-version:
+        required: true
+        type: string
+      server_ip:
+        required: true
+        type: string
+      ssh_private_key:
+        required: true
+        type: string
+      ssh_user:
+        required: true
+        type: string
+      docker_image_name:
+        required: true
+        type: string
+      docker_image_tag:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    timeout-minutes: 30
+    name: Deploy WAS docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ inputs.server_ip }}
+          username: ${{ inputs.ssh_user }}
+          key: ${{ inputs.ssh_private_key }}
+          script: |
+            cd /path/to/your/project
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker pull ghcr.io/${{ github.repository }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
+            docker stop ${inputs.docker_image_name} || true
+            docker rm ${inputs.docker_image_name} || true
+            docker run -d --name ${inputs.docker_image_name} -p 80:8080 --env-file .env.production ghcr.io/${{ github.repository }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
+            docker image prune -a
