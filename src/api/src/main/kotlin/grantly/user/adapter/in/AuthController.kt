@@ -101,7 +101,7 @@ class AuthController(
             ApiResponse(responseCode = "204", description = "로그인 성공. session_token 키로 쿠키 설정"),
             ApiResponse(
                 responseCode = "401",
-                description = "비밀번호 불일치",
+                description = "비밀번호 불일치, 존재하지 않는 유저",
                 content =
                     arrayOf(
                         Content(
