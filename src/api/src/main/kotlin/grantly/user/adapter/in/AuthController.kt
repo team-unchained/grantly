@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
@@ -123,6 +124,8 @@ class AuthController(
         val session: AuthSession
         try {
             session = loginUseCase.login(LoginParams(body.email, body.password, ip, userAgent), response)
+        } catch (e: EntityNotFoundException) {
+            throw HttpUnauthorizedException(e.message)
         } catch (e: PasswordMismatchException) {
             throw HttpUnauthorizedException(e.message)
         }
