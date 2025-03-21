@@ -29,4 +29,3 @@ jobs:
       ssh_private_key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
       docker_image_name: api
       docker_image_tag: ${{ github.sha }}
-    secrets: inherit
