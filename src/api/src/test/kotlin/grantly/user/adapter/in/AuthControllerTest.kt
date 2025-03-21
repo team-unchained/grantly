@@ -1,6 +1,7 @@
 package grantly.user.adapter.`in`
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import grantly.common.constants.AuthConstants
 import grantly.user.adapter.`in`.dto.LoginRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
 import grantly.user.application.port.out.UserRepository
@@ -40,8 +41,6 @@ class AuthControllerTest(
     @Autowired
     private val passwordEncoder: BCryptPasswordEncoder,
 ) {
-    private val sessionTokenKey: String by lazy { env.getProperty("grantly.auth.token.key", "") }
-
     private lateinit var existingUser: User
 
     @BeforeAll
@@ -98,19 +97,19 @@ class AuthControllerTest(
 
     @Test
     @DisplayName("로그인 성공")
-    fun `should return 200 when login is successful`() {
+    fun `should return 204 when login is successful`() {
         // given
         val jsonBody = objectMapper.writeValueAsString(LoginRequest(existingUser.email, "test123!"))
 
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/token")
+                post("/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
-            ).andExpect(status().isOk)
-            .andExpect(jsonPath("$.token").exists())
-            .andExpect(cookie().exists(sessionTokenKey))
+            ).andExpect(status().isNoContent)
+            .andExpect(cookie().exists(AuthConstants.SESSION_COOKIE_NAME))
+            .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
     }
 
     @Test
@@ -122,7 +121,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/token")
+                post("/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isUnauthorized)
@@ -137,7 +136,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/token")
+                post("/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isUnauthorized)
