@@ -23,7 +23,7 @@ jobs:
     with:
       environment: prod
       server_ip: ${{ secrets.SERVER_IP }}
-      ssh_user: ${{ secrets.SSH_USER }}
+      ssh_user: ${{ secrets.SERVER_SSH_USER }}
       ssh_private_key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
       docker_image_name: api
       docker_image_tag: ${{ github.sha }}
