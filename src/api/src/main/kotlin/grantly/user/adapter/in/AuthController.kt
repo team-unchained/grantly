@@ -131,6 +131,12 @@ class AuthController(
         return ResponseEntity.noContent().build()
     }
 
+    @Operation(
+        summary = "CSRF 토큰 조회",
+        responses = [
+            ApiResponse(responseCode = "204", description = "CSRF 토큰 조회 성공. CSRF-TOKEN 키로 쿠키 설정"),
+        ],
+    )
     @GetMapping("/csrf-token")
     fun getCsrfToken(
         request: HttpServletRequest,
