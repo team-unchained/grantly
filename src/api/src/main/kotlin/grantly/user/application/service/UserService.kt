@@ -2,6 +2,7 @@ package grantly.user.application.service
 
 import grantly.common.annotations.UseCase
 import grantly.common.constants.AuthConstants
+import grantly.user.application.port.`in`.CsrfTokenUseCase
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.LoginUseCase
@@ -38,6 +39,7 @@ class UserService(
     private val csrfTokenRepository: CsrfTokenRepository,
 ) : SignUpUseCase,
     LoginUseCase,
+    CsrfTokenUseCase,
     FindUserQuery,
     EditProfileUseCase {
     @Value("\${grantly.cookie.domain}")

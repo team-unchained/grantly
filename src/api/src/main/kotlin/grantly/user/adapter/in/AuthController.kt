@@ -10,6 +10,7 @@ import grantly.user.adapter.`in`.dto.LoginRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
 import grantly.user.adapter.out.dto.SignUpResponse
 import grantly.user.adapter.out.dto.UserResponse
+import grantly.user.application.port.`in`.CsrfTokenUseCase
 import grantly.user.application.port.`in`.LoginUseCase
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.LoginParams
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(
     private val signUpUseCase: SignUpUseCase,
     private val loginUseCase: LoginUseCase,
+    private val csrfTokenUseCase: CsrfTokenUseCase,
 ) {
     @Operation(
         summary = "이메일을 이용한 회원가입",
@@ -142,7 +144,7 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
-        loginUseCase.setCsrfToken(request, response)
+        csrfTokenUseCase.setCsrfToken(request, response)
         return ResponseEntity.noContent().build()
     }
 }
