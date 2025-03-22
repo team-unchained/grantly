@@ -1,6 +1,11 @@
 server:
   port: 6000
 spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 6000
   datasource:
     url: jdbc:mysql://localhost:3306/grantly?useSSL=false&allowPublicKeyRetrieval=true
     username: admin
@@ -33,7 +38,9 @@ springdoc:
   show-actuator: true
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
-
+grantly:
+  cookie:
+    domain: .grantly.work
 ---
 spring:
   config:
@@ -42,7 +49,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-
+grantly:
+  cookie:
+    domain: api.grantly.work
 ---
 spring:
   config:
@@ -51,3 +60,4 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
