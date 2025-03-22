@@ -28,14 +28,12 @@ class UserJpaEntity(
 ) : BaseEntity() {
     override fun toString() = entityToString(*toStringProperties)
 
-    override fun equals(other: Any?) = entityEquals(other, UserJpaEntity::id, *equalsAndHashCodeProperties)
+    override fun equals(other: Any?) = entityEquals(other, UserJpaEntity::id)
 
-    override fun hashCode() = entityHashCode(*equalsAndHashCodeProperties)
+    override fun hashCode() = entityHashCode(UserJpaEntity::id)
 
     companion object {
         // 사용할 프로퍼티 정의
         val toStringProperties = arrayOf(UserJpaEntity::id, UserJpaEntity::email)
-        val equalsAndHashCodeProperties =
-            arrayOf(UserJpaEntity::id, UserJpaEntity::email, UserJpaEntity::name)
     }
 }
