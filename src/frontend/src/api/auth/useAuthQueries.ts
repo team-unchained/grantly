@@ -1,12 +1,15 @@
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
-import { SignUp } from '@grantly/api/auth/authApi';
+import { CreateUser } from '@grantly/api/auth/authApi';
 import { toast } from 'sonner';
-import { CreateUserRequestType } from '@grantly/api/auth/auth.schema';
+import {
+  CreateUserRequestType,
+  CreateUserResponseType,
+} from '@grantly/api/auth/auth.schema';
 
 export const useCreateUserMutation = (
   options?: UseMutationOptions<
-    AxiosResponse,
+    CreateUserResponseType,
     AxiosError,
     CreateUserRequestType,
     unknown
@@ -14,7 +17,7 @@ export const useCreateUserMutation = (
 ) =>
   useMutation({
     ...options,
-    mutationFn: (params: CreateUserRequestType) => SignUp(params),
+    mutationFn: (params: CreateUserRequestType) => CreateUser(params),
     onError: (error) => {
       const status = error.response?.status;
       if (status === 409) {

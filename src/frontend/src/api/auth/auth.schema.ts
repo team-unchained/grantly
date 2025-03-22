@@ -22,3 +22,17 @@ export const signUpSchema = z.object({
 });
 
 export type CreateUserRequestType = z.infer<typeof signUpSchema>;
+
+export const UserSchema = z.object({
+  id: z.number().int(),
+  email: z.string().email(),
+  name: z.string(),
+  createdAt: z.string().datetime(),
+  modifiedAt: z.string().datetime(),
+});
+
+export type UserType = z.infer<typeof UserSchema>;
+
+export type CreateUserResponseType = {
+  user: UserType;
+};
