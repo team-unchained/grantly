@@ -4,19 +4,12 @@ on:
   push:
     branches:
       - main
-
+      - feature/*
   workflow_dispatch:
 
 jobs:
   get-env:
     uses: ./.github/workflows/reusable-get-env.yml
-
-  lint-api:
-    needs: [ get-env ]
-    uses: ./.github/workflows/reusable-lint-api.yml
-    with:
-      java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
-    secrets: inherit
 
   build-api:
     needs: [ get-env ]
@@ -24,4 +17,14 @@ jobs:
     with:
       environment: prod
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
+    secrets: inherit
+
+  deploy:
+    needs: [ build-api ]
+    uses: ./.github/workflows/reusable-deploy.yml
+    with:
+      environment: prod
+      docker_image_path: team-unchained/grantly/prod
+      docker_image_name: grantly-api
+      docker_image_tag: ${{ github.sha }}
     secrets: inherit

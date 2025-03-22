@@ -23,6 +23,7 @@ jobs:
               - "src/api/**"
               - "docs/infra/${{ inputs.environment }}/Dockerfile"
               - ".github/workflows/reusable-build-api.yml"
+              - ".github/workflows/reusable-deploy.yml"
 
   build-alpine:
     needs: [ changes ]
