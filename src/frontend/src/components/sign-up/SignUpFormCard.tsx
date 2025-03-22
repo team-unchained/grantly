@@ -1,3 +1,9 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { Button } from '@grantly/components/ui/button';
 import {
   Card,
@@ -6,39 +12,72 @@ import {
   CardHeader,
   CardTitle,
 } from '@grantly/components/ui/card';
-import { Input } from '@grantly/components/ui/input';
-import { Label } from '@grantly/components/ui/label';
+
+import { useCreateUserMutation } from '@grantly/api/auth/useAuthQueries';
+import { FormInputField } from '@grantly/components/common/FormInputField';
+import {
+  CreateUserRequestType,
+  signUpSchema,
+} from '@grantly/api/auth/auth.schema';
 
 export function SignUpFormCard() {
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CreateUserRequestType>({
+    resolver: zodResolver(signUpSchema),
+  });
+
+  const { mutate: createUser, isPending } = useCreateUserMutation({
+    onSuccess: () => {
+      router.replace('/welcome');
+    },
+  });
+
+  const onSubmit = (data: CreateUserRequestType) => {
+    createUser(data);
+  };
+
   return (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign Up</CardTitle>
+          <CardTitle className="heading1">Sign Up</CardTitle>
           <CardDescription>
             Sign up now and enjoy seamless access to our platform.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                Sign Up
+              {/* Email */}
+              <FormInputField
+                id="email"
+                label="Email"
+                type="email"
+                error={errors.email?.message}
+                register={register}
+              />
+              {/* userName */}
+              <FormInputField
+                id="name"
+                label="User Name"
+                error={errors.name?.message}
+                register={register}
+              />
+              {/* Password */}
+              <FormInputField
+                id="password"
+                label="Password"
+                type="password"
+                error={errors.password?.message}
+                register={register}
+              />
+
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? 'Signing up...' : 'Sign Up'}
               </Button>
             </div>
           </form>
