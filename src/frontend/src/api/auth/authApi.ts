@@ -1,16 +1,12 @@
-import axios, { AxiosInstance } from 'axios';
-import { CreateUserRequestType } from '@grantly/api/auth/auth.schema';
+import {
+  CreateUserRequestType,
+  CreateUserResponseType,
+} from '@grantly/api/auth/auth.schema';
+import { axiosInstance } from '../axiosInstance';
 
-const authInstance: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true,
-});
-
-export const SignUp = async (params: CreateUserRequestType) => {
-  const response = await authInstance.post('v1/auth/signup', params);
+export const CreateUser = async (
+  params: CreateUserRequestType
+): Promise<CreateUserResponseType> => {
+  const response = await axiosInstance.post('v1/auth/signup', params);
   return response.data;
 };
