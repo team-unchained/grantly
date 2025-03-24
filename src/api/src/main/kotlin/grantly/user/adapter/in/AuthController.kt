@@ -83,7 +83,6 @@ class AuthController(
         } catch (e: DuplicateEmailException) {
             throw HttpConflictException(e.message ?: "Email already exists")
         }
-        // TODO: 토큰 발급 및 응답에 포함
         return ResponseEntity.created(HttpUtil.buildLocationURI("/v1/users/me")).body(
             SignUpResponse(
                 user =

@@ -132,7 +132,7 @@ class UserService(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ) {
-        val csrfToken = csrfTokenRepository.generateToken(request) // request는 null이 아님만 보장되면 OK
+        val csrfToken = csrfTokenRepository.generateToken(request)
         csrfTokenRepository.saveToken(csrfToken, request, response)
         val csrfCookie =
             Cookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token).apply {
