@@ -2,7 +2,6 @@ package grantly.user.application.service
 
 import grantly.common.annotations.UseCase
 import grantly.common.constants.AuthConstants
-import grantly.user.application.port.`in`.CsrfTokenUseCase
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.LoginUseCase
@@ -17,15 +16,9 @@ import grantly.user.application.service.exceptions.TokenGenerationException
 import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import jakarta.persistence.EntityNotFoundException
-import jakarta.servlet.http.Cookie
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.web.csrf.CsrfTokenRepository
-import java.time.Duration
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -36,15 +29,10 @@ class UserService(
     private val userRepository: UserRepository,
     private val authSessionRepository: AuthSessionRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val csrfTokenRepository: CsrfTokenRepository,
 ) : SignUpUseCase,
     LoginUseCase,
-    CsrfTokenUseCase,
     FindUserQuery,
     EditProfileUseCase {
-    @Value("\${grantly.cookie.domain}")
-    private lateinit var cookieDomain: String
-
     override fun signUp(params: SignUpParams): User {
         try {
             findUserByEmail(params.email)
@@ -72,12 +60,8 @@ class UserService(
             }
         } catch (e: EntityNotFoundException) {
             // 세션이 없으면 새로 생성
-            val ip = params.request.remoteAddr
-            val userAgent = params.request.getHeader("User-Agent")
-            validSession = generateSessionToken(user.id, ip, userAgent)
+            validSession = generateSessionToken(user.id, params.ip, params.userAgent)
         }
-        setSession(params.request, params.response, validSession)
-        setCsrfToken(params.request, params.response)
         return validSession
     }
 
@@ -109,40 +93,6 @@ class UserService(
             }
         }
         throw TokenGenerationException() // make compiler happy
-    }
-
-    fun setSession(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        session: AuthSession,
-    ) {
-        val secondsBeforeExpiration = Duration.between(OffsetDateTime.now(), session.expiresAt).seconds
-        val cookie =
-            Cookie(AuthConstants.SESSION_COOKIE_NAME, session.token).apply {
-                maxAge = secondsBeforeExpiration.toInt()
-                domain = cookieDomain
-                secure = true
-                isHttpOnly = true
-                setAttribute("SameSite", "Lax")
-            }
-        response.addCookie(cookie)
-    }
-
-    override fun setCsrfToken(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-    ) {
-        val csrfToken = csrfTokenRepository.generateToken(request)
-        csrfTokenRepository.saveToken(csrfToken, request, response)
-        val csrfCookie =
-            Cookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token).apply {
-                maxAge = AuthConstants.CSRF_TOKEN_EXPIRATION.toInt()
-                domain = cookieDomain
-                secure = true
-                isHttpOnly = false
-                setAttribute("SameSite", "Lax")
-            }
-        response.addCookie(csrfCookie)
     }
 
     override fun findUserById(id: Long) = userRepository.getUser(id)
