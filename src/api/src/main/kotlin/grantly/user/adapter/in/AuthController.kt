@@ -1,5 +1,6 @@
 package grantly.user.adapter.`in`
 
+import grantly.common.constants.AuthConstants
 import grantly.common.exceptions.HttpConflictException
 import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.exceptions.HttpInternalServerErrorException
@@ -18,6 +19,7 @@ import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.application.service.exceptions.PasswordMismatchException
 import grantly.user.application.service.exceptions.TokenGenerationException
+import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -28,6 +30,7 @@ import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -35,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
+import java.time.Duration
+import java.time.OffsetDateTime
 
 @RestController
 @ResponseBody
@@ -45,6 +50,9 @@ class AuthController(
     private val loginUseCase: LoginUseCase,
     private val csrfTokenUseCase: CsrfTokenUseCase,
 ) {
+    @Value("\${grantly.cookie.domain}")
+    private lateinit var cookieDomain: String
+
     @Operation(
         summary = "이메일을 이용한 회원가입",
         responses = [
@@ -120,8 +128,11 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
+        val session: AuthSession
         try {
-            loginUseCase.login(LoginParams(body.email, body.password, request, response))
+            val ip = request.remoteAddr
+            val userAgent = request.getHeader("User-Agent")
+            session = loginUseCase.login(LoginParams(body.email, body.password, ip, userAgent))
         } catch (e: EntityNotFoundException) {
             throw HttpUnauthorizedException(e.message)
         } catch (e: PasswordMismatchException) {
@@ -129,6 +140,28 @@ class AuthController(
         } catch (e: TokenGenerationException) {
             throw HttpInternalServerErrorException(e.message)
         }
+        // set session token
+        HttpUtil
+            .buildCookie(AuthConstants.SESSION_COOKIE_NAME, session.token)
+            .maxAge(
+                Duration.between(OffsetDateTime.now(), session.expiresAt).seconds.toInt(),
+            ).domain(cookieDomain)
+            .sameSite("Lax")
+            .secure(true)
+            .httpOnly(true)
+            .build(response)
+
+        // set csrf token
+        val csrfToken = csrfTokenUseCase.setCsrfToken(request, response)
+        HttpUtil
+            .buildCookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token)
+            .maxAge(Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION).seconds.toInt())
+            .domain(cookieDomain)
+            .sameSite("Lax")
+            .secure(true)
+            .httpOnly(true)
+            .build(response)
+
         return ResponseEntity.noContent().build()
     }
 
@@ -143,7 +176,15 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
-        csrfTokenUseCase.setCsrfToken(request, response)
+        val csrfToken = csrfTokenUseCase.setCsrfToken(request, response)
+        HttpUtil
+            .buildCookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token)
+            .maxAge(Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION).seconds.toInt())
+            .domain(cookieDomain)
+            .sameSite("Lax")
+            .secure(true)
+            .httpOnly(true)
+            .build(response)
         return ResponseEntity.noContent().build()
     }
 }
