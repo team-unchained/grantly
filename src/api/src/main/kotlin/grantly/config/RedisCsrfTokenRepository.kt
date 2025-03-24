@@ -33,7 +33,6 @@ class RedisCsrfTokenRepository(
         response: HttpServletResponse,
     ) {
         // session token 이 없다면 anonymous token 임시 발급
-        // TODO: anonymous csrf token 의 ttl 은 기본 ttl 보다 적게 설정?
         val sessionToken = extractSessionToken(request) ?: ("anonymous-" + generateTokenValue())
         val redisKey = "csrf:$sessionToken"
 
