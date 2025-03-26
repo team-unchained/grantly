@@ -1,5 +1,5 @@
 {
-  "plugins": ["import", "@typescript-eslint", "react", "prettier"],
+  "plugins": ["import", "@typescript-eslint", "react-hooks", "react", "prettier"],
   "extends": [
     "airbnb",
     "airbnb-typescript",
@@ -20,6 +20,8 @@
     "project": "./tsconfig.json"
   },
   "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "prettier/prettier": ["error"],
     "@typescript-eslint/no-use-before-define": "off", //emotion 코드를 뒤에 선언하기 위해 Off
     "@typescript-eslint/no-namespace": "off", // emotion 컴포넌트들은 namespace에 그룹핑해두기 위해 Off
