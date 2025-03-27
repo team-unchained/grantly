@@ -51,48 +51,76 @@ class UserService(
             throw PasswordMismatchException()
         }
 
-        var validSession: AuthSession
-        // 이미 존재하는 세션이 있는지 확인
         try {
-            validSession = authSessionRepository.getSessionByUserId(user.id)
-            if (!validSession.isValid()) {
-                throw EntityNotFoundException("Valid session not found")
+            val existing = authSessionRepository.getSessionByUserId(user.id)
+            if (existing.isValid() && existing.deviceId == params.deviceId) {
+                return existing
+            }
+            repeat(3) {
+                val session = refreshSession(existing, params.deviceId, params.ip, params.userAgent)
+                try {
+                    return authSessionRepository.upsertAuthSession(session)
+                } catch (e: DataIntegrityViolationException) {
+                    // retry
+                }
             }
         } catch (e: EntityNotFoundException) {
-            // 세션이 없으면 새로 생성
-            validSession = generateSessionToken(user.id, params.ip, params.userAgent)
+            repeat(3) {
+                val session = buildNewSession(user.id, params.ip, params.userAgent)
+                try {
+                    return authSessionRepository.upsertAuthSession(session)
+                } catch (e: DataIntegrityViolationException) {
+                    // retry
+                }
+            }
         }
-        return validSession
+
+        log.error { "Failed to generate session token: session token collision" }
+        throw TokenGenerationException()
     }
 
-    fun generateSessionToken(
+    /**
+     * 세션 토큰 생성
+     * @return 생성된 세션 토큰과 만료 시각
+     */
+    private fun generateToken(): Pair<String, OffsetDateTime> =
+        Pair(UUID.randomUUID().toString(), OffsetDateTime.now().plusSeconds(AuthConstants.SESSION_TOKEN_EXPIRATION))
+
+    private fun buildNewSession(
         userId: Long,
         ip: String?,
         userAgent: String?,
     ): AuthSession {
-        val retries = 3
-        for (i in 1..retries) {
-            val token = UUID.randomUUID().toString()
-            val session =
-                AuthSession(
-                    userId = userId,
-                    ip = ip,
-                    userAgent = userAgent,
-                    token = token,
-                    expiresAt = OffsetDateTime.now().plusSeconds(AuthConstants.SESSION_TOKEN_EXPIRATION),
-                )
-            try {
-                return authSessionRepository.createAuthSession(session)
-            } catch (e: DataIntegrityViolationException) {
-                if (i == retries) {
-                    log.error { "Failed to generate session token" }
-                    throw TokenGenerationException()
-                } else {
-                    continue
-                }
-            }
-        }
-        throw TokenGenerationException() // make compiler happy
+        val (token, expiresAt) = generateToken()
+        return AuthSession(
+            userId = userId,
+            token = token,
+            deviceId = UUID.randomUUID().toString(),
+            ip = ip,
+            userAgent = userAgent,
+            expiresAt = expiresAt,
+        )
+    }
+
+    /**
+     * 세션 갱신.
+     * 기존 세션이 유효한데 deviceId 가 다르거나 없는 경우, 기존 세션이 만료된 경우를 처리한다.
+     * @return 갱신된 세션
+     */
+    private fun refreshSession(
+        existing: AuthSession,
+        deviceId: String?,
+        ip: String?,
+        userAgent: String?,
+    ): AuthSession {
+        val (token, expiresAt) = generateToken()
+        return existing.copy(
+            token = token,
+            deviceId = deviceId ?: UUID.randomUUID().toString(),
+            ip = ip,
+            userAgent = userAgent,
+            expiresAt = expiresAt,
+        )
     }
 
     override fun findUserById(id: Long) = userRepository.getUser(id)
