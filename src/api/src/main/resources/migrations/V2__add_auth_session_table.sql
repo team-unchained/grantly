@@ -4,6 +4,7 @@ CREATE TABLE auth_session
     created_at  datetime              NOT NULL,
     modified_at datetime              NOT NULL,
     token       VARCHAR(50)           NOT NULL,
+    device_id   VARCHAR(50)           NOT NULL,
     user_agent  VARCHAR(255)          NULL,
     ip          VARCHAR(45)           NULL,
     expires_at  datetime              NOT NULL,

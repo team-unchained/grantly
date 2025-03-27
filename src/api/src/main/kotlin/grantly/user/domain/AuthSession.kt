@@ -8,6 +8,7 @@ data class AuthSession(
     val id: Long = 0L,
     val userId: Long,
     var token: String,
+    val deviceId: String,
     val ip: String? = null,
     val userAgent: String? = null,
     var expiresAt: OffsetDateTime,

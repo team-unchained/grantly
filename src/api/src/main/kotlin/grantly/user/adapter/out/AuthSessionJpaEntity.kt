@@ -24,6 +24,8 @@ class AuthSessionJpaEntity(
     val id: Long? = null,
     @Column(nullable = false, unique = true, length = 50)
     val token: String,
+    @Column(nullable = false, length = 50)
+    val deviceId: String,
     @Column(nullable = true, length = 255)
     val userAgent: String? = null,
     @Column(nullable = true, length = 45)

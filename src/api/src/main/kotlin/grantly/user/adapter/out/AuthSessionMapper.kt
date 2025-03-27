@@ -10,6 +10,7 @@ class AuthSessionMapper : IsMapper<AuthSessionJpaEntity, AuthSession> {
         AuthSession(
             id = entity.id ?: 0L,
             userId = entity.userId,
+            deviceId = entity.deviceId,
             ip = entity.ip,
             token = entity.token,
             userAgent = entity.userAgent,
@@ -23,6 +24,7 @@ class AuthSessionMapper : IsMapper<AuthSessionJpaEntity, AuthSession> {
             id = if (domain.id == 0L) null else domain.id,
             userId = domain.userId,
             token = domain.token,
+            deviceId = domain.deviceId,
             ip = domain.ip,
             userAgent = domain.userAgent,
             expiresAt = domain.expiresAt,
