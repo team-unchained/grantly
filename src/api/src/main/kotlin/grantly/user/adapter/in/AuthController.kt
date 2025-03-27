@@ -128,11 +128,12 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
+        val ip = request.remoteAddr
+        val userAgent = request.getHeader("User-Agent")
+        val deviceId = HttpUtil.getCookie(request, AuthConstants.DEVICE_ID_COOKIE_NAME)?.value
         val session: AuthSession
         try {
-            val ip = request.remoteAddr
-            val userAgent = request.getHeader("User-Agent")
-            session = loginUseCase.login(LoginParams(body.email, body.password, ip, userAgent))
+            session = loginUseCase.login(LoginParams(body.email, body.password, deviceId, ip, userAgent))
         } catch (e: EntityNotFoundException) {
             throw HttpUnauthorizedException(e.message)
         } catch (e: PasswordMismatchException) {
@@ -156,6 +157,16 @@ class AuthController(
         HttpUtil
             .buildCookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token)
             .maxAge(Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION).seconds.toInt())
+            .domain(cookieDomain)
+            .sameSite("Lax")
+            .secure(true)
+            .httpOnly(true)
+            .build(response)
+
+        // set device id
+        HttpUtil
+            .buildCookie(AuthConstants.DEVICE_ID_COOKIE_NAME, session.deviceId)
+            .maxAge(Integer.MAX_VALUE)
             .domain(cookieDomain)
             .sameSite("Lax")
             .secure(true)
