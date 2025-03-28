@@ -1,0 +1,27 @@
+services:
+
+  grantly-api:
+    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}:${GIT_HASH}
+    container_name: grantly-api
+    restart: always
+    expose:
+      - '6000'
+    env_file:
+      - ../../../.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: [ "java", "-Dspring.profiles.active=${ENVIRONMENT}", "-jar", "/app.jar" ]
+
+  caddy:
+    image: caddy:2
+    container_name: grantly-caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ../../../.tmp/caddy_data:/data
+      - ../../../.tmp/caddy_config:/config
+    depends_on:
+      - grantly-api

@@ -1,0 +1,42 @@
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      docker_image_path:
+        required: true
+        type: string
+      docker_image_name:
+        required: true
+        type: string
+      docker_image_tag:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    timeout-minutes: 30
+    name: Deploy WAS docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_SSH_USER }}
+          key: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/projects/team-unchanined/grantly
+
+            git stash -u
+            git fetch
+            git checkout ${{ github.sha }}
+
+            echo "${{ secrets.PACKAGE_READ }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            sudo make run
+
+            sudo docker image prune -a
