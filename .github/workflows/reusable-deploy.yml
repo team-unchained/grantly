@@ -33,7 +33,6 @@ jobs:
 
             git stash -u
             git checkout ${{ github.sha }}
-            git pull
 
             echo "${{ secrets.PACKAGE_READ }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
