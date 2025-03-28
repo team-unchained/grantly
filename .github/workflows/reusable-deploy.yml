@@ -32,6 +32,7 @@ jobs:
             cd ~/projects/team-unchanined/grantly
 
             git stash -u
+            git fetch
             git checkout ${{ github.sha }}
 
             echo "${{ secrets.PACKAGE_READ }}" | sudo docker login ghcr.io -u ${{ github.actor }} --password-stdin
