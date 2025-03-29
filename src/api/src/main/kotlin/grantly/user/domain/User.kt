@@ -17,4 +17,12 @@ data class User(
     fun hashPassword(passwordEncoder: PasswordEncoder) {
         password = passwordEncoder.encode(password)
     }
+
+    fun checkPassword(
+        passwordEncoder: PasswordEncoder,
+        rawPassword: String,
+    ): Boolean =
+        password?.let {
+            passwordEncoder.matches(rawPassword, it)
+        } ?: false
 }
