@@ -6,6 +6,9 @@ import grantly.user.adapter.`in`.dto.LoginRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
 import grantly.user.application.port.out.UserRepository
 import grantly.user.domain.User
+import jakarta.servlet.http.Cookie
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.not
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -123,6 +126,45 @@ class AuthControllerTest(
             ).andExpect(status().isNoContent)
             .andExpect(cookie().exists(AuthConstants.SESSION_COOKIE_NAME))
             .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
+            .andExpect(cookie().exists(AuthConstants.DEVICE_ID_COOKIE_NAME))
+    }
+
+    @Test
+    @DisplayName("로그인 성공: deviceId 가 다른 경우 세션 갱신")
+    fun `should refresh session token when deviceId does not match`() {
+        // given
+        val jsonBody = objectMapper.writeValueAsString(LoginRequest(existingUser.email, "test123!"))
+        val initialLogin =
+            mockMvc
+                .perform(
+                    post("/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonBody),
+                ).andExpect(status().isNoContent)
+                .andExpect(cookie().exists(AuthConstants.SESSION_COOKIE_NAME))
+                .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
+                .andExpect(cookie().exists(AuthConstants.DEVICE_ID_COOKIE_NAME))
+                .andReturn()
+
+        val initialSessionToken =
+            initialLogin.response.cookies
+                .find { it.name == AuthConstants.SESSION_COOKIE_NAME }!!
+                .value
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/login")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .cookie(
+                        Cookie(AuthConstants.DEVICE_ID_COOKIE_NAME, "different-device-id"),
+                        Cookie(AuthConstants.SESSION_COOKIE_NAME, initialSessionToken),
+                    ).content(jsonBody),
+            ).andExpect(status().isNoContent)
+            .andExpect { result ->
+                val cookie = result.response.getCookie(AuthConstants.SESSION_COOKIE_NAME)
+                assertThat(cookie?.value).isNotEqualTo(initialSessionToken)
+            }
     }
 
     @Test
