@@ -44,11 +44,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Gradle test
-        uses: ./.github/workflows/reusable-test-api.yml
-        with:
-          java-version: ${{ inputs.java-version }}
-
       - name: Build, tag, and push image to GitHub Packages
         run: |
           make build-api
