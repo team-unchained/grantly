@@ -11,8 +11,15 @@ jobs:
   get-env:
     uses: ./.github/workflows/reusable-get-env.yml
 
-  build-api:
+  test-api:
     needs: [ get-env ]
+    uses: ./.github/workflows/reusable-test-api.yml
+    with:
+      java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
+    secrets: inherit
+
+  build-api:
+    needs: [ test-api ]
     uses: ./.github/workflows/reusable-build-api.yml
     with:
       environment: prod
