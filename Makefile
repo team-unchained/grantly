@@ -34,6 +34,9 @@ docker-restart: docker-down docker-up
 build-api:
 	@$(MAKE) -C src/api build
 
+test-api:
+	@$(MAKE) -C src/api test
+
 run-api:
 	@$(MAKE) -C src/api dev
 
