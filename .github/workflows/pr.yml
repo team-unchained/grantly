@@ -12,3 +12,25 @@ jobs:
     with:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
+
+  api-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      apiChanged: ${{ steps.filter.outputs.apiChanged }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            apiChanged:
+              - "src/api/**"
+              - ".github/workflows/reusable-test-api.yml"
+
+  test-api:
+    needs: [ get-env, api-changes ]
+    if: ${{ needs.api-changes.outputs.apiChanged == 'true' }}
+    uses: ./.github/workflows/reusable-test-api.yml
+    with:
+      java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
+    secrets: inherit

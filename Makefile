@@ -32,7 +32,10 @@ docker-down:
 docker-restart: docker-down docker-up
 
 build-api:
-	@$(MAKE) -C src/api build
+	@$(MAKE) -C src/api build -x test
+
+test-api:
+	@cd src/api && ./gradlew test
 
 run-api:
 	@$(MAKE) -C src/api dev
