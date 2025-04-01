@@ -45,3 +45,6 @@ lint-api:
 
 build-api-alpine: build-api
 	docker build -t grantly:latest -f docs/infra/local/Dockerfile .
+
+run:
+	@ENVIRONMENT=prod GIT_HASH=$$(git rev-parse HEAD) docker compose -f docs/infra/prod/docker-compose.yml up -d
