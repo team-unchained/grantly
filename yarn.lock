@@ -110,12 +110,12 @@ __metadata:
     eslint-plugin-react-hooks: "npm:4.6.2"
     lucide-react: "npm:0.479.0"
     next: "npm:15.2.0"
-    next-themes: "npm:^0.4.6"
+    next-themes: "npm:0.4.6"
     prettier: "npm:3.3.3"
     react: "npm:19.0.0"
     react-dom: "npm:19.0.0"
     react-hook-form: "npm:7.54.2"
-    sonner: "npm:^2.0.1"
+    sonner: "npm:2.0.1"
     tailwind-merge: "npm:3.0.2"
     tailwindcss: "npm:4.0.9"
     tailwindcss-animate: "npm:1.0.7"
@@ -3642,7 +3642,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-themes@npm:^0.4.6":
+"next-themes@npm:0.4.6":
   version: 0.4.6
   resolution: "next-themes@npm:0.4.6"
   peerDependencies:
@@ -4529,7 +4529,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonner@npm:^2.0.1":
+"sonner@npm:2.0.1":
   version: 2.0.1
   resolution: "sonner@npm:2.0.1"
   peerDependencies:
