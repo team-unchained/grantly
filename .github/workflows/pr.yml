@@ -6,6 +6,13 @@ jobs:
   get-env:
     uses: ./.github/workflows/reusable-get-env.yml
 
+  lint-frontend:
+    needs: [ get-env ]
+    uses: ./.github/workflows/reusable-lint-frontend.yml
+    with:
+      node-version: ${{ needs.get-env.outputs.NODE_VERSION }}
+    secrets: inherit
+
   lint-api:
     needs: [ get-env ]
     uses: ./.github/workflows/reusable-lint-api.yml
@@ -13,23 +20,8 @@ jobs:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
 
-  api-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      apiChanged: ${{ steps.filter.outputs.apiChanged }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            apiChanged:
-              - "src/api/**"
-              - ".github/workflows/reusable-test-api.yml"
-
   test-api:
-    needs: [ get-env, api-changes ]
-    if: ${{ needs.api-changes.outputs.apiChanged == 'true' }}
+    needs: [ get-env ]
     uses: ./.github/workflows/reusable-test-api.yml
     with:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}

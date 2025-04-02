@@ -1,0 +1,49 @@
+name: Lint Frontend
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      isChanged: ${{ steps.filter.outputs.isChanged }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            isChanged:
+              - "src/frontend/**"
+              - ".github/workflows/reusable-lint-frontend.yml"
+
+  lint:
+    needs: [ changes ]
+    if: ${{ needs.changes.outputs.isChanged == 'true' }}
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Install Node Packages
+        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
+        run: yarn install
+
+      - run: yarn lint-frontend

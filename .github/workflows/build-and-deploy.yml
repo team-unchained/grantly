@@ -10,6 +10,20 @@ jobs:
   get-env:
     uses: ./.github/workflows/reusable-get-env.yml
 
+  lint-frontend:
+    needs: [ get-env ]
+    uses: ./.github/workflows/reusable-lint-frontend.yml
+    with:
+      node-version: ${{ needs.get-env.outputs.NODE_VERSION }}
+    secrets: inherit
+
+  lint-api:
+    needs: [ get-env ]
+    uses: ./.github/workflows/reusable-lint-api.yml
+    with:
+      java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
+    secrets: inherit
+
   test-api:
     needs: [ get-env ]
     uses: ./.github/workflows/reusable-test-api.yml
@@ -18,7 +32,7 @@ jobs:
     secrets: inherit
 
   build-api:
-    needs: [ test-api ]
+    needs: [ get-env ]
     uses: ./.github/workflows/reusable-build-api.yml
     with:
       environment: prod
@@ -26,7 +40,7 @@ jobs:
     secrets: inherit
 
   deploy:
-    needs: [ build-api ]
+    needs: [ lint-frontend, lint-api, test-api, build-api ]
     uses: ./.github/workflows/reusable-deploy.yml
     with:
       environment: prod
