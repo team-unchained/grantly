@@ -32,8 +32,8 @@ class RedisCsrfTokenRepository(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ) {
-        // session token 이 없다면 anonymous token 임시 발급
-        val sessionToken = extractSessionToken(request) ?: ("anonymous-" + generateTokenValue())
+        // session token 이 없다면 attribute 에서 조회
+        val sessionToken = extractSessionToken(request) ?: request.getAttribute(AuthConstants.SESSION_COOKIE_NAME)
         val redisKey = "csrf:$sessionToken"
 
         log.debug { "Saving CSRF token to Redis: $redisKey" }
