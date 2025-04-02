@@ -4,9 +4,6 @@ on:
       environment:
         required: true
         type: string
-      java-version:
-        required: true
-        type: string
 
 jobs:
   changes:
@@ -20,10 +17,9 @@ jobs:
         with:
           filters: |
             isChanged:
-              - "src/api/**"
-              - "docs/infra/${{ inputs.environment }}/Dockerfile"
-              - ".github/workflows/reusable-build-api.yml"
-              - ".github/workflows/reusable-deploy.yml"
+              - "src/frontend/**"
+              - "docs/infra/${{ inputs.environment }}/Dockerfile.frontend"
+              - ".github/workflows/reusable-build-frontend.yml"
 
   build-alpine:
     needs: [ changes ]
@@ -48,9 +44,9 @@ jobs:
         run: |
           make build-api
           DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME \
-            -f ./docs/infra/$ENVIRONMENT/Dockerfile .
+            -f ./docs/infra/$ENVIRONMENT/Dockerfile.frontend .
           docker push $IMAGE_NAME
           docker builder prune -f
         env:
-          IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ inputs.environment }}:${{ github.sha }}
+          IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ inputs.environment }}/frontend:${{ github.sha }}
           ENVIRONMENT: ${{ inputs.environment }}

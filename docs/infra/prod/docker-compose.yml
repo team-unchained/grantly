@@ -1,8 +1,8 @@
 services:
 
-  grantly-api:
-    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}:${GIT_HASH}
-    container_name: grantly-api
+  grantly-backend:
+    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/backend:${GIT_HASH}
+    container_name: grantly-backend
     restart: always
     expose:
       - '6000'
@@ -11,6 +11,18 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: [ "java", "-Dspring.profiles.active=${ENVIRONMENT}", "-jar", "/app.jar" ]
+
+  grantly-frontend:
+    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/frontend:${GIT_HASH}
+    container_name: grantly-frontend
+    restart: always
+    expose:
+      - '6001'
+    env_file:
+      - ../../../.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: [ "yarn", "@grantly/frontend", "start" ]
 
   caddy:
     image: caddy:2

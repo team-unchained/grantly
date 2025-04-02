@@ -17,34 +17,40 @@ jobs:
       node-version: ${{ needs.get-env.outputs.NODE_VERSION }}
     secrets: inherit
 
-  lint-api:
+  lint-backend:
     needs: [ get-env ]
-    uses: ./.github/workflows/reusable-lint-api.yml
+    uses: ./.github/workflows/reusable-lint-backend.yml
     with:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
 
-  test-api:
+  test-backend:
     needs: [ get-env ]
-    uses: ./.github/workflows/reusable-test-api.yml
+    uses: ./.github/workflows/reusable-test-backend.yml
     with:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
 
-  build-api:
+  build-backend:
     needs: [ get-env ]
-    uses: ./.github/workflows/reusable-build-api.yml
+    uses: ./.github/workflows/reusable-build-backend.yml
     with:
       environment: prod
-      java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
+    secrets: inherit
+
+  build-frontend:
+    needs: [ get-env ]
+    uses: ./.github/workflows/reusable-build-frontend.yml
+    with:
+      environment: prod
     secrets: inherit
 
   deploy:
-    needs: [ lint-frontend, lint-api, test-api, build-api ]
+    needs: [ lint-frontend, lint-backend, test-backend, build-backend, build-frontend ]
     uses: ./.github/workflows/reusable-deploy.yml
     with:
       environment: prod
       docker_image_path: team-unchained/grantly/prod
-      docker_image_name: grantly-api
+      docker_image_name: grantly-backend
       docker_image_tag: ${{ github.sha }}
     secrets: inherit
