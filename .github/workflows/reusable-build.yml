@@ -4,32 +4,15 @@ on:
       environment:
         required: true
         type: string
-      java-version:
+      service:
         required: true
         type: string
+        description: 'Service to build (frontend or backend)'
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      isChanged: ${{ steps.filter.outputs.isChanged }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            isChanged:
-              - "src/api/**"
-              - "docs/infra/${{ inputs.environment }}/Dockerfile"
-              - ".github/workflows/reusable-build-api.yml"
-              - ".github/workflows/reusable-deploy.yml"
-
-  build-alpine:
-    needs: [ changes ]
-    if: ${{ needs.changes.outputs.isChanged == 'true' }}
+  build:
     timeout-minutes: 30
-    name: Build WAS docker image
+    name: Build Docker image
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,9 +31,10 @@ jobs:
         run: |
           make build-api
           DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME \
-            -f ./docs/infra/$ENVIRONMENT/Dockerfile .
+            -f ./docs/infra/$ENVIRONMENT/Dockerfile.$SERVICE .
           docker push $IMAGE_NAME
           docker builder prune -f
         env:
-          IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ inputs.environment }}:${{ github.sha }}
+          IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ inputs.environment }}/${{ inputs.service }}:${{ github.sha }}
           ENVIRONMENT: ${{ inputs.environment }}
+          SERVICE: ${{ inputs.service }}

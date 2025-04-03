@@ -15,14 +15,14 @@ jobs:
 
   lint-api:
     needs: [ get-env ]
-    uses: ./.github/workflows/reusable-lint-api.yml
+    uses: ./.github/workflows/reusable-lint-backend.yml
     with:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
 
   test-api:
     needs: [ get-env ]
-    uses: ./.github/workflows/reusable-test-api.yml
+    uses: ./.github/workflows/reusable-test-backend.yml
     with:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
