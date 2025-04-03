@@ -1,5 +1,8 @@
 package grantly.common.utils
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import grantly.common.exceptions.HttpException
+import grantly.common.exceptions.HttpExceptionResponse
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -30,6 +33,33 @@ class HttpUtil {
             request: HttpServletRequest,
             key: String,
         ): Cookie? = request.cookies?.firstOrNull { it.name == key }
+
+        fun deleteCookie(
+            response: HttpServletResponse,
+            cookie: Cookie,
+        ) {
+            cookie.maxAge = 0
+            response.addCookie(cookie)
+        }
+
+        fun writeErrorResponse(
+            response: HttpServletResponse,
+            exc: HttpException,
+        ) {
+            response.status = exc.errorType.httpStatus.value()
+            response.contentType = "application/json;charset=UTF-8"
+
+            val payload =
+                HttpExceptionResponse(
+                    exc.errorType.httpStatus.value(),
+                    exc.message ?: exc.errorType.message,
+                    exc.detail,
+                )
+
+            response.writer.write(ObjectMapper().writeValueAsString(payload))
+            response.writer.flush()
+            response.writer.close()
+        }
     }
 
     class CookieBuilder(
