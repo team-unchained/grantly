@@ -1,4 +1,12 @@
 services:
+  grantly-redis:
+    image: redis:7
+    container_name: grantly-redis
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - ../../../.tmp/redis:/data
 
   grantly-backend:
     image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/backend:${GIT_HASH}
@@ -36,4 +44,5 @@ services:
       - ../../../.tmp/caddy_data:/data
       - ../../../.tmp/caddy_config:/config
     depends_on:
-      - grantly-api
+      - grantly-backend
+      - grantly-frontend
