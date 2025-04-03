@@ -34,16 +34,18 @@ jobs:
 
   build-backend:
     needs: [ get-env ]
-    uses: ./.github/workflows/reusable-build-backend.yml
+    uses: ./.github/workflows/reusable-build.yml
     with:
-      environment: prod
+      environment: 'prod'
+      service: 'backend'
     secrets: inherit
 
   build-frontend:
     needs: [ get-env ]
-    uses: ./.github/workflows/reusable-build-frontend.yml
+    uses: ./.github/workflows/reusable-build.yml
     with:
-      environment: prod
+      environment: 'prod'
+      service: 'frontend'
     secrets: inherit
 
   deploy:
