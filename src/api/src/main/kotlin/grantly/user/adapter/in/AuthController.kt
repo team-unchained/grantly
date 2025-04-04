@@ -152,17 +152,6 @@ class AuthController(
             .httpOnly(true)
             .build(response)
 
-        // set csrf token
-        val csrfToken = csrfTokenUseCase.setCsrfToken(request, response)
-        HttpUtil
-            .buildCookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token)
-            .maxAge(Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION).seconds.toInt())
-            .domain(cookieDomain)
-            .sameSite("Lax")
-            .secure(true)
-            .httpOnly(true)
-            .build(response)
-
         // set device id
         HttpUtil
             .buildCookie(AuthConstants.DEVICE_ID_COOKIE_NAME, session.deviceId)

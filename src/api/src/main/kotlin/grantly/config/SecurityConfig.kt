@@ -1,13 +1,17 @@
 package grantly.config
 
+import grantly.user.application.port.out.AuthSessionRepository
+import grantly.user.application.port.out.UserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.csrf.CsrfTokenRepository
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
@@ -18,6 +22,8 @@ import java.security.SecureRandom
 @EnableWebSecurity
 class SecurityConfig(
     private val redisTemplate: StringRedisTemplate,
+    private val authSessionRepository: AuthSessionRepository,
+    private val userRepository: UserRepository,
 ) {
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12, SecureRandom())
@@ -26,16 +32,26 @@ class SecurityConfig(
     fun csrfTokenRepository(): CsrfTokenRepository = RedisCsrfTokenRepository(redisTemplate)
 
     @Bean
-    fun securityFilterChainDSL(http: HttpSecurity): SecurityFilterChain {
+    @Order(1)
+    fun publicFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
+            .securityMatcher("/v*/auth/login", "/v*/auth/signup", "/v*/auth/csrf-token", "/docs/**")
+            .authorizeHttpRequests { it.anyRequest().permitAll() }
+            .addFilterAfter(CustomCsrfFilter(csrfTokenRepository()), UsernamePasswordAuthenticationFilter::class.java)
             .csrf { it.disable() }
-            .cors { }
-            .authorizeHttpRequests { auth ->
-                auth
-                    .anyRequest()
-                    .permitAll()
-            }
+        return http.build()
+    }
 
+    @Bean
+    @Order(2)
+    fun secureFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .authorizeHttpRequests { it.anyRequest().authenticated() }
+            .addFilterBefore(
+                CustomSessionFilter(authSessionRepository, userRepository),
+                UsernamePasswordAuthenticationFilter::class.java,
+            ).addFilterAfter(CustomCsrfFilter(csrfTokenRepository()), UsernamePasswordAuthenticationFilter::class.java)
+            .csrf { it.disable() }
         return http.build()
     }
 

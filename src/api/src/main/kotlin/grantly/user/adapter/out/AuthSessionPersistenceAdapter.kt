@@ -30,4 +30,8 @@ class AuthSessionPersistenceAdapter(
         }
         return authSessionMapper.toDomain(sessionEntity.get())
     }
+
+    override fun deleteSession(session: AuthSession) {
+        authSessionJpaRepository.deleteById(session.id)
+    }
 }
