@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.env.Environment
+import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.annotation.DirtiesContext
@@ -59,9 +60,15 @@ class AuthControllerTest(
 
     private lateinit var existingUser: User
 
+    @Autowired
+    lateinit var redisConnectionFactory: RedisConnectionFactory
+    private var mockSessionToken: String = "some-session-token"
+    private var mockCsrfToken: String = "some-csrf-token"
+
     @BeforeAll
     fun setUp() {
         existingUser = createTestUser("test@email.com", "test", "test123!")
+        manuallyInsertCsrfToken(mockSessionToken, mockCsrfToken)
     }
 
     @Test
@@ -72,6 +79,8 @@ class AuthControllerTest(
         mockMvc
             .perform(
                 post("/v1/auth/signup")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, mockSessionToken))
+                    .header(AuthConstants.CSRF_HEADER_NAME, mockCsrfToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isConflict)
@@ -89,6 +98,8 @@ class AuthControllerTest(
         mockMvc
             .perform(
                 post("/v1/auth/signup")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, mockSessionToken))
+                    .header(AuthConstants.CSRF_HEADER_NAME, mockCsrfToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isCreated)
@@ -106,6 +117,8 @@ class AuthControllerTest(
         mockMvc
             .perform(
                 post("/v1/auth/signup")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, mockSessionToken))
+                    .header(AuthConstants.CSRF_HEADER_NAME, mockCsrfToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isUnprocessableEntity)
@@ -121,11 +134,12 @@ class AuthControllerTest(
         mockMvc
             .perform(
                 post("/v1/auth/login")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, mockSessionToken))
+                    .header(AuthConstants.CSRF_HEADER_NAME, mockCsrfToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isNoContent)
             .andExpect(cookie().exists(AuthConstants.SESSION_COOKIE_NAME))
-            .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
             .andExpect(cookie().exists(AuthConstants.DEVICE_ID_COOKIE_NAME))
     }
 
@@ -138,11 +152,12 @@ class AuthControllerTest(
             mockMvc
                 .perform(
                     post("/v1/auth/login")
+                        .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, mockSessionToken))
+                        .header(AuthConstants.CSRF_HEADER_NAME, mockCsrfToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonBody),
                 ).andExpect(status().isNoContent)
                 .andExpect(cookie().exists(AuthConstants.SESSION_COOKIE_NAME))
-                .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
                 .andExpect(cookie().exists(AuthConstants.DEVICE_ID_COOKIE_NAME))
                 .andReturn()
 
@@ -155,6 +170,8 @@ class AuthControllerTest(
         mockMvc
             .perform(
                 post("/v1/auth/login")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, mockSessionToken))
+                    .header(AuthConstants.CSRF_HEADER_NAME, mockCsrfToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .cookie(
                         Cookie(AuthConstants.DEVICE_ID_COOKIE_NAME, "different-device-id"),
@@ -177,6 +194,8 @@ class AuthControllerTest(
         mockMvc
             .perform(
                 post("/v1/auth/login")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, mockSessionToken))
+                    .header(AuthConstants.CSRF_HEADER_NAME, mockCsrfToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isUnauthorized)
@@ -192,6 +211,8 @@ class AuthControllerTest(
         mockMvc
             .perform(
                 post("/v1/auth/login")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, mockSessionToken))
+                    .header(AuthConstants.CSRF_HEADER_NAME, mockCsrfToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isUnauthorized)
@@ -216,5 +237,16 @@ class AuthControllerTest(
         val user = User(email = email, name = name, password = password)
         user.hashPassword(passwordEncoder)
         return userRepository.createUser(user)
+    }
+
+    fun manuallyInsertCsrfToken(
+        sessionToken: String,
+        csrfToken: String,
+    ) {
+        val connection = redisConnectionFactory.connection
+        val key = "csrf:$sessionToken".toByteArray()
+        val value = csrfToken.toByteArray()
+        connection.set(key, value)
+        connection.close()
     }
 }
