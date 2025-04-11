@@ -98,7 +98,7 @@ __metadata:
     axios: "npm:1.8.4"
     class-variance-authority: "npm:0.7.1"
     clsx: "npm:2.1.1"
-    dotenv-flow: "npm:^4.1.0"
+    dotenv-flow: "npm:4.1.0"
     eslint: "npm:8.57.1"
     eslint-config-airbnb: "npm:19.0.4"
     eslint-config-airbnb-typescript: "npm:18.0.0"
@@ -1670,7 +1670,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv-flow@npm:^4.1.0":
+"dotenv-flow@npm:4.1.0":
   version: 4.1.0
   resolution: "dotenv-flow@npm:4.1.0"
   dependencies:
