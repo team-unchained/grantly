@@ -1,38 +1,61 @@
 services:
+
+  grantly-mysql:
+    image: mysql:8
+    container_name: grantly-mysql
+    restart: always
+    volumes:
+      - ./.tmp/mysql:/var/lib/mysql
+    ports:
+      - "23306:3306"
+    env_file:
+      - ../../../.env
+    command: --max-connections=500 --wait-timeout=60 --interactive-timeout=60
+    networks:
+      - grantly-network
+
   grantly-redis:
     image: redis:7
     container_name: grantly-redis
     restart: always
-    ports:
-      - '6379:6379'
     volumes:
       - ../../../.tmp/redis:/data
+    ports:
+      - "26379:6379"
+    networks:
+      - grantly-network
 
   grantly-backend:
     image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/backend:${GIT_HASH}
     container_name: grantly-backend
     restart: always
-    expose:
-      - '6000'
     env_file:
       - ../../../.env
+    environment:
+      - SPRING_REDIS_HOST=grantly-redis
+      - SPRING_REDIS_PORT=6379
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: [ "java", "-Dspring.profiles.active=${ENVIRONMENT}", "-jar", "/app.jar" ]
+    depends_on:
+      - grantly-mysql
+      - grantly-redis
+    networks:
+      - grantly-network
 
   grantly-frontend:
     image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/frontend:${GIT_HASH}
     container_name: grantly-frontend
     restart: always
-    expose:
-      - '6001'
     env_file:
       - ../../../.env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: [ "yarn", "@grantly/frontend", "start" ]
+    networks:
+      - grantly-network
 
-  caddy:
+  grantly-caddy:
     image: caddy:2
     container_name: grantly-caddy
     restart: always
@@ -46,3 +69,9 @@ services:
     depends_on:
       - grantly-backend
       - grantly-frontend
+    networks:
+      - grantly-network
+
+networks:
+  grantly-network:
+    driver: bridge
