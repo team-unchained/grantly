@@ -1,5 +1,6 @@
 package grantly.config
 
+import grantly.config.filter.SessionContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.core.StringRedisTemplate
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.csrf.CsrfTokenRepository
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
@@ -18,6 +20,7 @@ import java.security.SecureRandom
 @EnableWebSecurity
 class SecurityConfig(
     private val redisTemplate: StringRedisTemplate,
+    private val sessionContext: SessionContext,
 ) {
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12, SecureRandom())
@@ -34,7 +37,7 @@ class SecurityConfig(
                 auth
                     .anyRequest()
                     .permitAll()
-            }
+            }.addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
     }
