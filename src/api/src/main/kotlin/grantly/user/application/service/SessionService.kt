@@ -4,6 +4,7 @@ import grantly.common.constants.AuthConstants
 import grantly.common.utils.HttpUtil
 import grantly.config.CustomHttpSession
 import grantly.user.application.port.out.AuthSessionRepository
+import grantly.user.domain.AuthSession
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -80,5 +81,20 @@ class SessionService(
     ) {
         val httpSession = CustomHttpSession(token, deviceId)
         request.setAttribute(AuthConstants.SESSION_ATTR, httpSession)
+    }
+
+    fun persist(request: HttpServletRequest): AuthSession {
+        val httpSession = request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
+        val ip = request.remoteAddr
+        val userAgent = request.getHeader("User-Agent")
+        val authSession =
+            AuthSession(
+                token = httpSession.token,
+                deviceId = httpSession.deviceId,
+                expiresAt = OffsetDateTime.now().plusSeconds(AuthConstants.SESSION_TOKEN_EXPIRATION),
+                ip = ip,
+                userAgent = userAgent,
+            )
+        return sessionRepository.createSession(authSession)
     }
 }

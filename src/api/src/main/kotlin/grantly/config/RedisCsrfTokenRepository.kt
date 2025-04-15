@@ -15,7 +15,6 @@ private val log = KotlinLogging.logger {}
 
 class RedisCsrfTokenRepository(
     private val redisTemplate: StringRedisTemplate,
-    private val sessionTokenName: String = AuthConstants.SESSION_COOKIE_NAME,
     private val headerName: String = AuthConstants.CSRF_HEADER_NAME,
     private val parameterName: String = "_csrf",
     private val ttl: Duration = Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION),
@@ -32,22 +31,20 @@ class RedisCsrfTokenRepository(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ) {
-        // session token 이 없다면 anonymous token 임시 발급
-        val sessionToken = extractSessionToken(request) ?: ("anonymous-" + generateTokenValue())
-        val redisKey = "csrf:$sessionToken"
+        val sessionToken = extractSessionToken(request)
+        val redisKey = "csrf:${sessionToken.token}"
 
         log.debug { "Saving CSRF token to Redis: $redisKey" }
         redisTemplate.opsForValue().set(redisKey, token.token, ttl)
     }
 
     override fun loadToken(request: HttpServletRequest): CsrfToken? {
-        val sessionToken = extractSessionToken(request) ?: return null
-        val redisKey = "csrf:$sessionToken"
+        val sessionToken = extractSessionToken(request)
+        val redisKey = "csrf:${sessionToken.token}"
         val tokenValue = redisTemplate.opsForValue().get(redisKey) ?: return null
 
         return DefaultCsrfToken(headerName, parameterName, tokenValue)
     }
 
-    private fun extractSessionToken(request: HttpServletRequest): String? =
-        request.cookies?.firstOrNull { it.name == sessionTokenName }?.value
+    private fun extractSessionToken(request: HttpServletRequest) = request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
 }

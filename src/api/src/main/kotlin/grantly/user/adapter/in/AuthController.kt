@@ -153,7 +153,7 @@ class AuthController(
             .build(response)
 
         // set csrf token
-        val csrfToken = csrfTokenUseCase.setCsrfToken(request, response)
+        val csrfToken = csrfTokenUseCase.issueCsrfToken(request, response)
         HttpUtil
             .buildCookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token)
             .maxAge(Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION).seconds.toInt())
@@ -187,15 +187,7 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
-        val csrfToken = csrfTokenUseCase.setCsrfToken(request, response)
-        HttpUtil
-            .buildCookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token)
-            .maxAge(Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION).seconds.toInt())
-            .domain(cookieDomain)
-            .sameSite("Lax")
-            .secure(true)
-            .httpOnly(true)
-            .build(response)
+        csrfTokenUseCase.issueCsrfToken(request, response)
         return ResponseEntity.noContent().build()
     }
 }
