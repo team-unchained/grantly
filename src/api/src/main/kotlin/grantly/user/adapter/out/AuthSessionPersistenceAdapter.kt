@@ -30,4 +30,10 @@ class AuthSessionPersistenceAdapter(
         }
         return authSessionMapper.toDomain(sessionEntity.get())
     }
+
+    override fun createSession(session: AuthSession): AuthSession {
+        val newSession = session.copy(id = 0L)
+        val userEntity = authSessionJpaRepository.save(authSessionMapper.toEntity(newSession))
+        return authSessionMapper.toDomain(userEntity)
+    }
 }
