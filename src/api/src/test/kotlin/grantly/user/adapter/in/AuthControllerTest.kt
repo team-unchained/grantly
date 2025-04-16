@@ -4,11 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import grantly.common.constants.AuthConstants
 import grantly.user.adapter.`in`.dto.LoginRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
+import grantly.user.application.port.out.AuthSessionRepository
 import grantly.user.application.port.out.UserRepository
+import grantly.user.domain.AuthSession
 import grantly.user.domain.User
+import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.Cookie
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.not
+import org.assertj.core.api.Assertions.assertThatCode
+import org.assertj.core.api.Assertions.assertThatException
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -30,6 +35,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.OffsetDateTime
+import java.util.UUID
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -40,6 +47,8 @@ import org.testcontainers.junit.jupiter.Testcontainers
 class AuthControllerTest(
     @Autowired
     private val userRepository: UserRepository,
+    @Autowired
+    private val authSessionRepository: AuthSessionRepository,
     @Autowired
     private val mockMvc: MockMvc,
     @Autowired
@@ -62,6 +71,16 @@ class AuthControllerTest(
     @BeforeAll
     fun setUp() {
         existingUser = createTestUser("test@email.com", "test", "test123!")
+    }
+
+    @AfterEach
+    fun deleteSessionData() {
+        try {
+            val session = authSessionRepository.getSessionByUserId(existingUser.id)
+            authSessionRepository.deleteSession(session.id)
+        } catch (e: EntityNotFoundException) {
+            // do nothing
+        }
     }
 
     @Test
@@ -115,41 +134,33 @@ class AuthControllerTest(
     @DisplayName("로그인 성공")
     fun `should return 204 when login is successful`() {
         // given
+        val session = createAnonymousAuthSession()
         val jsonBody = objectMapper.writeValueAsString(LoginRequest(existingUser.email, "test123!"))
 
         // when & then
         mockMvc
             .perform(
                 post("/v1/auth/login")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, session.token))
+                    .cookie(Cookie(AuthConstants.DEVICE_ID_COOKIE_NAME, session.deviceId))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isNoContent)
             .andExpect(cookie().exists(AuthConstants.SESSION_COOKIE_NAME))
-            .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
             .andExpect(cookie().exists(AuthConstants.DEVICE_ID_COOKIE_NAME))
+
+        assertThatCode {
+            authSessionRepository.getSessionByUserId(existingUser.id)
+        }.doesNotThrowAnyException()
     }
 
     @Test
-    @DisplayName("로그인 성공: deviceId 가 다른 경우 세션 갱신")
-    fun `should refresh session token when deviceId does not match`() {
+    @DisplayName("로그인 성공: 익명 세션을 사용했으나 유저와 연결된 세션이 존재했을 때 이를 제거해야함")
+    fun `should delete existing user session on new login request`() {
         // given
         val jsonBody = objectMapper.writeValueAsString(LoginRequest(existingUser.email, "test123!"))
-        val initialLogin =
-            mockMvc
-                .perform(
-                    post("/v1/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonBody),
-                ).andExpect(status().isNoContent)
-                .andExpect(cookie().exists(AuthConstants.SESSION_COOKIE_NAME))
-                .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
-                .andExpect(cookie().exists(AuthConstants.DEVICE_ID_COOKIE_NAME))
-                .andReturn()
-
-        val initialSessionToken =
-            initialLogin.response.cookies
-                .find { it.name == AuthConstants.SESSION_COOKIE_NAME }!!
-                .value
+        val userSession = createUserAuthSession(existingUser.id)
+        val anonSession = createAnonymousAuthSession()
 
         // when & then
         mockMvc
@@ -157,13 +168,16 @@ class AuthControllerTest(
                 post("/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .cookie(
-                        Cookie(AuthConstants.DEVICE_ID_COOKIE_NAME, "different-device-id"),
-                        Cookie(AuthConstants.SESSION_COOKIE_NAME, initialSessionToken),
+                        Cookie(AuthConstants.DEVICE_ID_COOKIE_NAME, anonSession.deviceId),
+                        Cookie(AuthConstants.SESSION_COOKIE_NAME, anonSession.token),
                     ).content(jsonBody),
             ).andExpect(status().isNoContent)
             .andExpect { result ->
                 val cookie = result.response.getCookie(AuthConstants.SESSION_COOKIE_NAME)
-                assertThat(cookie?.value).isNotEqualTo(initialSessionToken)
+                assertThat(cookie?.value).isNotEqualTo(anonSession.token)
+                assertThatException()
+                    .isThrownBy { authSessionRepository.getSessionByToken(userSession.token) }
+                    .isInstanceOf(EntityNotFoundException::class.java)
             }
     }
 
@@ -216,5 +230,26 @@ class AuthControllerTest(
         val user = User(email = email, name = name, password = password)
         user.hashPassword(passwordEncoder)
         return userRepository.createUser(user)
+    }
+
+    fun createAnonymousAuthSession(): AuthSession {
+        val session =
+            AuthSession(
+                token = UUID.randomUUID().toString(),
+                deviceId = UUID.randomUUID().toString(),
+                expiresAt = OffsetDateTime.now().plusSeconds(3600),
+            )
+        return authSessionRepository.createSession(session)
+    }
+
+    fun createUserAuthSession(userId: Long): AuthSession {
+        val session =
+            AuthSession(
+                token = UUID.randomUUID().toString(),
+                deviceId = UUID.randomUUID().toString(),
+                expiresAt = OffsetDateTime.now().plusSeconds(3600),
+                userId = userId,
+            )
+        return authSessionRepository.createSession(session)
     }
 }
