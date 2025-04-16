@@ -12,12 +12,10 @@ import grantly.user.application.port.out.AuthSessionRepository
 import grantly.user.application.port.out.UserRepository
 import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.application.service.exceptions.PasswordMismatchException
-import grantly.user.application.service.exceptions.TokenGenerationException
 import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import jakarta.persistence.EntityNotFoundException
 import mu.KotlinLogging
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -29,6 +27,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val authSessionRepository: AuthSessionRepository,
     private val passwordEncoder: PasswordEncoder,
+    private val sessionService: SessionService,
 ) : SignUpUseCase,
     LoginUseCase,
     FindUserQuery,
@@ -51,32 +50,48 @@ class UserService(
             throw PasswordMismatchException()
         }
 
-        try {
-            val existing = authSessionRepository.getSessionByUserId(user.id)
-            if (existing.isValid() && existing.deviceId == params.deviceId) {
-                return existing
-            }
-            repeat(3) {
-                val session = refreshSession(existing, params.deviceId, params.ip, params.userAgent)
-                try {
-                    return authSessionRepository.upsertAuthSession(session)
-                } catch (e: DataIntegrityViolationException) {
-                    // retry
-                }
-            }
-        } catch (e: EntityNotFoundException) {
-            repeat(3) {
-                val session = buildNewSession(user.id, params.ip, params.userAgent)
-                try {
-                    return authSessionRepository.upsertAuthSession(session)
-                } catch (e: DataIntegrityViolationException) {
-                    // retry
-                }
+        val httpSession = sessionService.getHttpSession(params.request)
+        val authSession = authSessionRepository.getSessionByToken(httpSession.token)
+
+        if (!authSession.isValid()) {
+            authSessionRepository.deleteSession(authSession.id)
+            throw EntityNotFoundException("Valid session not found")
+        }
+
+        // 익명 세션으로 요청이 들어온 경우, 현재 유저와 연결된 세션이 있는지 확인
+        if (authSession.isAnonymous()) {
+            try {
+                val existingUserSession = authSessionRepository.getSessionByUserId(user.id)
+                // 이미 로그인된 세션이 있는 경우 제거함
+                authSessionRepository.deleteSession(existingUserSession.id)
+            } catch (e: EntityNotFoundException) {
+                // do nothing
             }
         }
 
-        log.error { "Failed to generate session token: session token collision" }
-        throw TokenGenerationException()
+        // 메타 정보 갱신
+        authSession.updateMeta(
+            deviceId = httpSession.deviceId,
+            ip = params.request.remoteAddr,
+            userAgent = params.request.getHeader("User-Agent"),
+        )
+        // 세션 값 갱신
+        val (newSessionToken, expiresAt) = sessionService.generateSessionToken()
+        authSession.replaceToken(newSessionToken, expiresAt)
+        // 유저와 연결
+        authSession.connectUser(user.id)
+
+        val updatedSession = authSessionRepository.updateSession(authSession)
+
+        // 세션 토큰을 쿠키에 설정
+        sessionService.setSessionToken(
+            params.response,
+            updatedSession.token,
+            updatedSession.expiresAt,
+        )
+        // 디바이스 ID를 쿠키에 설정
+        sessionService.setDeviceId(params.response, updatedSession.deviceId)
+        return updatedSession
     }
 
     /**

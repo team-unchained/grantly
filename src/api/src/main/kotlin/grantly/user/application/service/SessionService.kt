@@ -83,6 +83,9 @@ class SessionService(
         request.setAttribute(AuthConstants.SESSION_ATTR, httpSession)
     }
 
+    fun getHttpSession(request: HttpServletRequest): CustomHttpSession =
+        request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
+
     fun persist(request: HttpServletRequest): AuthSession {
         val httpSession = request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
         val ip = request.remoteAddr
