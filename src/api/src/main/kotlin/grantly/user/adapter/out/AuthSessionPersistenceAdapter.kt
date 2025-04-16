@@ -10,7 +10,7 @@ class AuthSessionPersistenceAdapter(
     private val authSessionJpaRepository: AuthSessionJpaRepository,
     private val authSessionMapper: AuthSessionMapper,
 ) : AuthSessionRepository {
-    override fun upsertAuthSession(session: AuthSession): AuthSession {
+    override fun updateSession(session: AuthSession): AuthSession {
         val userEntity = authSessionJpaRepository.save(authSessionMapper.toEntity(session))
         return authSessionMapper.toDomain(userEntity)
     }
@@ -36,4 +36,6 @@ class AuthSessionPersistenceAdapter(
         val userEntity = authSessionJpaRepository.save(authSessionMapper.toEntity(newSession))
         return authSessionMapper.toDomain(userEntity)
     }
+
+    override fun deleteSession(id: Long) = authSessionJpaRepository.deleteById(id)
 }
