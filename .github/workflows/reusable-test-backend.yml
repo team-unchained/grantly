@@ -20,7 +20,7 @@ jobs:
           filters: |
             isChanged:
               - "src/api/**"
-              - ".github/workflows/reusable-test-api.yml"
+              - ".github/workflows/reusable-test-backend.yml"
 
   test:
     needs: [ changes ]
@@ -54,3 +54,9 @@ jobs:
       - name: Run Gradle tests
         run: |
           make test-api
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: src/api/build/test-results/test/

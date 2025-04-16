@@ -26,3 +26,19 @@ jobs:
     with:
       java-version: ${{ needs.get-env.outputs.JAVA_VERSION }}
     secrets: inherit
+
+  report:
+    needs: [ test-api ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: test-results
+
+      - name: Register test results as comments in PR
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: 'test-results/TEST-*.xml'
