@@ -42,7 +42,7 @@ class UserService(
             throw PasswordMismatchException()
         }
 
-        val httpSession = sessionService.getHttpSession(params.request)
+        val httpSession = sessionService.getHttpSession(params.request) ?: throw EntityNotFoundException("Session not found")
         val authSession = sessionService.findSessionByToken(httpSession.token)
 
         if (!authSession.isValid()) {
