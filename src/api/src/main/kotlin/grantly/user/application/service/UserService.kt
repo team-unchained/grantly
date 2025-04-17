@@ -46,7 +46,7 @@ class UserService(
         val authSession = sessionService.findSessionByToken(httpSession.token)
 
         if (!authSession.isValid()) {
-            sessionService.deleteSession(authSession.id)
+            sessionService.delete(authSession.id)
             throw EntityNotFoundException("Valid session not found")
         }
 
@@ -55,7 +55,7 @@ class UserService(
             try {
                 val existingUserSession = sessionService.findSessionByUserId(user.id)
                 // 이미 로그인된 세션이 있는 경우 제거함
-                sessionService.deleteSession(existingUserSession.id)
+                sessionService.delete(existingUserSession.id)
             } catch (e: EntityNotFoundException) {
                 // do nothing
             }

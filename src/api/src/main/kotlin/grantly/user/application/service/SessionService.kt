@@ -105,7 +105,7 @@ class SessionService(
 
     fun findSessionByUserId(userId: Long): AuthSession = authSessionRepository.getSessionByUserId(userId)
 
-    fun deleteSession(id: Long) = authSessionRepository.deleteSession(id)
+    fun delete(id: Long) = authSessionRepository.deleteSession(id)
 
     fun update(authSession: AuthSession): AuthSession = authSessionRepository.updateSession(authSession)
 }
