@@ -18,7 +18,7 @@ import java.util.UUID
  */
 @Component
 class SessionService(
-    private val sessionRepository: AuthSessionRepository,
+    private val authSessionRepository: AuthSessionRepository,
 ) {
     @Value("\${grantly.cookie.domain}")
     private lateinit var cookieDomain: String
@@ -98,6 +98,14 @@ class SessionService(
                 ip = ip,
                 userAgent = userAgent,
             )
-        return sessionRepository.createSession(authSession)
+        return authSessionRepository.createSession(authSession)
     }
+
+    fun findSessionByToken(token: String): AuthSession = authSessionRepository.getSessionByToken(token)
+
+    fun findSessionByUserId(userId: Long): AuthSession = authSessionRepository.getSessionByUserId(userId)
+
+    fun deleteSession(id: Long) = authSessionRepository.deleteSession(id)
+
+    fun update(authSession: AuthSession): AuthSession = authSessionRepository.updateSession(authSession)
 }
