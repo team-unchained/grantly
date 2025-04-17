@@ -7,6 +7,7 @@ import grantly.user.application.port.out.UserRepository
 import grantly.user.application.service.SessionService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.core.annotation.Order
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -41,8 +42,15 @@ class SecurityConfig(
     fun csrfTokenRepository(): CsrfTokenRepository = RedisCsrfTokenRepository(redisTemplate)
 
     @Bean
+    @Profile("!test")
+    fun csrfValidationFilter(csrfTokenRepository: CsrfTokenRepository): CsrfValidationFilter = CsrfValidationFilter(csrfTokenRepository)
+
+    @Bean
     @Order(ORDER_PUBLIC_FILTER)
-    fun publicFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun publicFilterChain(
+        http: HttpSecurity,
+        csrfValidationFilter: CsrfValidationFilter?,
+    ): SecurityFilterChain {
         http
             .securityMatcher(
                 "/v*/auth/login",
@@ -51,20 +59,27 @@ class SecurityConfig(
                 "/docs/**",
             ).authorizeHttpRequests { it.anyRequest().permitAll() }
             .addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
-            .addFilterAfter(
-                CsrfValidationFilter(csrfTokenRepository()),
-                UsernamePasswordAuthenticationFilter::class.java,
-            ).csrf { it.disable() }
+        csrfValidationFilter?.let {
+            http.addFilterAfter(it, UsernamePasswordAuthenticationFilter::class.java)
+        }
+        http.csrf { it.disable() }
         return http.build()
     }
 
     @Bean
     @Order(ORDER_SECURE_FILTER)
-    fun secureFilterChain(http: HttpSecurity): SecurityFilterChain {
+    fun secureFilterChain(
+        http: HttpSecurity,
+        csrfValidationFilter: CsrfValidationFilter?,
+    ): SecurityFilterChain {
         // SessionContext -> CsrfValidationFilter -> SessionValidationFilter
         http
             .authorizeHttpRequests { it.anyRequest().authenticated() }
             .addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
+        csrfValidationFilter?.let {
+            http.addFilterAfter(it, UsernamePasswordAuthenticationFilter::class.java)
+        }
+        http
             .addFilterAfter(
                 CsrfValidationFilter(csrfTokenRepository()),
                 UsernamePasswordAuthenticationFilter::class.java,
