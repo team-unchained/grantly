@@ -32,10 +32,10 @@ class AuthSessionJpaEntity(
     val ip: String? = null,
     @Column(nullable = false)
     val expiresAt: OffsetDateTime,
-    @Column(name = "user_id", nullable = false, updatable = false)
-    val userId: Long,
+    @Column(name = "user_id", nullable = true)
+    val userId: Long? = null,
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id", updatable = false, insertable = false)
+    @JoinColumn(name = "user_id", nullable = true, referencedColumnName = "id", updatable = false, insertable = false)
     val user: UserJpaEntity? = null,
 ) : BaseEntity() {
     override fun toString() = entityToString(*toStringProperties)

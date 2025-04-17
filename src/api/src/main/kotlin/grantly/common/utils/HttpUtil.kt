@@ -38,13 +38,13 @@ class HttpUtil {
     ) {
         private val cookie = Cookie(name, value)
 
-        fun maxAge(maxAge: Int) = apply { cookie.maxAge }
+        fun maxAge(maxAge: Int) = apply { cookie.maxAge = maxAge }
 
-        fun domain(domain: String) = apply { cookie.domain ?: domain }
+        fun domain(domain: String) = apply { cookie.domain = domain }
 
-        fun secure(secure: Boolean) = apply { cookie.secure }
+        fun secure(secure: Boolean) = apply { cookie.secure = secure }
 
-        fun httpOnly(httpOnly: Boolean) = apply { cookie.isHttpOnly }
+        fun httpOnly(httpOnly: Boolean) = apply { cookie.isHttpOnly = httpOnly }
 
         fun sameSite(sameSite: String) = apply { cookie.setAttribute("SameSite", sameSite) }
 

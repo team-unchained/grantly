@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.web.csrf.CsrfToken
 
 interface CsrfTokenUseCase {
-    fun setCsrfToken(
+    fun issueCsrfToken(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): CsrfToken

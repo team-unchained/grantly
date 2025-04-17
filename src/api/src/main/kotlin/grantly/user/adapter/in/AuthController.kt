@@ -1,9 +1,7 @@
 package grantly.user.adapter.`in`
 
-import grantly.common.constants.AuthConstants
 import grantly.common.exceptions.HttpConflictException
 import grantly.common.exceptions.HttpExceptionResponse
-import grantly.common.exceptions.HttpInternalServerErrorException
 import grantly.common.exceptions.HttpUnauthorizedException
 import grantly.common.utils.HttpUtil
 import grantly.common.utils.TimeUtil
@@ -18,8 +16,6 @@ import grantly.user.application.port.`in`.dto.LoginParams
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.application.service.exceptions.PasswordMismatchException
-import grantly.user.application.service.exceptions.TokenGenerationException
-import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -38,8 +34,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
-import java.time.Duration
-import java.time.OffsetDateTime
 
 @RestController
 @ResponseBody
@@ -128,50 +122,13 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
-        val ip = request.remoteAddr
-        val userAgent = request.getHeader("User-Agent")
-        val deviceId = HttpUtil.getCookie(request, AuthConstants.DEVICE_ID_COOKIE_NAME)?.value
-        val session: AuthSession
         try {
-            session = loginUseCase.login(LoginParams(body.email, body.password, deviceId, ip, userAgent))
+            loginUseCase.login(LoginParams(body.email, body.password, request, response))
         } catch (e: EntityNotFoundException) {
-            throw HttpUnauthorizedException(e.message)
+            throw HttpUnauthorizedException("Authorization failed")
         } catch (e: PasswordMismatchException) {
             throw HttpUnauthorizedException(e.message)
-        } catch (e: TokenGenerationException) {
-            throw HttpInternalServerErrorException(e.message)
         }
-        // set session token
-        HttpUtil
-            .buildCookie(AuthConstants.SESSION_COOKIE_NAME, session.token)
-            .maxAge(
-                Duration.between(OffsetDateTime.now(), session.expiresAt).seconds.toInt(),
-            ).domain(cookieDomain)
-            .sameSite("Lax")
-            .secure(true)
-            .httpOnly(true)
-            .build(response)
-
-        // set csrf token
-        val csrfToken = csrfTokenUseCase.setCsrfToken(request, response)
-        HttpUtil
-            .buildCookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token)
-            .maxAge(Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION).seconds.toInt())
-            .domain(cookieDomain)
-            .sameSite("Lax")
-            .secure(true)
-            .httpOnly(true)
-            .build(response)
-
-        // set device id
-        HttpUtil
-            .buildCookie(AuthConstants.DEVICE_ID_COOKIE_NAME, session.deviceId)
-            .maxAge(Integer.MAX_VALUE)
-            .domain(cookieDomain)
-            .sameSite("Lax")
-            .secure(true)
-            .httpOnly(true)
-            .build(response)
 
         return ResponseEntity.noContent().build()
     }
@@ -187,15 +144,7 @@ class AuthController(
         request: HttpServletRequest,
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
-        val csrfToken = csrfTokenUseCase.setCsrfToken(request, response)
-        HttpUtil
-            .buildCookie(AuthConstants.CSRF_COOKIE_NAME, csrfToken.token)
-            .maxAge(Duration.ofSeconds(AuthConstants.CSRF_TOKEN_EXPIRATION).seconds.toInt())
-            .domain(cookieDomain)
-            .sameSite("Lax")
-            .secure(true)
-            .httpOnly(true)
-            .build(response)
+        csrfTokenUseCase.issueCsrfToken(request, response)
         return ResponseEntity.noContent().build()
     }
 }
