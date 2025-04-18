@@ -1,10 +1,11 @@
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
-import { CreateUser } from '@grantly/api/auth/authApi';
+import { CreateUser, Login } from '@grantly/api/auth/authApi';
 import { toast } from 'sonner';
 import {
   CreateUserRequestType,
   CreateUserResponseType,
+  LoginRequestType,
 } from '@grantly/api/auth/auth.schema';
 
 export const useCreateUserMutation = (
@@ -26,6 +27,22 @@ export const useCreateUserMutation = (
         toast.error('입력한 정보를 다시 확인해주세요.');
       } else {
         toast.error('회원가입 중 알 수 없는 오류가 발생했습니다.');
+      }
+    },
+  });
+
+export const useLoginMutation = (
+  options?: UseMutationOptions<void, AxiosError, LoginRequestType, unknown>
+) =>
+  useMutation({
+    ...options,
+    mutationFn: (params: LoginRequestType) => Login(params),
+    onError: (error) => {
+      const status = error.response?.status;
+      if (status === 401) {
+        toast.error('입력한 정보를 다시 확인해주세요.');
+      } else {
+        toast.error('로그인 중 알 수 없는 오류가 발생했습니다.');
       }
     },
   });

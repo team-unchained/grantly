@@ -17,7 +17,7 @@ import { useCreateUserMutation } from '@grantly/api/auth/useAuthQueries';
 import { FormInputField } from '@grantly/components/common/FormInputField';
 import {
   CreateUserRequestType,
-  signUpSchema,
+  SignUpSchema,
 } from '@grantly/api/auth/auth.schema';
 
 export function SignUpFormCard() {
@@ -27,7 +27,7 @@ export function SignUpFormCard() {
     handleSubmit,
     formState: { errors },
   } = useForm<CreateUserRequestType>({
-    resolver: zodResolver(signUpSchema),
+    resolver: zodResolver(SignUpSchema),
   });
 
   const { mutate: createUser, isPending } = useCreateUserMutation({
