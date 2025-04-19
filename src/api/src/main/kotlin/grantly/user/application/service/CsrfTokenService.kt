@@ -44,7 +44,7 @@ class CsrfTokenService(
             .domain(cookieDomain)
             .sameSite("Lax")
             .secure(true)
-            .httpOnly(true)
+            .httpOnly(false)
             .build(response)
     }
 }
