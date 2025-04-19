@@ -62,7 +62,7 @@ class SecurityConfig(
         csrfValidationFilter?.let {
             http.addFilterAfter(it, UsernamePasswordAuthenticationFilter::class.java)
         }
-        http.csrf { it.disable() }
+        http.csrf { it.disable() }.cors { }
         return http.build()
     }
 
@@ -87,6 +87,7 @@ class SecurityConfig(
                 SessionValidationFilter(sessionService, userRepository),
                 UsernamePasswordAuthenticationFilter::class.java,
             ).csrf { it.disable() }
+            .cors { }
         return http.build()
     }
 
