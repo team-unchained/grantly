@@ -1,8 +1,14 @@
 package grantly.config
 
+import grantly.config.filter.CsrfValidationFilter
 import grantly.config.filter.SessionContext
+import grantly.config.filter.SessionValidationFilter
+import grantly.user.application.port.out.UserRepository
+import grantly.user.application.service.SessionService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
+import org.springframework.core.annotation.Order
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -21,7 +27,14 @@ import java.security.SecureRandom
 class SecurityConfig(
     private val redisTemplate: StringRedisTemplate,
     private val sessionContext: SessionContext,
+    private val sessionService: SessionService,
+    private val userRepository: UserRepository,
 ) {
+    companion object {
+        private const val ORDER_PUBLIC_FILTER = 1
+        private const val ORDER_SECURE_FILTER = 2
+    }
+
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder(12, SecureRandom())
 
@@ -29,16 +42,52 @@ class SecurityConfig(
     fun csrfTokenRepository(): CsrfTokenRepository = RedisCsrfTokenRepository(redisTemplate)
 
     @Bean
-    fun securityFilterChainDSL(http: HttpSecurity): SecurityFilterChain {
-        http
-            .csrf { it.disable() }
-            .cors { }
-            .authorizeHttpRequests { auth ->
-                auth
-                    .anyRequest()
-                    .permitAll()
-            }.addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
+    @Profile("!test")
+    fun csrfValidationFilter(csrfTokenRepository: CsrfTokenRepository): CsrfValidationFilter = CsrfValidationFilter(csrfTokenRepository)
 
+    @Bean
+    @Order(ORDER_PUBLIC_FILTER)
+    fun publicFilterChain(
+        http: HttpSecurity,
+        csrfValidationFilter: CsrfValidationFilter?,
+    ): SecurityFilterChain {
+        http
+            .securityMatcher(
+                "/v*/auth/login",
+                "/v*/auth/signup",
+                "/v*/auth/csrf-token",
+                "/docs/**",
+            ).authorizeHttpRequests { it.anyRequest().permitAll() }
+            .addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
+        csrfValidationFilter?.let {
+            http.addFilterAfter(it, UsernamePasswordAuthenticationFilter::class.java)
+        }
+        http.csrf { it.disable() }.cors { }
+        return http.build()
+    }
+
+    @Bean
+    @Order(ORDER_SECURE_FILTER)
+    fun secureFilterChain(
+        http: HttpSecurity,
+        csrfValidationFilter: CsrfValidationFilter?,
+    ): SecurityFilterChain {
+        // SessionContext -> CsrfValidationFilter -> SessionValidationFilter
+        http
+            .authorizeHttpRequests { it.anyRequest().authenticated() }
+            .addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
+        csrfValidationFilter?.let {
+            http.addFilterAfter(it, UsernamePasswordAuthenticationFilter::class.java)
+        }
+        http
+            .addFilterAfter(
+                CsrfValidationFilter(csrfTokenRepository()),
+                UsernamePasswordAuthenticationFilter::class.java,
+            ).addFilterAfter(
+                SessionValidationFilter(sessionService, userRepository),
+                UsernamePasswordAuthenticationFilter::class.java,
+            ).csrf { it.disable() }
+            .cors { }
         return http.build()
     }
 
