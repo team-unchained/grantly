@@ -40,7 +40,7 @@ springdoc:
   default-produces-media-type: application/json
 grantly:
   cookie:
-    domain: .grantly.work
+    domain: grantly.work
 ---
 spring:
   config:
@@ -49,9 +49,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-grantly:
-  cookie:
-    domain: api.grantly.work
 ---
 spring:
   config:
@@ -67,4 +64,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-
+grantly:
+  cookie:
+    domain: w0nder.land

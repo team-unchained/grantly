@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const signUpSchema = z.object({
+export const SignUpSchema = z.object({
   email: z
     .string()
     .min(1, { message: '이메일은 필수값입니다.' })
@@ -21,7 +21,7 @@ export const signUpSchema = z.object({
     }),
 });
 
-export type CreateUserRequestType = z.infer<typeof signUpSchema>;
+export type CreateUserRequestType = z.infer<typeof SignUpSchema>;
 
 export const UserSchema = z.object({
   id: z.number().int(),
@@ -36,3 +36,10 @@ export type UserType = z.infer<typeof UserSchema>;
 export type CreateUserResponseType = {
   user: UserType;
 };
+
+export const LoginSchema = z.object({
+  email: z.string().min(1),
+  password: z.string().min(1),
+});
+
+export type LoginRequestType = z.infer<typeof LoginSchema>;

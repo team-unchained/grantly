@@ -5,6 +5,7 @@ import grantly.common.utils.HttpUtil
 import grantly.config.CustomHttpSession
 import grantly.user.application.port.out.AuthSessionRepository
 import grantly.user.domain.AuthSession
+import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -86,8 +87,19 @@ class SessionService(
     fun getHttpSession(request: HttpServletRequest): CustomHttpSession =
         request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
 
-    fun persist(request: HttpServletRequest): AuthSession {
-        val httpSession = request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
+    fun persistIfAbsent(request: HttpServletRequest): AuthSession {
+        val httpSession = getHttpSession(request)
+        return try {
+            authSessionRepository.getSessionByToken(httpSession.token)
+        } catch (e: EntityNotFoundException) {
+            persist(request, httpSession)
+        }
+    }
+
+    private fun persist(
+        request: HttpServletRequest,
+        httpSession: CustomHttpSession,
+    ): AuthSession {
         val ip = request.remoteAddr
         val userAgent = request.getHeader("User-Agent")
         val authSession =

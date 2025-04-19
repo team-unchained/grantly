@@ -32,6 +32,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download test results
+        id: download
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: test-results
@@ -39,6 +41,6 @@ jobs:
 
       - name: Register test results as comments in PR
         uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
+        if: steps.download.outcome == 'success'
         with:
           files: 'test-results/TEST-*.xml'
