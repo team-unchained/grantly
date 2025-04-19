@@ -88,7 +88,8 @@ class SessionService(
         request.getAttribute(AuthConstants.SESSION_ATTR) as? CustomHttpSession
 
     fun persistIfAbsent(request: HttpServletRequest): AuthSession {
-        val httpSession = getHttpSession(request)
+        val httpSession =
+            getHttpSession(request) ?: throw IllegalStateException("Request object requires HttpSession attribute.")
         return try {
             authSessionRepository.getSessionByToken(httpSession.token)
         } catch (e: EntityNotFoundException) {
