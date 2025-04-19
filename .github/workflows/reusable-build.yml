@@ -31,6 +31,7 @@ jobs:
         run: |
           make build-api
           DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME \
+            --build-arg ENVIRONMENT=$ENVIRONMENT \
             -f ./docs/infra/$ENVIRONMENT/Dockerfile.$SERVICE .
           docker push $IMAGE_NAME
           docker builder prune -f
