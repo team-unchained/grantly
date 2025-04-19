@@ -222,6 +222,21 @@ class AuthControllerTest(
             .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
     }
 
+    @Test
+    @DisplayName("CSRF 토큰 조회: 세션 토큰이 함께 들어왔을 때")
+    fun `skip persist if session exists when requesting csrf token`() {
+        // given
+        val authSession = createUserAuthSession(existingUser.id)
+
+        // when & then
+        mockMvc
+            .perform(
+                get("/v1/auth/csrf-token")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, authSession.token)),
+            ).andExpect(status().isNoContent)
+            .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
+    }
+
     fun createTestUser(
         email: String,
         name: String,

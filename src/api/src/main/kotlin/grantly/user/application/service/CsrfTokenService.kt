@@ -27,7 +27,7 @@ class CsrfTokenService(
         val csrfToken = csrfTokenRepository.generateToken(request)
         csrfTokenRepository.saveToken(csrfToken, request, response)
         // 세션 토큰 영속화
-        sessionService.persist(request)
+        sessionService.persistIfAbsent(request)
         // csrf token 쿠키 설정
         setCsrfTokenCookie(response, csrfToken)
 
