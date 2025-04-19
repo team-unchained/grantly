@@ -95,7 +95,7 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration =
             CorsConfiguration().apply {
-                allowedOrigins = listOf("https://grantly.work")
+                allowedOrigins = listOf("https://grantly.work", "https://grantly.w0nder.land")
                 allowedMethods = listOf("POST", "GET", "DELETE", "PUT", "PATCH", "OPTIONS")
                 allowedHeaders =
                     listOf("Authorization", "Content-Type", "X-Requested-With", "X-CSRF-TOKEN", "User-Agent")
