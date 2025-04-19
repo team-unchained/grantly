@@ -79,6 +79,7 @@ class HttpUtil {
         fun sameSite(sameSite: String) = apply { cookie.setAttribute("SameSite", sameSite) }
 
         fun build(response: HttpServletResponse) {
+            cookie.path = "/"
             response.addCookie(cookie)
         }
     }
