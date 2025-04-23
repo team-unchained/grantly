@@ -1,5 +1,6 @@
 package grantly.config.filter
 
+import grantly.config.CustomHttpSession
 import grantly.user.application.service.SessionService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -19,18 +20,18 @@ class SessionContext(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        var sessionToken = sessionService.getSessionTokenCookie(request)
+        var (sessionToken, expiresAt) = sessionService.getSessionTokenCookie(request)
         if (sessionToken == null) {
-            val (token, expiresAt) = sessionService.generateSessionToken()
-            sessionToken = token
-            sessionService.setSessionToken(response, token, expiresAt)
+            val (newSessionToken, newExpiresAt) = sessionService.generateSessionToken()
+            sessionToken = newSessionToken
+            expiresAt = newExpiresAt
         }
         var deviceId = sessionService.getDeviceIdCookie(request)
         if (deviceId == null) {
             deviceId = sessionService.generateDeviceId()
-            sessionService.setDeviceId(response, deviceId)
         }
-        sessionService.setHttpSession(request, sessionToken, deviceId)
+        val httpSession = CustomHttpSession(sessionToken, expiresAt!!, deviceId)
+        sessionService.setHttpSession(request, httpSession)
         log.debug { "Session token: $sessionToken, Device ID: $deviceId" }
 
         filterChain.doFilter(request, response)

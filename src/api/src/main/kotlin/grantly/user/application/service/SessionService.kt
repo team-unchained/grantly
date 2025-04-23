@@ -24,12 +24,12 @@ class SessionService(
     @Value("\${grantly.cookie.domain}")
     private lateinit var cookieDomain: String
 
-    fun getSessionTokenCookie(request: HttpServletRequest): String? {
+    fun getSessionTokenCookie(request: HttpServletRequest): Pair<String?, OffsetDateTime?> {
         HttpUtil
             .getCookie(request, AuthConstants.SESSION_COOKIE_NAME)
             ?.let { cookie ->
-                return cookie.value
-            } ?: return null
+                return Pair(cookie.value, OffsetDateTime.now().plusSeconds(cookie.maxAge.toLong()))
+            } ?: return Pair(null, null)
     }
 
     fun getDeviceIdCookie(request: HttpServletRequest): String? {
@@ -40,7 +40,16 @@ class SessionService(
             } ?: return null
     }
 
-    fun setSessionToken(
+    fun setCookies(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ) {
+        val httpSession = getHttpSession(request)
+        setSessionToken(response, httpSession.token, httpSession.expiresAt)
+        setDeviceId(response, httpSession.deviceId)
+    }
+
+    private fun setSessionToken(
         response: HttpServletResponse,
         token: String,
         expiresAt: OffsetDateTime,
@@ -56,13 +65,40 @@ class SessionService(
             .build(response)
     }
 
-    fun setDeviceId(
+    private fun setDeviceId(
         response: HttpServletResponse,
         deviceId: String,
     ) {
         HttpUtil
             .buildCookie(AuthConstants.DEVICE_ID_COOKIE_NAME, deviceId)
             .maxAge(Integer.MAX_VALUE)
+            .domain(cookieDomain)
+            .sameSite("Lax")
+            .secure(true)
+            .httpOnly(true)
+            .build(response)
+    }
+
+    fun unsetCookies(response: HttpServletResponse) {
+        unsetSessionToken(response)
+        unsetDeviceId(response)
+    }
+
+    private fun unsetSessionToken(response: HttpServletResponse) {
+        HttpUtil
+            .buildCookie(AuthConstants.SESSION_COOKIE_NAME, "")
+            .maxAge(0)
+            .domain(cookieDomain)
+            .sameSite("Lax")
+            .secure(true)
+            .httpOnly(true)
+            .build(response)
+    }
+
+    private fun unsetDeviceId(response: HttpServletResponse) {
+        HttpUtil
+            .buildCookie(AuthConstants.DEVICE_ID_COOKIE_NAME, "")
+            .maxAge(0)
             .domain(cookieDomain)
             .sameSite("Lax")
             .secure(true)
@@ -77,20 +113,16 @@ class SessionService(
 
     fun setHttpSession(
         request: HttpServletRequest,
-        token: String,
-        deviceId: String,
+        httpSession: CustomHttpSession,
     ) {
-        val httpSession = CustomHttpSession(token, deviceId)
         request.setAttribute(AuthConstants.SESSION_ATTR, httpSession)
     }
 
-    fun getHttpSession(request: HttpServletRequest): CustomHttpSession? =
-        request.getAttribute(AuthConstants.SESSION_ATTR) as? CustomHttpSession
+    fun getHttpSession(request: HttpServletRequest): CustomHttpSession =
+        request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
 
     fun persistIfAbsent(request: HttpServletRequest): AuthSession {
-        // TODO: HttpServletRequest 확장해서 getHttpSession() 메서드 추가
-        val httpSession =
-            getHttpSession(request) ?: throw IllegalStateException("Request object requires HttpSession attribute.")
+        val httpSession = getHttpSession(request)
         return try {
             authSessionRepository.getSessionByToken(httpSession.token)
         } catch (e: EntityNotFoundException) {
