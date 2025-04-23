@@ -81,9 +81,6 @@ class SecurityConfig(
         }
         http
             .addFilterAfter(
-                CsrfValidationFilter(csrfTokenRepository()),
-                UsernamePasswordAuthenticationFilter::class.java,
-            ).addFilterAfter(
                 SessionValidationFilter(sessionService, userRepository),
                 UsernamePasswordAuthenticationFilter::class.java,
             ).csrf { it.disable() }
