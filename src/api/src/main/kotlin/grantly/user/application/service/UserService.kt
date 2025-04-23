@@ -1,6 +1,7 @@
 package grantly.user.application.service
 
 import grantly.common.annotations.UseCase
+import grantly.config.CustomHttpSession
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.LoginUseCase
@@ -70,19 +71,16 @@ class UserService(
         // 세션 값 갱신
         val (newSessionToken, expiresAt) = sessionService.generateSessionToken()
         authSession.replaceToken(newSessionToken, expiresAt)
-        // 유저와 연결
+        // 유저와 연결 및 저장
         authSession.connectUser(user.id)
-
         val updatedSession = sessionService.update(authSession)
 
-        // 세션 토큰을 쿠키에 설정
-        sessionService.setSessionToken(
-            params.response,
-            updatedSession.token,
-            updatedSession.expiresAt,
+        // 쿠키 설정
+        sessionService.setHttpSession(
+            params.request,
+            CustomHttpSession(updatedSession.token, updatedSession.expiresAt, updatedSession.deviceId),
         )
-        // 디바이스 ID를 쿠키에 설정
-        sessionService.setDeviceId(params.response, updatedSession.deviceId)
+        sessionService.setCookies(params.request, params.response)
         return updatedSession
     }
 

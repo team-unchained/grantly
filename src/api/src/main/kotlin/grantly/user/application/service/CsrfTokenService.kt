@@ -30,6 +30,8 @@ class CsrfTokenService(
         sessionService.persistIfAbsent(request)
         // csrf token 쿠키 설정
         setCsrfTokenCookie(response, csrfToken)
+        // 세션/device id 쿠키 설정
+        sessionService.setCookies(request, response)
 
         return csrfToken
     }
