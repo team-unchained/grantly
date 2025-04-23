@@ -38,6 +38,7 @@ class HttpUtil {
             response: HttpServletResponse,
             cookie: Cookie,
         ) {
+            cookie.value = null
             cookie.maxAge = 0
             response.addCookie(cookie)
         }
