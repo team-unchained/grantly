@@ -68,6 +68,7 @@ class SecurityConfig(
 
     @Bean
     @Order(ORDER_SECURE_FILTER)
+    @Profile("!test")
     fun secureFilterChain(
         http: HttpSecurity,
         csrfValidationFilter: CsrfValidationFilter?,
