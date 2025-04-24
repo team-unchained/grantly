@@ -1,9 +1,9 @@
 package grantly.user.application.service
 
 import grantly.common.annotations.UseCase
-import grantly.config.CustomHttpSession
 import grantly.common.constants.AuthConstants
 import grantly.common.utils.HttpUtil
+import grantly.config.CustomHttpSession
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.LoginUseCase
