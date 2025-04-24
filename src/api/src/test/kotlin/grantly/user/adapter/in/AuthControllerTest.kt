@@ -237,6 +237,25 @@ class AuthControllerTest(
             .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
     }
 
+    @Test
+    @DisplayName("로그아웃")
+    fun `should delete all cookies on logout`() {
+        // given
+        val authSession = createUserAuthSession(existingUser.id)
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/logout")
+                    .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, authSession.token)),
+            ).andExpect(status().isNoContent)
+            .andExpect { result ->
+                val deletedCookie = result.response.getCookie(AuthConstants.SESSION_COOKIE_NAME)
+                assertThat(deletedCookie?.value).isEqualTo("")
+                assertThat(deletedCookie?.maxAge).isEqualTo(0)
+            }
+    }
+
     fun createTestUser(
         email: String,
         name: String,

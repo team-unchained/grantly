@@ -1,11 +1,14 @@
 package grantly.user.application.service
 
 import grantly.common.annotations.UseCase
+import grantly.config.CustomHttpSession
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.LoginUseCase
+import grantly.user.application.port.`in`.LogoutUseCase
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.LoginParams
+import grantly.user.application.port.`in`.dto.LogoutParams
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.port.out.UserRepository
 import grantly.user.application.service.exceptions.DuplicateEmailException
@@ -22,6 +25,7 @@ class UserService(
     private val sessionService: SessionService,
 ) : SignUpUseCase,
     LoginUseCase,
+    LogoutUseCase,
     FindUserQuery,
     EditProfileUseCase {
     override fun signUp(params: SignUpParams): User {
@@ -42,7 +46,7 @@ class UserService(
             throw PasswordMismatchException()
         }
 
-        val httpSession = sessionService.getHttpSession(params.request) ?: throw EntityNotFoundException("Session not found")
+        val httpSession = sessionService.getHttpSession(params.request)
         val authSession = sessionService.findSessionByToken(httpSession.token)
 
         if (!authSession.isValid()) {
@@ -70,20 +74,27 @@ class UserService(
         // 세션 값 갱신
         val (newSessionToken, expiresAt) = sessionService.generateSessionToken()
         authSession.replaceToken(newSessionToken, expiresAt)
-        // 유저와 연결
+        // 유저와 연결 및 저장
         authSession.connectUser(user.id)
-
         val updatedSession = sessionService.update(authSession)
 
-        // 세션 토큰을 쿠키에 설정
-        sessionService.setSessionToken(
-            params.response,
-            updatedSession.token,
-            updatedSession.expiresAt,
+        // 쿠키 설정
+        sessionService.setHttpSession(
+            params.request,
+            CustomHttpSession(updatedSession.token, updatedSession.expiresAt, updatedSession.deviceId),
         )
-        // 디바이스 ID를 쿠키에 설정
-        sessionService.setDeviceId(params.response, updatedSession.deviceId)
+        sessionService.setCookies(params.request, params.response)
         return updatedSession
+    }
+
+    override fun logout(params: LogoutParams) {
+        // 세션 삭제
+        val httpSession =
+            sessionService.getHttpSession(params.request)
+        val authSession = sessionService.findSessionByToken(httpSession.token)
+        sessionService.delete(authSession.id)
+
+        sessionService.unsetCookies(params.response)
     }
 
     override fun findUserById(id: Long) = userRepository.getUser(id)

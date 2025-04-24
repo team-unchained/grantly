@@ -11,8 +11,10 @@ import grantly.user.adapter.out.dto.SignUpResponse
 import grantly.user.adapter.out.dto.UserResponse
 import grantly.user.application.port.`in`.CsrfTokenUseCase
 import grantly.user.application.port.`in`.LoginUseCase
+import grantly.user.application.port.`in`.LogoutUseCase
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.LoginParams
+import grantly.user.application.port.`in`.dto.LogoutParams
 import grantly.user.application.port.`in`.dto.SignUpParams
 import grantly.user.application.service.exceptions.DuplicateEmailException
 import grantly.user.application.service.exceptions.PasswordMismatchException
@@ -26,7 +28,6 @@ import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -43,10 +44,8 @@ class AuthController(
     private val signUpUseCase: SignUpUseCase,
     private val loginUseCase: LoginUseCase,
     private val csrfTokenUseCase: CsrfTokenUseCase,
+    private val logoutUseCase: LogoutUseCase,
 ) {
-    @Value("\${grantly.cookie.domain}")
-    private lateinit var cookieDomain: String
-
     @Operation(
         summary = "이메일을 이용한 회원가입",
         responses = [
@@ -145,6 +144,21 @@ class AuthController(
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
         csrfTokenUseCase.issueCsrfToken(request, response)
+        return ResponseEntity.noContent().build()
+    }
+
+    @Operation(
+        summary = "로그아웃",
+        responses = [
+            ApiResponse(responseCode = "204", description = "로그아웃 성공"),
+        ],
+    )
+    @PostMapping("/logout")
+    fun logout(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): ResponseEntity<Void> {
+        logoutUseCase.logout(LogoutParams(request, response))
         return ResponseEntity.noContent().build()
     }
 }

@@ -34,14 +34,6 @@ class HttpUtil {
             key: String,
         ): Cookie? = request.cookies?.firstOrNull { it.name == key }
 
-        fun deleteCookie(
-            response: HttpServletResponse,
-            cookie: Cookie,
-        ) {
-            cookie.maxAge = 0
-            response.addCookie(cookie)
-        }
-
         fun writeErrorResponse(
             response: HttpServletResponse,
             exc: HttpException,
