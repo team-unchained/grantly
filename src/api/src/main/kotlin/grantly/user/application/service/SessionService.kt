@@ -118,8 +118,10 @@ class SessionService(
         request.setAttribute(AuthConstants.SESSION_ATTR, httpSession)
     }
 
-    fun getHttpSession(request: HttpServletRequest): CustomHttpSession =
-        request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
+    fun getHttpSession(request: HttpServletRequest): CustomHttpSession {
+        // TODO: HttpServletRequest 확장해서 getHttpSession() 메서드 추가
+        return request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
+    }
 
     fun persistIfAbsent(request: HttpServletRequest): AuthSession {
         val httpSession = getHttpSession(request)
