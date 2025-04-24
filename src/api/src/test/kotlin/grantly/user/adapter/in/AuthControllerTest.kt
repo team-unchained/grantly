@@ -251,7 +251,7 @@ class AuthControllerTest(
             ).andExpect(status().isNoContent)
             .andExpect { result ->
                 val deletedCookie = result.response.getCookie(AuthConstants.SESSION_COOKIE_NAME)
-                assertThat(deletedCookie?.value).isNull()
+                assertThat(deletedCookie?.value).isEqualTo("")
                 assertThat(deletedCookie?.maxAge).isEqualTo(0)
             }
     }

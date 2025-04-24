@@ -24,10 +24,7 @@ class SessionValidationFilter(
     ) {
         // HttpSession 이 request 에 존재하는지 확인
         val httpSession =
-            sessionService.getHttpSession(request) ?: run {
-                HttpUtil.writeErrorResponse(response, HttpUnauthorizedException())
-                return
-            }
+            sessionService.getHttpSession(request)
 
         val authSession: AuthSession
         try {
@@ -55,8 +52,8 @@ class SessionValidationFilter(
         } catch (e: EntityNotFoundException) {
             sessionService.delete(authSession.id)
             // 세션 쿠키 삭제
-            HttpUtil.getCookie(request, AuthConstants.SESSION_COOKIE_NAME)?.let { cookie ->
-                HttpUtil.deleteCookie(response, cookie)
+            HttpUtil.getCookie(request, AuthConstants.SESSION_COOKIE_NAME)?.let {
+                sessionService.unsetCookies(response)
             }
             HttpUtil.writeErrorResponse(response, HttpUnauthorizedException("User not found"))
             return

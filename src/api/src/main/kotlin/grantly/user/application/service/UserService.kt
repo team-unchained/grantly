@@ -1,8 +1,6 @@
 package grantly.user.application.service
 
 import grantly.common.annotations.UseCase
-import grantly.common.constants.AuthConstants
-import grantly.common.utils.HttpUtil
 import grantly.config.CustomHttpSession
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
@@ -18,7 +16,6 @@ import grantly.user.application.service.exceptions.PasswordMismatchException
 import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import jakarta.persistence.EntityNotFoundException
-import jakarta.servlet.http.Cookie
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @UseCase
@@ -49,7 +46,7 @@ class UserService(
             throw PasswordMismatchException()
         }
 
-        val httpSession = sessionService.getHttpSession(params.request) ?: throw EntityNotFoundException("Session not found")
+        val httpSession = sessionService.getHttpSession(params.request)
         val authSession = sessionService.findSessionByToken(httpSession.token)
 
         if (!authSession.isValid()) {
@@ -92,23 +89,12 @@ class UserService(
 
     override fun logout(params: LogoutParams) {
         // 세션 삭제
-        val httpSession = sessionService.getHttpSession(params.request) ?: throw EntityNotFoundException("Session not found")
+        val httpSession =
+            sessionService.getHttpSession(params.request)
         val authSession = sessionService.findSessionByToken(httpSession.token)
         sessionService.delete(authSession.id)
 
-        // 쿠키 삭제
-        // 세션 쿠키 삭제
-        HttpUtil.getCookie(params.request, AuthConstants.SESSION_COOKIE_NAME)?.let { cookie: Cookie ->
-            HttpUtil.deleteCookie(params.response, cookie.clone() as Cookie)
-        }
-        // 디바이스 쿠키 삭제
-        HttpUtil.getCookie(params.request, AuthConstants.DEVICE_ID_COOKIE_NAME)?.let { cookie: Cookie ->
-            HttpUtil.deleteCookie(params.response, cookie.clone() as Cookie)
-        }
-        // CSRF 쿠키 삭제
-        HttpUtil.getCookie(params.request, AuthConstants.CSRF_COOKIE_NAME)?.let { cookie: Cookie ->
-            HttpUtil.deleteCookie(params.response, cookie.clone() as Cookie)
-        }
+        sessionService.unsetCookies(params.response)
     }
 
     override fun findUserById(id: Long) = userRepository.getUser(id)
