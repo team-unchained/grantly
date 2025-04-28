@@ -47,8 +47,6 @@ class UserController(
                 id = user.id,
                 email = user.email,
                 name = user.name,
-                createdAt = user.createdAt.toString(),
-                modifiedAt = user.modifiedAt?.toString(),
             ),
         )
     }
