@@ -45,6 +45,9 @@ class WithSessionSecurityContextFactory(
             authSession = newAuthSession
         }
 
+        // 세션 토큰을 ThreadLocal 에 저장
+        TestSessionTokenHolder.set(authSession.token)
+
         // context 에 설정
         context.authentication =
             UsernamePasswordAuthenticationToken(

@@ -1,6 +1,9 @@
 package grantly.user.adapter.`in`
 
+import grantly.common.utils.performWithSession
+import grantly.config.TestSessionTokenHolder
 import grantly.config.WithTestSessionUser
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -23,6 +26,9 @@ class UserControllerTest(
     @Autowired
     private val mockMvc: MockMvc,
 ) {
+    @AfterEach
+    fun tearDown() = TestSessionTokenHolder.clear()
+
     @Test
     @DisplayName("요청 사용자 정보 조회")
     @WithTestSessionUser(email = "test@email.com", name = "test")
@@ -30,8 +36,9 @@ class UserControllerTest(
         // given
         // when & then
         mockMvc
-            .perform(
+            .performWithSession(
                 get("/v1/users/me"),
+                TestSessionTokenHolder.get(),
             ).andExpect(status().isOk)
             .andExpect(jsonPath("$.email").value("test@email.com"))
             .andExpect(jsonPath("$.name").value("test"))
