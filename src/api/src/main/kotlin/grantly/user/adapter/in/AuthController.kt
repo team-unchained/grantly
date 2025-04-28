@@ -4,7 +4,6 @@ import grantly.common.exceptions.HttpConflictException
 import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.exceptions.HttpUnauthorizedException
 import grantly.common.utils.HttpUtil
-import grantly.common.utils.TimeUtil
 import grantly.user.adapter.`in`.dto.LoginRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
 import grantly.user.adapter.out.dto.SignUpResponse
@@ -91,8 +90,6 @@ class AuthController(
                         id = user.id,
                         email = user.email,
                         name = user.name,
-                        createdAt = TimeUtil.toRFC3339(user.createdAt),
-                        modifiedAt = user.modifiedAt?.let { TimeUtil.toRFC3339(it) },
                     ),
             ),
         )
