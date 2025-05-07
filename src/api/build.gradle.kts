@@ -41,6 +41,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.10")
+    implementation("com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations")
 
     testImplementation("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

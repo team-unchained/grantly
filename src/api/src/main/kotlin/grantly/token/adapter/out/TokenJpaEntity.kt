@@ -29,7 +29,7 @@ class TokenJpaEntity(
     @Column(nullable = false)
     val type: Int,
     @Type(JsonType::class)
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "json")
     var payload: Map<String, Any>? = null,
 ) : BaseEntity() {
     override fun equals(other: Any?) = entityEquals(other, TokenJpaEntity::id)
