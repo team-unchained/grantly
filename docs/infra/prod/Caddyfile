@@ -39,3 +39,22 @@ grantly.w0nder.land {
     # gzip 압축
     encode gzip
 }
+
+grantly-grafana.w0nder.land {
+
+    # TLS 설정 (자동으로 Let's Encrypt 인증서 발급)
+    tls {
+        protocols tls1.2 tls1.3
+    }
+
+    # API 서버로 리버스 프록시
+    reverse_proxy grantly-grafana:6600
+
+    # 로깅 설정
+    log {
+        output file /var/log/caddy/access.log
+    }
+
+    # gzip 압축
+    encode gzip
+}

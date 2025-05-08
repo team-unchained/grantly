@@ -3,7 +3,13 @@ services:
   grantly-mysql:
     image: mysql:8
     container_name: grantly-mysql
-    restart: unless-stopped
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "grantly-mysql"
     volumes:
       - ./.tmp/mysql:/var/lib/mysql
     ports:
@@ -13,34 +19,34 @@ services:
     command: --max-connections=500 --wait-timeout=60 --interactive-timeout=60
     networks:
       - grantly-network
+
+  grantly-redis:
+    image: redis:7
+    container_name: grantly-redis
+    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-
-  grantly-redis:
-    image: redis:7
-    container_name: grantly-redis
-    restart: unless-stopped
+        tag: "grantly-redis"
     volumes:
       - ../../../.tmp/redis:/data
     ports:
       - "26379:6379"
     networks:
       - grantly-network
+
+  grantly-backend:
+    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/backend:${GIT_HASH}
+    container_name: grantly-backend
+    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-
-  grantly-backend:
-    build:
-      context: ../../..
-      dockerfile: docs/infra/local/Dockerfile.backend
-    container_name: grantly-backend
-    restart: unless-stopped
+        tag: "grantly-backend"
     env_file:
       - ../../../.env
     environment:
@@ -54,18 +60,17 @@ services:
       - grantly-redis
     networks:
       - grantly-network
+
+  grantly-frontend:
+    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/frontend:${GIT_HASH}
+    container_name: grantly-frontend
+    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-
-  grantly-frontend:
-    build:
-      context: ../../..
-      dockerfile: docs/infra/local/Dockerfile.frontend
-    container_name: grantly-frontend
-    restart: unless-stopped
+        tag: "grantly-frontend"
     env_file:
       - ../../../.env
     extra_hosts:
@@ -73,16 +78,17 @@ services:
     command: [ "yarn", "@grantly/frontend", "start" ]
     networks:
       - grantly-network
+
+  grantly-caddy:
+    image: caddy:2
+    container_name: grantly-caddy
+    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-
-  grantly-caddy:
-    image: caddy:2
-    container_name: grantly-caddy
-    restart: unless-stopped
+        tag: "grantly-caddy"
     ports:
       - "80:80"
       - "443:443"
@@ -100,8 +106,12 @@ services:
     image: grafana/loki:2.9.0
     container_name: grantly-loki
     restart: unless-stopped
-    ports:
-      - "3100:3100"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "grantly-loki"
     volumes:
       - ../../../.tmp/loki:/loki
       - ./loki-local-config.yaml:/etc/loki/local-config.yaml
@@ -112,6 +122,12 @@ services:
   grantly-promtail:
     image: grafana/promtail:2.9.0
     container_name: grantly-promtail
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "grantly-promtail"
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./promtail-config.yml:/etc/promtail/config.yml
@@ -124,6 +140,12 @@ services:
   grantly-grafana:
     image: grafana/grafana:11.6.1
     container_name: grantly-grafana
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "grantly-grafana"
     ports:
       - "3000:3000"
     environment:
@@ -132,6 +154,7 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
       - GF_FEATURE_TOGGLES_ENABLE=publicDashboards
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SERVER_HTTP_PORT=6600
     volumes:
       - ../../../.tmp/grafana:/var/lib/grafana
       - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
