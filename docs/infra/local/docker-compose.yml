@@ -3,13 +3,7 @@ services:
   grantly-mysql:
     image: mysql:8
     container_name: grantly-mysql
-    restart: always
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-        tag: "grantly-mysql"
+    restart: unless-stopped
     volumes:
       - ./.tmp/mysql:/var/lib/mysql
     ports:
@@ -19,34 +13,35 @@ services:
     command: --max-connections=500 --wait-timeout=60 --interactive-timeout=60
     networks:
       - grantly-network
-
-  grantly-redis:
-    image: redis:7
-    container_name: grantly-redis
-    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "grantly-redis"
+        tag: "grantly-mysql"
+
+  grantly-redis:
+    image: redis:7
+    container_name: grantly-redis
+    restart: unless-stopped
     volumes:
       - ../../../.tmp/redis:/data
     ports:
       - "26379:6379"
     networks:
       - grantly-network
-
-  grantly-backend:
-    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/backend:${GIT_HASH}
-    container_name: grantly-backend
-    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "grantly-backend"
+        tag: "grantly-redis"
+  grantly-backend:
+    build:
+      context: ../../..
+      dockerfile: docs/infra/local/Dockerfile.backend
+    container_name: grantly-backend
+    restart: unless-stopped
     env_file:
       - ../../../.env
     environment:
@@ -60,17 +55,18 @@ services:
       - grantly-redis
     networks:
       - grantly-network
-
-  grantly-frontend:
-    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/frontend:${GIT_HASH}
-    container_name: grantly-frontend
-    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "grantly-frontend"
+        tag: "grantly-backend"
+  grantly-frontend:
+    build:
+      context: ../../..
+      dockerfile: docs/infra/local/Dockerfile.frontend
+    container_name: grantly-frontend
+    restart: unless-stopped
     env_file:
       - ../../../.env
     extra_hosts:
@@ -78,17 +74,16 @@ services:
     command: [ "yarn", "@grantly/frontend", "start" ]
     networks:
       - grantly-network
-
-  grantly-caddy:
-    image: caddy:2
-    container_name: grantly-caddy
-    restart: always
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "grantly-caddy"
+        tag: "grantly-frontend"
+  grantly-caddy:
+    image: caddy:2
+    container_name: grantly-caddy
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -96,38 +91,40 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ../../../.tmp/caddy_data:/data
       - ../../../.tmp/caddy_config:/config
+      - ./cert:/etc/caddy/cert
     depends_on:
       - grantly-backend
       - grantly-frontend
     networks:
       - grantly-network
-
-  grantly-loki:
-    image: grafana/loki:2.9.0
-    container_name: grantly-loki
-    restart: unless-stopped
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "grantly-loki"
+        tag: "grantly-caddy"
+
+  grantly-loki:
+    image: grafana/loki:2.9.0
+    container_name: grantly-loki
+    restart: unless-stopped
     volumes:
       - ../../../.tmp/loki:/loki
       - ./loki-local-config.yaml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - grantly-network
-
-  grantly-promtail:
-    image: grafana/promtail:2.9.0
-    container_name: grantly-promtail
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "grantly-promtail"
+        tag: "grantly-loki"
+
+  grantly-promtail:
+    image: grafana/promtail:2.9.0
+    container_name: grantly-promtail
+    restart: unless-stopped
     volumes:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./promtail-config.yml:/etc/promtail/config.yml
@@ -136,18 +133,17 @@ services:
       - grantly-loki
     networks:
       - grantly-network
-
-  grantly-grafana:
-    image: grafana/grafana:11.6.1
-    container_name: grantly-grafana
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-        tag: "grantly-grafana"
-    ports:
-      - "3000:3000"
+        tag: "grantly-promtail"
+
+  grantly-grafana:
+    image: grafana/grafana:11.6.1
+    container_name: grantly-grafana
+    restart: unless-stopped
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -162,6 +158,12 @@ services:
       - grantly-network
     depends_on:
       - grantly-loki
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "grantly-grafana"
 
 networks:
   grantly-network:
