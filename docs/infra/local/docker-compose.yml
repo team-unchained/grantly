@@ -36,9 +36,10 @@ services:
         max-size: "10m"
         max-file: "3"
         tag: "grantly-redis"
-
   grantly-backend:
-    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/backend:${GIT_HASH}
+    build:
+      context: ../../..
+      dockerfile: docs/infra/local/Dockerfile.backend
     container_name: grantly-backend
     restart: unless-stopped
     env_file:
@@ -60,9 +61,10 @@ services:
         max-size: "10m"
         max-file: "3"
         tag: "grantly-backend"
-
   grantly-frontend:
-    image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/frontend:${GIT_HASH}
+    build:
+      context: ../../..
+      dockerfile: docs/infra/local/Dockerfile.frontend
     container_name: grantly-frontend
     restart: unless-stopped
     env_file:
@@ -78,7 +80,6 @@ services:
         max-size: "10m"
         max-file: "3"
         tag: "grantly-frontend"
-
   grantly-caddy:
     image: caddy:2
     container_name: grantly-caddy
@@ -90,6 +91,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - ../../../.tmp/caddy_data:/data
       - ../../../.tmp/caddy_config:/config
+      - ./cert:/etc/caddy/cert
     depends_on:
       - grantly-backend
       - grantly-frontend

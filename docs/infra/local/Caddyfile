@@ -1,14 +1,11 @@
 {
     # Caddy 글로벌 설정
     admin off
+    # 로컬 인증서 설정
+    local_certs
 }
 
-grantly-api.w0nder.land {
-    # TLS 설정 (자동으로 Let's Encrypt 인증서 발급)
-    tls {
-        protocols tls1.2 tls1.3
-    }
-
+api.grantly.work {
     # API 서버로 리버스 프록시
     reverse_proxy grantly-backend:6000
 
@@ -19,15 +16,12 @@ grantly-api.w0nder.land {
 
     # gzip 압축
     encode gzip
+
+    # 인증서 설정
+    tls /etc/caddy/cert/grantly.work+1.pem /etc/caddy/cert/grantly.work+1-key.pem
 }
 
-grantly.w0nder.land {
-
-    # TLS 설정 (자동으로 Let's Encrypt 인증서 발급)
-    tls {
-        protocols tls1.2 tls1.3
-    }
-
+grantly.work {
     # API 서버로 리버스 프록시
     reverse_proxy grantly-frontend:6001
 
@@ -38,15 +32,12 @@ grantly.w0nder.land {
 
     # gzip 압축
     encode gzip
+
+    # 인증서 설정
+    tls /etc/caddy/cert/grantly.work+1.pem /etc/caddy/cert/grantly.work+1-key.pem
 }
 
-grantly-grafana.w0nder.land {
-
-    # TLS 설정 (자동으로 Let's Encrypt 인증서 발급)
-    tls {
-        protocols tls1.2 tls1.3
-    }
-
+grafana.grantly.work {
     # API 서버로 리버스 프록시
     reverse_proxy grantly-grafana:6600
 
@@ -57,4 +48,7 @@ grantly-grafana.w0nder.land {
 
     # gzip 압축
     encode gzip
+
+    # 인증서 설정
+    tls /etc/caddy/cert/grantly.work+1.pem /etc/caddy/cert/grantly.work+1-key.pem
 }

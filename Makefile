@@ -51,3 +51,6 @@ build-api-alpine: build-api
 
 run:
 	@ENVIRONMENT=prod GIT_HASH=$$(git rev-parse HEAD) docker compose -f docs/infra/prod/docker-compose.yml up -d
+
+run-local:
+	@docker compose -f docs/infra/local/docker-compose.yml up
