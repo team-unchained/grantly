@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { UserType } from '@grantly/api/user/user.shcema';
 
 export const SignUpSchema = z.object({
   email: z
@@ -22,16 +23,6 @@ export const SignUpSchema = z.object({
 });
 
 export type CreateUserRequestType = z.infer<typeof SignUpSchema>;
-
-export const UserSchema = z.object({
-  id: z.number().int(),
-  email: z.string().email(),
-  name: z.string(),
-  createdAt: z.string().datetime(),
-  modifiedAt: z.string().datetime(),
-});
-
-export type UserType = z.infer<typeof UserSchema>;
 
 export type CreateUserResponseType = {
   user: UserType;

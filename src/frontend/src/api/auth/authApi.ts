@@ -16,6 +16,10 @@ export const Login = async (params: LoginRequestType): Promise<void> => {
   await axiosInstance.post('/v1/auth/login', params);
 };
 
+export const Logout = async (): Promise<void> => {
+  await axiosInstance.post('/v1/auth/logout');
+};
+
 export const getCsrfToken = async (): Promise<void> => {
   await axiosInstance.get('/v1/auth/csrf-token');
 };
