@@ -9,7 +9,7 @@ import { LoginRequestType, LoginSchema } from '@grantly/api/auth/auth.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLoginMutation } from '@grantly/api/auth/useAuthQueries';
 
-export const LoginForm = () => {
+export const LoginForm = ({ redirectUrl }: { redirectUrl: string }) => {
   const router = useRouter();
   const {
     register,
@@ -21,7 +21,7 @@ export const LoginForm = () => {
 
   const { mutate: login, isPending } = useLoginMutation({
     onSuccess: () => {
-      router.replace('/welcome');
+      router.replace(redirectUrl);
     },
   });
 
