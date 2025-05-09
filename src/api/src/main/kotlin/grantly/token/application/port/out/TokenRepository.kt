@@ -6,4 +6,8 @@ interface TokenRepository {
     fun createToken(token: Token): Token
 
     fun getToken(value: String): Token
+
+    fun getTokenById(id: Long): Token
+
+    fun deactivate(id: Long): Token
 }

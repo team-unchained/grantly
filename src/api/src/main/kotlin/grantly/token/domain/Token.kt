@@ -6,7 +6,7 @@ import java.time.OffsetDateTime
 
 @Schema(description = "토큰 도메인 모델")
 class Token(
-    val id: Long = 0L,
+    var id: Long = 0L,
     val token: String,
     val expiresAt: OffsetDateTime,
     val type: TokenType,
