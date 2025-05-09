@@ -29,8 +29,8 @@ class TokenJpaEntity(
     @Column(nullable = false)
     val type: Int,
     @Type(JsonType::class)
-    @Column(nullable = true, columnDefinition = "json")
-    var payload: Map<String, Any>? = null,
+    @Column(nullable = false, columnDefinition = "json")
+    var payload: Map<String, Any> = emptyMap(),
     @Column(nullable = false)
     var isActive: Boolean = true,
 ) : BaseEntity() {
