@@ -31,6 +31,8 @@ class TokenJpaEntity(
     @Type(JsonType::class)
     @Column(nullable = true, columnDefinition = "json")
     var payload: Map<String, Any>? = null,
+    @Column(nullable = false)
+    var isActive: Boolean = true,
 ) : BaseEntity() {
     override fun equals(other: Any?) = entityEquals(other, TokenJpaEntity::id)
 

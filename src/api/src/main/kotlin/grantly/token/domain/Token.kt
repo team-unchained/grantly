@@ -11,6 +11,7 @@ class Token(
     val expiresAt: OffsetDateTime,
     val type: TokenType,
     val payload: Map<String, Any>? = null,
+    var isActive: Boolean = true,
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
     var modifiedAt: OffsetDateTime? = null,
 )
