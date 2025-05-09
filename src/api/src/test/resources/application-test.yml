@@ -9,6 +9,7 @@ spring:
     hikari:
       jdbc-url: jdbc:h2:mem:test;NON_KEYWORDS=user;DB_CLOSE_DELAY=-1;MODE=MYSQL;SCHEMA=PUBLIC;DATABASE_TO_LOWER=TRUE
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto:
         create-drop
@@ -19,7 +20,6 @@ spring:
         generate-ddl: true
         database: h2
         globally_quoted_identifiers: true
-        dialect: org.hibernate.dialect.H2Dialect
     show-sql: true
     generate-ddl: true
   h2:
