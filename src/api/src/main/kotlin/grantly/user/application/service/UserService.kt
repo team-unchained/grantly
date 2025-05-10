@@ -1,11 +1,14 @@
 package grantly.user.application.service
 
 import grantly.common.annotations.UseCase
+import grantly.common.core.email.EmailSender
 import grantly.config.CustomHttpSession
+import grantly.token.application.service.TokenService
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.LoginUseCase
 import grantly.user.application.port.`in`.LogoutUseCase
+import grantly.user.application.port.`in`.PasswordResetUseCase
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.LoginParams
 import grantly.user.application.port.`in`.dto.LogoutParams
@@ -16,6 +19,7 @@ import grantly.user.application.service.exceptions.PasswordMismatchException
 import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @UseCase
@@ -23,11 +27,17 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val sessionService: SessionService,
+    private val tokenService: TokenService,
+    private val emailSender: EmailSender,
 ) : SignUpUseCase,
     LoginUseCase,
     LogoutUseCase,
     FindUserQuery,
-    EditProfileUseCase {
+    EditProfileUseCase,
+    PasswordResetUseCase {
+    @Value("\${grantly.service.domain}")
+    private lateinit var serviceDomain: String
+
     override fun signUp(params: SignUpParams): User {
         try {
             findUserByEmail(params.email)
@@ -107,4 +117,23 @@ class UserService(
         id: Long,
         name: String,
     ): User = userRepository.updateUser(id, name)
+
+    override fun requestPasswordReset(email: String): Boolean {
+        // 존재하는 유저인지 확인
+        val user =
+            try {
+                findUserByEmail(email)
+            } catch (e: EntityNotFoundException) {
+                return false
+            }
+        // 비밀번호 리셋 토큰 생성
+        val token = tokenService.createPasswordResetToken(user.id)
+        // 이메일 전송
+        emailSender.send(
+            user.email,
+            "Password Reset",
+            "$serviceDomain/auth/reset-password?token=${token.token}",
+        )
+        return true
+    }
 }

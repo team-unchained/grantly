@@ -41,6 +41,8 @@ springdoc:
 grantly:
   cookie:
     domain: grantly.work
+  service:
+    domain: https://grantly.work
 ---
 spring:
   config:
@@ -71,3 +73,5 @@ spring:
 grantly:
   cookie:
     domain: w0nder.land
+  service:
+    domain: https://grantly.w0nder.land
