@@ -1,4 +1,4 @@
-CREATE TABLE user
+CREATE TABLE IF NOT EXISTS user
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
     created_at    datetime              NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE user
 ALTER TABLE user
     ADD CONSTRAINT uc_user_email UNIQUE (email);
 
-CREATE TABLE auth_session
+CREATE TABLE IF NOT EXISTS auth_session
 (
     id          BIGINT AUTO_INCREMENT NOT NULL,
     created_at  datetime              NOT NULL,
@@ -33,7 +33,7 @@ ALTER TABLE auth_session
 ALTER TABLE auth_session
     ADD CONSTRAINT FK_AUTH_SESSION_ON_USER FOREIGN KEY (user_id) REFERENCES user (id);
 
-CREATE TABLE token
+CREATE TABLE IF NOT EXISTS token
 (
     id          BIGINT AUTO_INCREMENT NOT NULL,
     created_at  datetime              NOT NULL,
