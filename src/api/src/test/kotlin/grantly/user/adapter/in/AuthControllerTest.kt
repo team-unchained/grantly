@@ -256,6 +256,46 @@ class AuthControllerTest(
             }
     }
 
+    @Test
+    @DisplayName("존재하는 유저에 대한 이메일 전송 요청")
+    fun `should return 204 when email is sent successfully`() {
+        // given
+        val jsonBody =
+            objectMapper.writeValueAsString(
+                mapOf(
+                    "email" to existingUser.email,
+                ),
+            )
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/request-password-reset")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonBody),
+            ).andExpect(status().isNoContent)
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 유저에 대한 이메일 전송 요청")
+    fun `should return 204 when email does not exist`() {
+        // given
+        val jsonBody =
+            objectMapper.writeValueAsString(
+                mapOf(
+                    "email" to "unknown@email.com",
+                ),
+            )
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/request-password-reset")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonBody),
+            ).andExpect(status().isNoContent)
+    }
+
     fun createTestUser(
         email: String,
         name: String,
