@@ -4,10 +4,8 @@ import grantly.common.entity.BaseEntity
 import grantly.common.entity.entityEquals
 import grantly.common.entity.entityHashCode
 import grantly.common.entity.entityToString
-import grantly.token.adapter.out.enums.TokenTypeConverter
 import io.hypersistence.utils.hibernate.type.json.JsonType
 import jakarta.persistence.Column
-import jakarta.persistence.Convert
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -25,7 +23,6 @@ class TokenJpaEntity(
     val token: String,
     @Column(nullable = false)
     val expiresAt: OffsetDateTime,
-    @Convert(converter = TokenTypeConverter::class)
     @Column(nullable = false)
     val type: Int,
     @Type(JsonType::class)

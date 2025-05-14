@@ -56,6 +56,7 @@ class SecurityConfig(
                 "/v*/auth/login",
                 "/v*/auth/signup",
                 "/v*/auth/csrf-token",
+                "/v*/auth/request-password-reset",
                 "/docs/**",
             ).authorizeHttpRequests { it.anyRequest().permitAll() }
             .addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)

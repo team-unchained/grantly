@@ -24,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.env.Environment
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -42,7 +41,6 @@ import java.util.UUID
 @AutoConfigureMockMvc
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AuthControllerTest(
     @Autowired
@@ -254,6 +252,46 @@ class AuthControllerTest(
                 assertThat(deletedCookie?.value).isEqualTo("")
                 assertThat(deletedCookie?.maxAge).isEqualTo(0)
             }
+    }
+
+    @Test
+    @DisplayName("존재하는 유저에 대한 이메일 전송 요청")
+    fun `should return 204 when email is sent successfully`() {
+        // given
+        val jsonBody =
+            objectMapper.writeValueAsString(
+                mapOf(
+                    "email" to existingUser.email,
+                ),
+            )
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/request-password-reset")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonBody),
+            ).andExpect(status().isNoContent)
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 유저에 대한 이메일 전송 요청")
+    fun `should return 204 when email does not exist`() {
+        // given
+        val jsonBody =
+            objectMapper.writeValueAsString(
+                mapOf(
+                    "email" to "unknown@email.com",
+                ),
+            )
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/request-password-reset")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonBody),
+            ).andExpect(status().isNoContent)
     }
 
     fun createTestUser(
