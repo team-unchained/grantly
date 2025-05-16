@@ -36,4 +36,6 @@ class TokenService(
         }
         throw IllegalStateException("Failed to create token after multiple attempts")
     }
+
+    fun findToken(token: String) = tokenRepository.getToken(token)
 }

@@ -1,9 +1,13 @@
 package grantly.user.application.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import grantly.common.annotations.UseCase
 import grantly.common.core.email.EmailSender
 import grantly.config.CustomHttpSession
+import grantly.token.adapter.out.dto.UserIdTokenPayload
 import grantly.token.application.service.TokenService
+import grantly.token.application.service.exceptions.InvalidTokenException
+import grantly.token.domain.Token
 import grantly.user.application.port.`in`.EditProfileUseCase
 import grantly.user.application.port.`in`.FindUserQuery
 import grantly.user.application.port.`in`.LoginUseCase
@@ -29,6 +33,7 @@ class UserService(
     private val sessionService: SessionService,
     private val tokenService: TokenService,
     private val emailSender: EmailSender,
+    private val objectMapper: ObjectMapper,
 ) : SignUpUseCase,
     LoginUseCase,
     LogoutUseCase,
@@ -113,7 +118,10 @@ class UserService(
 
     override fun findAllUsers(): List<User> = userRepository.getAllUsers()
 
-    override fun update(id: Long, name: String): User {
+    override fun update(
+        id: Long,
+        name: String,
+    ): User {
         val user = findUserById(id)
         user.name = name
         return userRepository.updateUser(user)
@@ -136,5 +144,31 @@ class UserService(
             "$serviceDomain/auth/reset-password?token=${token.token}",
         )
         return true
+    }
+
+    override fun resetPassword(
+        token: String,
+        newPassword: String,
+    ) {
+        val tokenObj: Token
+        try {
+            tokenObj = tokenService.findToken(token)
+            if (!tokenObj.isValid()) {
+                throw EntityNotFoundException()
+            }
+        } catch (e: EntityNotFoundException) {
+            throw InvalidTokenException()
+        }
+
+        val payload = tokenObj.getPayloadAs<UserIdTokenPayload>(objectMapper)
+        val userId = payload.userId
+        try {
+            val user = findUserById(userId)
+            user.resetPassword(passwordEncoder, newPassword)
+            userRepository.updateUser(user)
+        } catch (e: EntityNotFoundException) {
+            // 토큰에 연결된 유저가 존재하지 않는 경우, 토큰이 유효하지 않은 것처럼 처리함
+            throw InvalidTokenException()
+        }
     }
 }

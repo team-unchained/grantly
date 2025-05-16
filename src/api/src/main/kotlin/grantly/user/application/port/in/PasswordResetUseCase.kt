@@ -5,4 +5,9 @@ package grantly.user.application.port.`in`
  */
 interface PasswordResetUseCase {
     fun requestPasswordReset(email: String): Boolean
+
+    fun resetPassword(
+        token: String,
+        newPassword: String,
+    )
 }
