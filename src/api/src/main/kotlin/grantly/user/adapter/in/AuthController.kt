@@ -3,8 +3,11 @@ package grantly.user.adapter.`in`
 import grantly.common.exceptions.HttpConflictException
 import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.exceptions.HttpUnauthorizedException
+import grantly.common.exceptions.HttpUnprocessableException
 import grantly.common.utils.HttpUtil
+import grantly.token.application.service.exceptions.InvalidTokenException
 import grantly.user.adapter.`in`.dto.LoginRequest
+import grantly.user.adapter.`in`.dto.PasswordResetRequest
 import grantly.user.adapter.`in`.dto.SendEmailRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
 import grantly.user.adapter.out.dto.SignUpResponse
@@ -173,6 +176,25 @@ class AuthController(
         @Valid @RequestBody body: SendEmailRequest,
     ): ResponseEntity<Void> {
         passwordResetUseCase.requestPasswordReset(body.email)
+        return ResponseEntity.noContent().build()
+    }
+
+    @Operation(
+        summary = "비밀번호 초기화",
+        responses = [
+            ApiResponse(responseCode = "204", description = "비밀번호 초기화 성공"),
+            ApiResponse(responseCode = "422", description = "유효하지 않은 토큰"),
+        ],
+    )
+    @PostMapping("/reset-password")
+    fun resetPassword(
+        @Valid @RequestBody body: PasswordResetRequest,
+    ): ResponseEntity<Void> {
+        try {
+            passwordResetUseCase.resetPassword(body.token, body.password)
+        } catch (e: InvalidTokenException) {
+            throw HttpUnprocessableException("Invalid token")
+        }
         return ResponseEntity.noContent().build()
     }
 }
