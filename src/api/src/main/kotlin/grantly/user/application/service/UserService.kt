@@ -113,10 +113,11 @@ class UserService(
 
     override fun findAllUsers(): List<User> = userRepository.getAllUsers()
 
-    override fun update(
-        id: Long,
-        name: String,
-    ): User = userRepository.updateUser(id, name)
+    override fun update(id: Long, name: String): User {
+        val user = findUserById(id)
+        user.name = name
+        return userRepository.updateUser(user)
+    }
 
     override fun requestPasswordReset(email: String): Boolean {
         // 존재하는 유저인지 확인
