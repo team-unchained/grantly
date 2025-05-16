@@ -1,5 +1,7 @@
 package grantly.token.domain
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import grantly.token.adapter.out.enums.TokenType
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
@@ -14,4 +16,12 @@ class Token(
     var isActive: Boolean = true,
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
     var modifiedAt: OffsetDateTime? = null,
-)
+) {
+    fun isValid(): Boolean = isActive && expiresAt.isAfter(OffsetDateTime.now())
+
+    inline fun <reified T> getPayloadAs(objectMapper: ObjectMapper): T {
+        // Map<String, Any> → JSON → DTO
+        val json = objectMapper.writeValueAsString(payload)
+        return objectMapper.readValue<T>(json)
+    }
+}
