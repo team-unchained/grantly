@@ -162,13 +162,19 @@ class UserService(
 
         val payload = tokenObj.getPayloadAs<UserIdTokenPayload>(objectMapper)
         val userId = payload.userId
+
+        val user: User
         try {
-            val user = findUserById(userId)
-            user.resetPassword(passwordEncoder, newPassword)
-            userRepository.updateUser(user)
+            user = findUserById(userId)
         } catch (e: EntityNotFoundException) {
             // 토큰에 연결된 유저가 존재하지 않는 경우, 토큰이 유효하지 않은 것처럼 처리함
             throw InvalidTokenException()
         }
+
+        // 비번 변경
+        user.resetPassword(passwordEncoder, newPassword)
+        userRepository.updateUser(user)
+        // 사용한 토큰 비활성화
+        tokenService.deactivateToken(tokenObj)
     }
 }
