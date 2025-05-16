@@ -25,4 +25,12 @@ data class User(
         password?.let {
             passwordEncoder.matches(rawPassword, it)
         } ?: false
+
+    fun resetPassword(
+        passwordEncoder: PasswordEncoder,
+        newPassword: String,
+    ) {
+        password = newPassword
+        hashPassword(passwordEncoder)
+    }
 }
