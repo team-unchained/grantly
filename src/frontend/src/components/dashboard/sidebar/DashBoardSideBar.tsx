@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 
-import { NavUser } from '@grantly/components/common/sidebar/NavUser';
-import { ServiceSwitcher } from '@grantly/components/common/sidebar/ServiceSwitcher';
-import { NavMenu } from '@grantly/components/common/sidebar/NavMenu';
+import { NavUser } from '@grantly/components/dashboard/sidebar/NavUser';
+import { ServiceSwitcher } from '@grantly/components/dashboard/sidebar/ServiceSwitcher';
+import { NavMenu } from '@grantly/components/dashboard/sidebar/NavMenu';
 import {
   Sidebar,
   SidebarContent,

@@ -6,8 +6,8 @@ import {
   SidebarMenu,
 } from '@grantly/components/ui/sidebar';
 import { DashboardMenu } from '@grantly/constants/DashboardMenu';
-import { CollapsibleMenuItem } from '@grantly/components/common/sidebar/CollapsibleMenuItem';
-import { SimpleMenuItem } from '@grantly/components/common/sidebar/SimpleMenuItem';
+import { CollapsibleMenuItem } from '@grantly/components/dashboard/sidebar/CollapsibleMenuItem';
+import { SimpleMenuItem } from '@grantly/components/dashboard/sidebar/SimpleMenuItem';
 
 export const NavMenu = () => {
   return (

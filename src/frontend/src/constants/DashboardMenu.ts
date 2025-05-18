@@ -25,7 +25,7 @@ export const DashboardMenu: MenuGroup[] = [
   {
     group: 'Service',
     items: [
-      { title: 'Overview', url: '#', icon: LayoutDashboard },
+      { title: 'Overview', url: '/dashboard/overview', icon: LayoutDashboard },
       { title: 'Service Info', url: '#', icon: Info },
       { title: 'Branding', url: '#', icon: LayoutDashboard },
     ],
