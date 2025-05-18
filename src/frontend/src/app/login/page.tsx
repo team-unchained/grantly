@@ -1,5 +1,33 @@
-import { LoginContainer } from '@grantly/components/login/LoginContainer';
+'use client';
+
+import { LoginForm } from '@grantly/components/login/LoginForm';
+import { useRedirectUrl } from '@grantly/hooks/useRedirectUrl';
+import { Suspense } from 'react';
+
+const LoginFromWrapper = () => {
+  const redirectUrl = useRedirectUrl('/dashboard');
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm redirectUrl={redirectUrl} />
+    </Suspense>
+  );
+};
 
 export default function LoginPage() {
-  return <LoginContainer />;
+  return (
+    <div className="grid min-h-svh lg:grid-cols-2">
+      <div className="flex flex-col gap-4 p-6 md:p-10">
+        <div className="flex justify-center gap-2 md:justify-start">
+          <p className="heading1">Grantly</p>
+        </div>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs">
+            <LoginFromWrapper />
+          </div>
+        </div>
+      </div>
+      <div className="relative hidden bg-muted lg:block" />
+    </div>
+  );
 }
