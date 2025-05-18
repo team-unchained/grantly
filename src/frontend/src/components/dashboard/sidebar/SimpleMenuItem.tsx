@@ -5,17 +5,16 @@ import {
   SidebarMenuButton,
 } from '@grantly/components/ui/sidebar';
 import { MenuItem } from '@grantly/constants/DashboardMenu';
+import Link from 'next/link';
 
 export const SimpleMenuItem = ({ item }: { item: MenuItem }) => {
-  const Icon = item.icon;
-
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild tooltip={item.title}>
-        <a href={item.url} className="flex items-center gap-2 w-full">
-          {Icon && <Icon />}
+        <Link href={item.url} className="flex items-center gap-2 w-full">
+          {item.icon && <item.icon />}
           <span>{item.title}</span>
-        </a>
+        </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
