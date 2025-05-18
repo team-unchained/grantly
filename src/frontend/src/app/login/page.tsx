@@ -1,7 +1,6 @@
 'use client';
 
 import { LoginForm } from '@grantly/components/login/LoginForm';
-import React, { Suspense } from 'react';
 import { useRedirectUrl } from '@grantly/hooks/useRedirectUrl';
 
 function LoginContent() {
@@ -25,9 +24,5 @@ function LoginContent() {
 }
 
 export default function LoginPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LoginContent />
-    </Suspense>
-  );
+  return <LoginContent />;
 }
