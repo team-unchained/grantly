@@ -6,6 +6,14 @@ jobs:
   get-env:
     uses: ./.github/workflows/reusable-get-env.yml
 
+  build-frontend:
+    needs: [ get-env ]
+    uses: ./.github/workflows/reusable-build.yml
+    with:
+      environment: 'prod'
+      service: 'frontend'
+    secrets: inherit
+
   lint-frontend:
     needs: [ get-env ]
     uses: ./.github/workflows/reusable-lint-frontend.yml

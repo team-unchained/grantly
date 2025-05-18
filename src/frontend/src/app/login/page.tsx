@@ -1,10 +1,10 @@
 'use client';
 
 import { LoginForm } from '@grantly/components/login/LoginForm';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useRedirectUrl } from '@grantly/hooks/useRedirectUrl';
 
-export default function Home() {
+function LoginContent() {
   const redirectUrl = useRedirectUrl('/dashboard');
 
   return (
@@ -21,5 +21,13 @@ export default function Home() {
       </div>
       <div className="relative hidden bg-muted lg:block" />
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
