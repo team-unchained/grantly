@@ -7,11 +7,7 @@ import { Suspense } from 'react';
 const LoginFromWrapper = () => {
   const redirectUrl = useRedirectUrl('/dashboard');
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LoginForm redirectUrl={redirectUrl} />
-    </Suspense>
-  );
+  return <LoginForm redirectUrl={redirectUrl} />;
 };
 
 export default function LoginPage() {
@@ -23,7 +19,9 @@ export default function LoginPage() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginFromWrapper />
+            <Suspense fallback={<div>Loading...</div>}>
+              <LoginFromWrapper />
+            </Suspense>
           </div>
         </div>
       </div>
