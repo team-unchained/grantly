@@ -27,10 +27,20 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@grantly/components/ui/sidebar';
+import { useRouter } from 'next/navigation';
+
 import { useGetMeQuery } from '@grantly/api/user/useUserQueries';
+import { useLogoutMutation } from '@grantly/api/auth/useAuthQueries';
 
 export const NavUser = () => {
+  const router = useRouter();
+
   const { data: me } = useGetMeQuery();
+  const { mutate: logout } = useLogoutMutation({
+    onSuccess: () => {
+      router.replace('/login');
+    },
+  });
   const { isMobile } = useSidebar();
 
   if (!me) {
@@ -80,7 +90,7 @@ export const NavUser = () => {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>
               <LogOut />
               Log out
             </DropdownMenuItem>
