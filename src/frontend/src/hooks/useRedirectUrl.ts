@@ -1,13 +1,18 @@
+'use client';
+
 import { useSearchParams } from 'next/navigation';
+import { useMemo } from 'react';
 
 export const useRedirectUrl = (fallback: string) => {
   const searchParams = useSearchParams();
-  const raw = searchParams.get('redirect');
+  const redirectRaw = searchParams.get('redirect');
 
-  try {
-    const decoded = raw ? decodeURIComponent(raw) : fallback;
-    return decoded.startsWith('/') ? decoded : fallback;
-  } catch {
-    return fallback;
-  }
+  return useMemo(() => {
+    try {
+      const decoded = redirectRaw ? decodeURIComponent(redirectRaw) : fallback;
+      return decoded.startsWith('/') ? decoded : fallback;
+    } catch {
+      return fallback;
+    }
+  }, [redirectRaw, fallback]);
 };
