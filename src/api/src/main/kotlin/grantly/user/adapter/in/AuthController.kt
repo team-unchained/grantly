@@ -5,12 +5,14 @@ import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.exceptions.HttpUnauthorizedException
 import grantly.common.utils.HttpUtil
 import grantly.user.adapter.`in`.dto.LoginRequest
+import grantly.user.adapter.`in`.dto.SendEmailRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
 import grantly.user.adapter.out.dto.SignUpResponse
 import grantly.user.adapter.out.dto.UserResponse
 import grantly.user.application.port.`in`.CsrfTokenUseCase
 import grantly.user.application.port.`in`.LoginUseCase
 import grantly.user.application.port.`in`.LogoutUseCase
+import grantly.user.application.port.`in`.PasswordResetUseCase
 import grantly.user.application.port.`in`.SignUpUseCase
 import grantly.user.application.port.`in`.dto.LoginParams
 import grantly.user.application.port.`in`.dto.LogoutParams
@@ -44,6 +46,7 @@ class AuthController(
     private val loginUseCase: LoginUseCase,
     private val csrfTokenUseCase: CsrfTokenUseCase,
     private val logoutUseCase: LogoutUseCase,
+    private val passwordResetUseCase: PasswordResetUseCase,
 ) {
     @Operation(
         summary = "이메일을 이용한 회원가입",
@@ -156,6 +159,20 @@ class AuthController(
         response: HttpServletResponse,
     ): ResponseEntity<Void> {
         logoutUseCase.logout(LogoutParams(request, response))
+        return ResponseEntity.noContent().build()
+    }
+
+    @Operation(
+        summary = "비밀번호 초기화 요청",
+        responses = [
+            ApiResponse(responseCode = "204", description = "비밀번호 초기화를 위한 이메일 전송 성공"),
+        ],
+    )
+    @PostMapping("/request-password-reset")
+    fun sendEmail(
+        @Valid @RequestBody body: SendEmailRequest,
+    ): ResponseEntity<Void> {
+        passwordResetUseCase.requestPasswordReset(body.email)
         return ResponseEntity.noContent().build()
     }
 }
