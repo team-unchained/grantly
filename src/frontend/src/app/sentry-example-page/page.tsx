@@ -76,7 +76,7 @@ export default function Page() {
           Click the button below, and view the sample error on the Sentry{' '}
           <a
             target="_blank"
-            href="https://unchained-sk.sentry.io/issues/?project=4509348497063936"
+            href="https://team-unchained.sentry.io/issues/?project=4509348497063936"
             rel="noreferrer"
           >
             Issues Page
