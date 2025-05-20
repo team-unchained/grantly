@@ -154,7 +154,7 @@ class UserService(
         try {
             tokenObj = tokenService.findToken(token)
             if (!tokenObj.isValid()) {
-                throw EntityNotFoundException()
+                throw InvalidTokenException()
             }
         } catch (e: EntityNotFoundException) {
             throw InvalidTokenException()
@@ -163,13 +163,16 @@ class UserService(
         val payload = tokenObj.getPayloadAs<UserIdTokenPayload>(objectMapper)
         val userId = payload.userId
 
-        val user: User
-        try {
-            user = findUserById(userId)
-        } catch (e: EntityNotFoundException) {
-            // 토큰에 연결된 유저가 존재하지 않는 경우, 토큰이 유효하지 않은 것처럼 처리함
-            throw InvalidTokenException()
-        }
+        val user =
+            runCatching {
+                findUserById(userId)
+            }.getOrElse { e ->
+                when (e) {
+                    // 토큰에 연결된 유저가 존재하지 않는 경우, 토큰이 유효하지 않은 것처럼 처리함
+                    is EntityNotFoundException -> throw InvalidTokenException()
+                    else -> throw e
+                }
+            }
 
         // 비번 변경
         user.resetPassword(passwordEncoder, newPassword)
