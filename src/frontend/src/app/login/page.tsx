@@ -1,12 +1,16 @@
 'use client';
 
 import { LoginForm } from '@grantly/components/login/LoginForm';
-import React from 'react';
 import { useRedirectUrl } from '@grantly/hooks/useRedirectUrl';
+import { Suspense } from 'react';
 
-export default function Home() {
+const LoginFromWrapper = () => {
   const redirectUrl = useRedirectUrl('/dashboard');
 
+  return <LoginForm redirectUrl={redirectUrl} />;
+};
+
+export default function LoginPage() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -15,7 +19,9 @@ export default function Home() {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <LoginForm redirectUrl={redirectUrl} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <LoginFromWrapper />
+            </Suspense>
           </div>
         </div>
       </div>
