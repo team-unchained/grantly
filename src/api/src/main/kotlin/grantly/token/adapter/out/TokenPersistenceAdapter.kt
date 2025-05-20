@@ -28,8 +28,7 @@ class TokenPersistenceAdapter(
     }
 
     override fun deactivate(token: Token): Token {
-        token.isActive = false
-        val tokenJpaEntity = mapper.toEntity(token)
+        val tokenJpaEntity = mapper.toEntity(token).apply { isActive = false }
         val updatedToken = tokenJpaRepository.save(tokenJpaEntity)
         return mapper.toDomain(updatedToken)
     }
