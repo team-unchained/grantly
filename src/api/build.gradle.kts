@@ -8,6 +8,7 @@ plugins {
     kotlin("plugin.spring") version kotlinVersion
     kotlin("plugin.jpa") version kotlinVersion
     id("org.hibernate.orm") version "6.6.8.Final"
+    id("io.sentry.jvm.gradle") version "5.5.0"
 }
 
 allOpen {
@@ -72,4 +73,11 @@ tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
     archiveBaseName.set("api")
     archiveVersion.set("1.0.0")
     archiveClassifier.set("")
+}
+
+sentry {
+    includeSourceContext = true
+    org = "team-unchained"
+    projectName = "grantly-backend"
+    authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }

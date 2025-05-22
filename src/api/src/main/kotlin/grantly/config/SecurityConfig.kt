@@ -53,6 +53,7 @@ class SecurityConfig(
     ): SecurityFilterChain {
         http
             .securityMatcher(
+                "/v*/system/**",
                 "/v*/auth/login",
                 "/v*/auth/signup",
                 "/v*/auth/csrf-token",
