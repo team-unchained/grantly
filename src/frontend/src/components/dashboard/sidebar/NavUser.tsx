@@ -31,6 +31,7 @@ import { useRouter } from 'next/navigation';
 
 import { useGetMeQuery } from '@grantly/api/user/useUserQueries';
 import { useLogoutMutation } from '@grantly/api/auth/useAuthQueries';
+import { queryClient } from '@grantly/app/providers';
 
 export const NavUser = () => {
   const router = useRouter();
@@ -38,6 +39,7 @@ export const NavUser = () => {
   const { data: me } = useGetMeQuery();
   const { mutate: logout } = useLogoutMutation({
     onSuccess: () => {
+      queryClient.clear();
       router.replace('/login');
     },
   });
