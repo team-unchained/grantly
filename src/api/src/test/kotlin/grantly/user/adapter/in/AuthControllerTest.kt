@@ -2,6 +2,9 @@ package grantly.user.adapter.`in`
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import grantly.common.constants.AuthConstants
+import grantly.token.adapter.out.enums.TokenType
+import grantly.token.application.port.out.TokenRepository
+import grantly.token.domain.Token
 import grantly.user.adapter.`in`.dto.LoginRequest
 import grantly.user.adapter.`in`.dto.SignUpRequest
 import grantly.user.application.port.out.AuthSessionRepository
@@ -47,6 +50,8 @@ class AuthControllerTest(
     private val userRepository: UserRepository,
     @Autowired
     private val authSessionRepository: AuthSessionRepository,
+    @Autowired
+    private val tokenRepository: TokenRepository,
     @Autowired
     private val mockMvc: MockMvc,
     @Autowired
@@ -292,6 +297,44 @@ class AuthControllerTest(
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isNoContent)
+    }
+
+    @Test
+    @DisplayName("비밀번호 초기화")
+    fun `should return 204 when password reset is successful`() {
+        // given
+        val newUser = createTestUser("test3@email.com", "test3", "password123!")
+        val tokenValue = "somerandomtoken1234"
+        val newPwd = "newpassword1234!"
+        val token =
+            tokenRepository.create(
+                Token(
+                    token = tokenValue,
+                    expiresAt = OffsetDateTime.now().plusHours(1),
+                    type = TokenType.PASSWORD_RESET,
+                    payload = mapOf("userId" to newUser.id),
+                ),
+            )
+        val jsonBody =
+            objectMapper.writeValueAsString(
+                mapOf(
+                    "token" to token.token,
+                    "password" to newPwd,
+                ),
+            )
+
+        // when & then
+        mockMvc
+            .perform(
+                post("/v1/auth/reset-password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonBody),
+            ).andExpect(status().isNoContent)
+
+        val usedToken = tokenRepository.get(tokenValue)
+        val updatedUser = userRepository.getUser(newUser.id)
+        assertThat(usedToken.isActive).isFalse
+        assertThat(updatedUser.checkPassword(passwordEncoder, newPwd)).isTrue
     }
 
     fun createTestUser(
