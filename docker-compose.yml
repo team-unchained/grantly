@@ -1,13 +1,13 @@
 services:
   grantly-mysql:
     image: mysql/mysql-server:8.0
-    container_name: grantly-mysql
+    container_name: grantly-mysql-local
     restart: always
     ports:
       - '3306:3306'
     volumes:
       - ./.tmp/mysql:/var/lib/mysql
-      - ./docs/local/init.sql/:/docker-entrypoint-initdb.d/init.sql
+      - ./docs/infra/local/init.sql/:/docker-entrypoint-initdb.d/init.sql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: grantly
@@ -17,14 +17,14 @@ services:
 
   grantly-redis:
     image: redis:7
-    container_name: grantly-redis
+    container_name: grantly-redis-local
     restart: always
     ports:
       - '6379:6379'
 
   grantly-localstack:
     image: localstack/localstack:0.14.5
-    container_name: grantly-localstack
+    container_name: grantly-localstack-local
     restart: always
     ports:
       - '4563-4599:4563-4599'

@@ -28,12 +28,18 @@ class TokenService(
         while (retries > 0) {
             val token = tokenFactory()
             try {
-                return tokenRepository.createToken(token)
+                return tokenRepository.create(token)
             } catch (e: ConstraintViolationException) {
                 if (retries == 1) throw e
                 retries--
             }
         }
         throw IllegalStateException("Failed to create token after multiple attempts")
+    }
+
+    fun findToken(token: String) = tokenRepository.get(token)
+
+    fun deactivateToken(token: Token) {
+        tokenRepository.deactivate(token)
     }
 }

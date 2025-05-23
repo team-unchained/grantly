@@ -53,10 +53,12 @@ class SecurityConfig(
     ): SecurityFilterChain {
         http
             .securityMatcher(
+                "/v*/system/**",
                 "/v*/auth/login",
                 "/v*/auth/signup",
                 "/v*/auth/csrf-token",
                 "/v*/auth/request-password-reset",
+                "/v*/auth/reset-password",
                 "/docs/**",
             ).authorizeHttpRequests { it.anyRequest().permitAll() }
             .addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)

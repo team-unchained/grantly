@@ -70,6 +70,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+
+# Sentry 설정
+sentry:
+  dsn: https://15afc79fae748e0fd5c19f37b9d2e236@o4509348474191872.ingest.us.sentry.io/4509348528717824
+  send-default-pii: true
+
 grantly:
   cookie:
     domain: w0nder.land

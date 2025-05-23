@@ -10,7 +10,7 @@ class TokenPersistenceAdapter(
     private val tokenJpaRepository: TokenJpaRepository,
     private val mapper: TokenMapper,
 ) : TokenRepository {
-    override fun createToken(token: Token): Token {
+    override fun create(token: Token): Token {
         if (token.id != 0L) {
             throw IllegalArgumentException("Token ID must be 0 when creating a new token.")
         }
@@ -19,11 +19,17 @@ class TokenPersistenceAdapter(
         return mapper.toDomain(savedToken)
     }
 
-    override fun getToken(value: String): Token {
+    override fun get(value: String): Token {
         val tokenEntity = tokenJpaRepository.findByToken(value)
         if (tokenEntity.isEmpty) {
             throw EntityNotFoundException("Token not found")
         }
         return mapper.toDomain(tokenEntity.get())
+    }
+
+    override fun deactivate(token: Token): Token {
+        val tokenJpaEntity = mapper.toEntity(token).apply { isActive = false }
+        val updatedToken = tokenJpaRepository.save(tokenJpaEntity)
+        return mapper.toDomain(updatedToken)
     }
 }

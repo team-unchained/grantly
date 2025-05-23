@@ -11,8 +11,5 @@ interface UserRepository {
 
     fun getAllUsers(): List<User>
 
-    fun updateUser(
-        userId: Long,
-        name: String,
-    ): User
+    fun updateUser(user: User): User
 }

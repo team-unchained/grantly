@@ -36,16 +36,8 @@ class UserPersistenceAdapter(
         return users.map { userMapper.toDomain(it) }
     }
 
-    override fun updateUser(
-        userId: Long,
-        name: String,
-    ): User {
-        val optionalUser = userJpaRepository.findById(userId)
-        if (optionalUser.isEmpty) {
-            throw EntityNotFoundException("User not found")
-        }
-        var userEntity = optionalUser.get()
-        userEntity.name = name
+    override fun updateUser(user: User): User {
+        var userEntity = userMapper.toEntity(user)
         userEntity = userJpaRepository.save(userEntity)
         return userMapper.toDomain(userEntity)
     }
