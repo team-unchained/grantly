@@ -2,6 +2,7 @@ package grantly.user.application.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import grantly.common.annotations.UseCase
+import grantly.common.core.email.EmailJobScope
 import grantly.common.core.email.EmailSender
 import grantly.config.CustomHttpSession
 import grantly.token.adapter.out.dto.UserIdTokenPayload
@@ -23,6 +24,7 @@ import grantly.user.application.service.exceptions.PasswordMismatchException
 import grantly.user.domain.AuthSession
 import grantly.user.domain.User
 import jakarta.persistence.EntityNotFoundException
+import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 
@@ -34,6 +36,7 @@ class UserService(
     private val tokenService: TokenService,
     private val emailSender: EmailSender,
     private val objectMapper: ObjectMapper,
+    private val emailJobScope: EmailJobScope,
 ) : SignUpUseCase,
     LoginUseCase,
     LogoutUseCase,
@@ -138,13 +141,21 @@ class UserService(
         // 비밀번호 리셋 토큰 생성
         val token = tokenService.createPasswordResetToken(user.id)
         // 이메일 전송
-        emailSender.send(
-            user.email,
-            "Password Reset",
-            "$serviceDomain/auth/reset-password?token=${token.token}",
-        )
+        emailJobScope.launch {
+            emailSender.send(
+                user.email,
+                "Password Reset",
+                getResetPasswordEmailParams(token)
+                    .let { emailSender.buildHTML("reset-password", it) },
+            )
+        }
         return true
     }
+
+    fun getResetPasswordEmailParams(token: Token): Map<String, Any> =
+        mapOf(
+            "resetPasswordUrl" to "$serviceDomain/auth/reset-password?token=${token.token}",
+        )
 
     override fun resetPassword(
         token: String,

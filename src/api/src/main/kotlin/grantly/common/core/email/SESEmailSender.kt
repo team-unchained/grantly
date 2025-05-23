@@ -16,7 +16,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine
 
 private val log = KotlinLogging.logger {}
 
-@Profile("!prod")
+@Profile("prod")
 @Component
 class SESEmailSender(
     private val templateEngine: SpringTemplateEngine,
@@ -79,7 +79,7 @@ class SESEmailSender(
                                 }
                         }
                 }
-            source = awsSource
+            source = "Grantly Support <$awsSource>"
         }
 
     override fun buildHTML(

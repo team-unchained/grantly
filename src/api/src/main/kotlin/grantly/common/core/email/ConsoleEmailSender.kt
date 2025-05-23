@@ -3,7 +3,7 @@ package grantly.common.core.email
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
-@Profile("prod")
+@Profile("!prod")
 @Component
 class ConsoleEmailSender : EmailSender {
     override suspend fun send(

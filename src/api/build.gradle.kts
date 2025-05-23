@@ -44,11 +44,10 @@ dependencies {
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.10")
     implementation("com.fasterxml.jackson.module:jackson-module-jakarta-xmlbind-annotations")
     implementation("io.viascom.nanoid:nanoid:1.0.1")
-    implementation("aws.sdk.kotlin:ses:1.4.86"){
+    implementation("aws.sdk.kotlin:ses:1.4.86") {
         exclude("com.squareup.okhttp3:okhttp")
     }
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.12")
-
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
