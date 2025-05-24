@@ -40,7 +40,7 @@ export const NavUser = () => {
   const { mutate: logout } = useLogoutMutation({
     onSuccess: () => {
       queryClient.clear();
-      router.replace('/login');
+      router.replace('/auth/login');
     },
   });
   const { isMobile } = useSidebar();

@@ -21,7 +21,7 @@ export default function Page() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button>Go to Login</Button>
               </Link>
             </CardContent>
