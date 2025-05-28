@@ -1,7 +1,9 @@
 import {
   CreateUserRequestType,
   CreateUserResponseType,
+  RequestPasswordResetType,
   LoginRequestType,
+  ResetPasswordRequestType,
 } from '@grantly/api/auth/auth.schema';
 import { axiosInstance } from '../axiosInstance';
 
@@ -22,4 +24,16 @@ export const Logout = async (): Promise<void> => {
 
 export const getCsrfToken = async (): Promise<void> => {
   await axiosInstance.get('/v1/auth/csrf-token');
+};
+
+export const requestPasswordReset = async (
+  params: RequestPasswordResetType
+): Promise<void> => {
+  await axiosInstance.post('/v1/auth/request-password-reset', params);
+};
+
+export const resetPassword = async (
+  params: ResetPasswordRequestType
+): Promise<void> => {
+  await axiosInstance.post('/v1/auth/rest-password', params);
 };
