@@ -32,6 +32,7 @@ jobs:
           make build-api
           DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME \
             --build-arg ENVIRONMENT=$ENVIRONMENT \
+            --build-arg SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN \
             -f ./docs/infra/$ENVIRONMENT/Dockerfile.$SERVICE .
           docker push $IMAGE_NAME
           docker builder prune -f
@@ -39,3 +40,4 @@ jobs:
           IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ inputs.environment }}/${{ inputs.service }}:${{ github.sha }}
           ENVIRONMENT: ${{ inputs.environment }}
           SERVICE: ${{ inputs.service }}
+          SENTRY_AUTH_TOKEN: ${{ inputs.sentry_auth_token }}
