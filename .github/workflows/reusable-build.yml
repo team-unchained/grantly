@@ -40,4 +40,4 @@ jobs:
           IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ inputs.environment }}/${{ inputs.service }}:${{ github.sha }}
           ENVIRONMENT: ${{ inputs.environment }}
           SERVICE: ${{ inputs.service }}
-          SENTRY_AUTH_TOKEN: ${{ inputs.sentry_auth_token }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
