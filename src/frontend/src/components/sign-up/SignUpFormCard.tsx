@@ -32,7 +32,7 @@ export function SignUpFormCard() {
 
   const { mutate: createUser, isPending } = useCreateUserMutation({
     onSuccess: () => {
-      router.replace('/welcome');
+      router.replace('/auth/sign-up/welcome');
     },
   });
 
