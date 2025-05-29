@@ -60,6 +60,8 @@ services:
         max-size: "10m"
         max-file: "3"
         tag: "grantly-backend"
+    volumes:
+      - /app/projects/team-unchanined/grantly/.aws:/root/.aws
 
   grantly-frontend:
     image: ghcr.io/team-unchained/grantly/${ENVIRONMENT}/frontend:${GIT_HASH}
