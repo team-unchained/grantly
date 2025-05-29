@@ -17,7 +17,7 @@ export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 
     if (error.response?.status === 401) {
       toast.info('로그인이 필요한 페이지입니다.');
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+      router.replace(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
     }
   }, [error, isLoading, pathname, router]);
 

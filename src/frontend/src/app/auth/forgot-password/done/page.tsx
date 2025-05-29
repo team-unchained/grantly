@@ -1,12 +1,9 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@grantly/components/ui/card';
-import { Button } from '@grantly/components/ui/button';
-import Link from 'next/link';
 
 export default function Page() {
   return (
@@ -15,15 +12,14 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="heading1">Welcome to Grantly!</CardTitle>
-              <CardDescription>
-                You’ve successfully created your account.
-              </CardDescription>
+              <CardTitle className="heading1 text-center">
+                이메일 전송 완료!
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <Link href="/login">
-                <Button>Go to Login</Button>
-              </Link>
+            <CardContent className="text-sm text-muted-foreground">
+              작성하신 이메일 주소로 비밀번호 재설정 링크를 보냈습니다.
+              <br />
+              이메일을 확인하시고 링크를 클릭하여 비밀번호를 재설정해 주세요.
             </CardContent>
           </Card>
         </div>
