@@ -35,5 +35,5 @@ export const requestPasswordReset = async (
 export const resetPassword = async (
   params: ResetPasswordRequestType
 ): Promise<void> => {
-  await axiosInstance.post('/v1/auth/rest-password', params);
+  await axiosInstance.post('/v1/auth/reset-password', params);
 };
