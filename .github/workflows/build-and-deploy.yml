@@ -37,7 +37,6 @@ jobs:
     with:
       environment: 'prod'
       service: 'backend'
-      sentry_auth_token: ${{ secrets.SENTRY_AUTH_TOKEN }}
     secrets: inherit
 
   build-frontend:
@@ -46,7 +45,6 @@ jobs:
     with:
       environment: 'prod'
       service: 'frontend'
-      sentry_auth_token: ${{ secrets.SENTRY_AUTH_TOKEN }}
     secrets: inherit
 
   deploy:
