@@ -1,11 +1,19 @@
 import { AxiosError } from 'axios';
 import { useMutation, UseMutationOptions } from '@tanstack/react-query';
-import { CreateUser, Login, Logout } from '@grantly/api/auth/authApi';
+import {
+  CreateUser,
+  Login,
+  Logout,
+  requestPasswordReset,
+  resetPassword,
+} from '@grantly/api/auth/authApi';
 import { toast } from 'sonner';
 import {
   CreateUserRequestType,
   CreateUserResponseType,
+  RequestPasswordResetType,
   LoginRequestType,
+  ResetPasswordRequestType,
 } from '@grantly/api/auth/auth.schema';
 
 export const useCreateUserMutation = (
@@ -53,4 +61,31 @@ export const useLogoutMutation = (
   useMutation({
     ...options,
     mutationFn: () => Logout(),
+  });
+
+export const useRequestPasswordResetMutation = (
+  options?: UseMutationOptions<
+    void,
+    AxiosError,
+    RequestPasswordResetType,
+    unknown
+  >
+) =>
+  useMutation({
+    ...options,
+    mutationFn: (params: RequestPasswordResetType) =>
+      requestPasswordReset(params),
+  });
+
+export const useResetPasswordMutation = (
+  options?: UseMutationOptions<
+    void,
+    AxiosError,
+    ResetPasswordRequestType,
+    unknown
+  >
+) =>
+  useMutation({
+    ...options,
+    mutationFn: (params: ResetPasswordRequestType) => resetPassword(params),
   });
