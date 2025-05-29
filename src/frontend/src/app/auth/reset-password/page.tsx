@@ -6,12 +6,12 @@ import {
   CardTitle,
 } from '@grantly/components/ui/card';
 
-export default async function ResetPasswordPage({
+async function ResetPasswordPage({
   searchParams,
 }: {
-  searchParams: { token?: string };
+  searchParams: Promise<{ token?: string }>;
 }) {
-  const { token } = searchParams;
+  const { token } = await searchParams;
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -36,3 +36,5 @@ export default async function ResetPasswordPage({
     </div>
   );
 }
+
+export default ResetPasswordPage;
