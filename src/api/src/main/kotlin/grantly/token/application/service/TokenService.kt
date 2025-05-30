@@ -12,14 +12,14 @@ import java.time.OffsetDateTime
 class TokenService(
     private val tokenRepository: TokenRepository,
 ) {
-    fun createPasswordResetToken(userId: Long): Token =
+    fun createPasswordResetToken(memberId: Long): Token =
         createToken {
             val tokenValue = NanoId.generate()
             Token(
                 token = tokenValue,
                 expiresAt = OffsetDateTime.now().plusHours(1),
                 type = TokenType.PASSWORD_RESET,
-                payload = mapOf("userId" to userId),
+                payload = mapOf("memberId" to memberId),
             )
         }
 

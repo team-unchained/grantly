@@ -3,8 +3,8 @@ package grantly.config
 import grantly.config.filter.CsrfValidationFilter
 import grantly.config.filter.SessionContext
 import grantly.config.filter.SessionValidationFilter
-import grantly.user.application.port.out.UserRepository
-import grantly.user.application.service.SessionService
+import grantly.member.application.port.out.MemberRepository
+import grantly.member.application.service.SessionService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -28,7 +28,7 @@ class SecurityConfig(
     private val redisTemplate: StringRedisTemplate,
     private val sessionContext: SessionContext,
     private val sessionService: SessionService,
-    private val userRepository: UserRepository,
+    private val memberRepository: MemberRepository,
 ) {
     companion object {
         private const val ORDER_PUBLIC_FILTER = 1
@@ -84,7 +84,7 @@ class SecurityConfig(
         }
         http
             .addFilterAfter(
-                SessionValidationFilter(sessionService, userRepository),
+                SessionValidationFilter(sessionService, memberRepository),
                 UsernamePasswordAuthenticationFilter::class.java,
             ).csrf { it.disable() }
             .cors { }
