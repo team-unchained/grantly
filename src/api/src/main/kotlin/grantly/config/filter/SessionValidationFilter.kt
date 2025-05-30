@@ -3,11 +3,11 @@ package grantly.config.filter
 import grantly.common.constants.AuthConstants
 import grantly.common.exceptions.HttpUnauthorizedException
 import grantly.common.utils.HttpUtil
-import grantly.config.AuthenticatedUser
-import grantly.user.application.port.out.UserRepository
-import grantly.user.application.service.SessionService
-import grantly.user.domain.AuthSession
-import grantly.user.domain.User
+import grantly.config.AuthenticatedMember
+import grantly.member.application.port.out.MemberRepository
+import grantly.member.application.service.SessionService
+import grantly.member.domain.AuthSession
+import grantly.member.domain.Member
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 class SessionValidationFilter(
     private val sessionService: SessionService,
-    private val userRepository: UserRepository,
+    private val memberRepository: MemberRepository,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: jakarta.servlet.http.HttpServletRequest,
@@ -45,10 +45,10 @@ class SessionValidationFilter(
         }
 
         // Security Context 설정
-        val user: User
+        val member: Member
         try {
             // 유저 정보 조회
-            user = userRepository.getUser(authSession.userId!!)
+            member = memberRepository.getMember(authSession.memberId!!)
         } catch (e: EntityNotFoundException) {
             sessionService.delete(authSession.id)
             // 세션 쿠키 삭제
@@ -60,10 +60,10 @@ class SessionValidationFilter(
         }
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken(
-                AuthenticatedUser(
-                    id = user.id,
-                    name = user.name,
-                    email = user.email,
+                AuthenticatedMember(
+                    id = member.id,
+                    name = member.name,
+                    email = member.email,
                 ),
                 null,
                 emptyList(), // TODO: 추후 member 와 user 의 Role 구분?
