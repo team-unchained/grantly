@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS user
+CREATE TABLE IF NOT EXISTS member
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
     created_at    datetime              NOT NULL,
@@ -7,11 +7,11 @@ CREATE TABLE IF NOT EXISTS user
     password      VARCHAR(255)          NULL,
     name          VARCHAR(255)          NOT NULL,
     last_login_at datetime              NULL,
-    CONSTRAINT pk_user PRIMARY KEY (id)
+    CONSTRAINT pk_member PRIMARY KEY (id)
 );
 
-ALTER TABLE user
-    ADD CONSTRAINT uc_user_email UNIQUE (email);
+ALTER TABLE member
+    ADD CONSTRAINT uc_member_email UNIQUE (email);
 
 CREATE TABLE IF NOT EXISTS auth_session
 (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS auth_session
     user_agent  VARCHAR(255)          NULL,
     ip          VARCHAR(45)           NULL,
     expires_at  datetime              NOT NULL,
-    user_id     BIGINT                NULL,
+    member_id     BIGINT                NULL,
     CONSTRAINT pk_auth_session PRIMARY KEY (id)
 );
 
@@ -31,7 +31,7 @@ ALTER TABLE auth_session
     ADD CONSTRAINT uc_auth_session_token UNIQUE (token);
 
 ALTER TABLE auth_session
-    ADD CONSTRAINT FK_AUTH_SESSION_ON_USER FOREIGN KEY (user_id) REFERENCES user (id);
+    ADD CONSTRAINT FK_AUTH_SESSION_ON_MEMBER FOREIGN KEY (member_id) REFERENCES member (id);
 
 CREATE TABLE IF NOT EXISTS token
 (
