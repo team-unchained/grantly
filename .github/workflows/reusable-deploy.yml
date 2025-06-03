@@ -29,6 +29,12 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ci
 
+      - name: Check Tailscale status
+        run: tailscale status
+
+      - name: Ping EC2 over Tailscale
+        run: tailscale ping ${{ secrets.SERVER_IP }}
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1
         with:
