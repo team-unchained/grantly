@@ -14,6 +14,8 @@ class ServiceMapper : IsMapper<ServiceJpaEntity, Service> {
             imageUrl = entity.imageUrl,
             description = entity.description,
             ownerId = entity.ownerId,
+            createdAt = entity.createdAt,
+            modifiedAt = entity.modifiedAt,
         )
 
     override fun toEntity(domain: Service): ServiceJpaEntity =
