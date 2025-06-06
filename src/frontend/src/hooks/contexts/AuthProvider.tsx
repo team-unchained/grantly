@@ -1,20 +1,23 @@
 'use client';
 
-import { UserType } from '@grantly/api/user/user.shcema';
-import { useGetMeQuery } from '@grantly/api/user/useUserQueries';
-import { Skeleton } from '@grantly/components/ui/skeleton';
-import { usePathname, useRouter } from 'next/navigation';
 import {
   createContext,
-  ReactNode,
   useContext,
-  useEffect,
+  ReactNode,
   useMemo,
+  useEffect,
 } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useGetMeQuery } from '@grantly/api/user/useUserQueries';
+import { useGetServicesQuery } from '@grantly/api/service/useServiceQueries';
+import { Skeleton } from '@grantly/components/ui/skeleton';
 import { toast } from 'sonner';
+import { UserType } from '@grantly/api/user/user.shcema';
+import { ServiceType } from '@grantly/api/service/service.shcema';
 
 interface AuthContextType {
   user: UserType | undefined;
+  services: ServiceType[] | undefined;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,8 +26,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
   const { data: user, isLoading: isUserMeLoading } = useGetMeQuery();
+  const { data: services, isLoading: isServicesLoading } =
+    useGetServicesQuery();
 
-  const isLoading = isUserMeLoading;
+  const isLoading = isUserMeLoading || isServicesLoading;
 
   // Login 확인
   useEffect(() => {
@@ -38,8 +43,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const value = useMemo(
     () => ({
       user,
+      services,
     }),
-    [user]
+    [user, services]
   );
 
   if (isLoading) {
