@@ -1,9 +1,9 @@
-import React from 'react';
-import { AuthGuard } from '@grantly/components/common/AuthGuard';
 import { Header } from '@grantly/components/dashboard/Header';
 import { DashBoardSideBar } from '@grantly/components/dashboard/sidebar/DashBoardSideBar';
+import React from 'react';
 
 import { SidebarInset, SidebarProvider } from '@grantly/components/ui/sidebar';
+import { AuthProvider } from '@grantly/hooks/contexts/AuthProvider';
 
 export default function DashboardLayout({
   children,
@@ -11,7 +11,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthGuard>
+    <AuthProvider>
       <SidebarProvider>
         <DashBoardSideBar />
         <SidebarInset>
@@ -19,6 +19,6 @@ export default function DashboardLayout({
           {children}
         </SidebarInset>
       </SidebarProvider>
-    </AuthGuard>
+    </AuthProvider>
   );
 }

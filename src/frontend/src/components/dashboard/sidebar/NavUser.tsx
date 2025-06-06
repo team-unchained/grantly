@@ -28,24 +28,23 @@ import {
   useSidebar,
 } from '@grantly/components/ui/sidebar';
 import { useRouter } from 'next/navigation';
-
-import { useGetMeQuery } from '@grantly/api/user/useUserQueries';
 import { useLogoutMutation } from '@grantly/api/auth/useAuthQueries';
 import { queryClient } from '@grantly/app/providers';
+import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
 
 export const NavUser = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  const { isMobile } = useSidebar();
 
-  const { data: me } = useGetMeQuery();
   const { mutate: logout } = useLogoutMutation({
     onSuccess: () => {
       queryClient.clear();
       router.replace('/auth/login');
     },
   });
-  const { isMobile } = useSidebar();
 
-  if (!me) {
+  if (!user) {
     return null;
   }
 
@@ -59,14 +58,14 @@ export const NavUser = () => {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage alt={me.name} />
+                <AvatarImage alt={user.name} />
                 <AvatarFallback className="rounded-lg">
-                  {me.name?.slice(0, 2).toUpperCase()}
+                  {user.name?.slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{me.name}</span>
-                <span className="truncate text-xs">{me.email}</span>
+                <span className="truncate font-semibold">{user.name}</span>
+                <span className="truncate text-xs">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
