@@ -14,10 +14,11 @@ import { Skeleton } from '@grantly/components/ui/skeleton';
 import { toast } from 'sonner';
 import { UserType } from '@grantly/api/user/user.shcema';
 import { ServiceType } from '@grantly/api/service/service.shcema';
+import { SentryService } from '@grantly/utils/sentry-service';
 
 interface AuthContextType {
-  user: UserType | undefined;
-  services: ServiceType[] | undefined;
+  user: UserType;
+  services: ServiceType[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,13 +43,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const value = useMemo(
     () => ({
-      user,
-      services,
+      // FIXME: 타입 추론 오류 해결
+      user: user!,
+      services: services ?? [],
     }),
     [user, services]
   );
 
   if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Skeleton className="w-8 h-8 rounded-full" />
+      </div>
+    );
+  }
+
+  if (!value.user) {
+    SentryService.captureException(
+      new Error('AuthProvider: user or services is undefined'),
+      {
+        user,
+        services,
+      }
+    );
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Skeleton className="w-8 h-8 rounded-full" />
