@@ -9,7 +9,7 @@ import grantly.member.application.port.`in`.EditProfileUseCase
 import grantly.member.application.port.`in`.FindMemberQuery
 import grantly.member.application.port.`in`.SignUpUseCase
 import grantly.member.application.port.`in`.dto.SignUpParams
-import grantly.member.domain.Member
+import grantly.member.domain.MemberDomain
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.persistence.EntityNotFoundException
 import mu.KotlinLogging
@@ -36,7 +36,7 @@ class MemberController(
     @GetMapping("/me")
     fun getCurrentMember(): ResponseEntity<MemberResponse> {
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
-        val member: Member
+        val member: MemberDomain
         try {
             member = findMemberQuery.findMemberById(requestMember.getId())
         } catch (e: EntityNotFoundException) {
@@ -52,7 +52,7 @@ class MemberController(
     }
 
     @GetMapping
-    fun findAll(): List<Member> {
+    fun findAll(): List<MemberDomain> {
         log.info { "멤버 전체 목록을 조회합니다" }
         val members = findMemberQuery.findAllMembers()
         log.debug { "조회된 멤버 수: ${members.size}" }
@@ -62,16 +62,16 @@ class MemberController(
     @GetMapping("/{memberId}")
     fun findById(
         @PathVariable memberId: Long,
-    ): Member = findMemberQuery.findMemberById(memberId)
+    ): MemberDomain = findMemberQuery.findMemberById(memberId)
 
     @PostMapping
     fun signUp(
         @RequestBody body: SignUpRequest,
-    ): Member = signUpUseCase.signUp(SignUpParams(body.email, body.name, body.password))
+    ): MemberDomain = signUpUseCase.signUp(SignUpParams(body.email, body.name, body.password))
 
     @PatchMapping("/{memberId}")
     fun update(
         @PathVariable memberId: Long,
         @RequestBody body: UpdateMemberRequest,
-    ): Member = editProfileUseCase.update(memberId, body.name)
+    ): MemberDomain = editProfileUseCase.update(memberId, body.name)
 }

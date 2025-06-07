@@ -21,7 +21,7 @@ import grantly.member.application.port.`in`.dto.LogoutParams
 import grantly.member.application.port.`in`.dto.SignUpParams
 import grantly.member.application.service.exceptions.DuplicateEmailException
 import grantly.member.application.service.exceptions.PasswordMismatchException
-import grantly.member.domain.Member
+import grantly.member.domain.MemberDomain
 import grantly.token.application.service.exceptions.InvalidTokenException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -83,7 +83,7 @@ class AuthController(
     fun signUp(
         @Valid @RequestBody body: SignUpRequest,
     ): ResponseEntity<SignUpResponse> {
-        val member: Member
+        val member: MemberDomain
         try {
             member = signUpUseCase.signUp(SignUpParams(body.email, body.name, body.password))
         } catch (e: DuplicateEmailException) {

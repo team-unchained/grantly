@@ -1,15 +1,15 @@
 package grantly.member.application.port.out
 
-import grantly.member.domain.Member
+import grantly.member.domain.MemberDomain
 
 interface MemberRepository {
-    fun createMember(member: Member): Member
+    fun createMember(member: MemberDomain): MemberDomain
 
-    fun getMember(id: Long): Member
+    fun getMember(id: Long): MemberDomain
 
-    fun getMemberByEmail(email: String): Member
+    fun getMemberByEmail(email: String): MemberDomain
 
-    fun getAllMembers(): List<Member>
+    fun getAllMembers(): List<MemberDomain>
 
-    fun updateMember(member: Member): Member
+    fun updateMember(member: MemberDomain): MemberDomain
 }

@@ -6,11 +6,11 @@ import grantly.member.adapter.`in`.dto.LoginRequest
 import grantly.member.adapter.`in`.dto.SignUpRequest
 import grantly.member.application.port.out.AuthSessionRepository
 import grantly.member.application.port.out.MemberRepository
-import grantly.member.domain.AuthSession
-import grantly.member.domain.Member
+import grantly.member.domain.AuthSessionDomain
+import grantly.member.domain.MemberDomain
 import grantly.token.adapter.out.enums.TokenType
 import grantly.token.application.port.out.TokenRepository
-import grantly.token.domain.Token
+import grantly.token.domain.TokenDomain
 import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.Cookie
 import org.assertj.core.api.Assertions.assertThat
@@ -69,7 +69,7 @@ class AuthControllerTest(
             }
     }
 
-    private lateinit var existingMember: Member
+    private lateinit var existingMember: MemberDomain
 
     @BeforeAll
     fun setUp() {
@@ -308,7 +308,7 @@ class AuthControllerTest(
         val newPwd = "newpassword1234!"
         val token =
             tokenRepository.create(
-                Token(
+                TokenDomain(
                     token = tokenValue,
                     expiresAt = OffsetDateTime.now().plusHours(1),
                     type = TokenType.PASSWORD_RESET,
@@ -341,15 +341,15 @@ class AuthControllerTest(
         email: String,
         name: String,
         password: String,
-    ): Member {
-        val member = Member(email = email, name = name, password = password)
+    ): MemberDomain {
+        val member = MemberDomain(email = email, name = name, password = password)
         member.hashPassword(passwordEncoder)
         return memberRepository.createMember(member)
     }
 
-    fun createAnonymousAuthSession(): AuthSession {
+    fun createAnonymousAuthSession(): AuthSessionDomain {
         val session =
-            AuthSession(
+            AuthSessionDomain(
                 token = UUID.randomUUID().toString(),
                 deviceId = UUID.randomUUID().toString(),
                 expiresAt = OffsetDateTime.now().plusSeconds(3600),
@@ -357,9 +357,9 @@ class AuthControllerTest(
         return authSessionRepository.createSession(session)
     }
 
-    fun createMemberAuthSession(memberId: Long): AuthSession {
+    fun createMemberAuthSession(memberId: Long): AuthSessionDomain {
         val session =
-            AuthSession(
+            AuthSessionDomain(
                 token = UUID.randomUUID().toString(),
                 deviceId = UUID.randomUUID().toString(),
                 expiresAt = OffsetDateTime.now().plusSeconds(3600),

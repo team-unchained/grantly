@@ -2,8 +2,8 @@ package grantly.config
 
 import grantly.member.application.port.out.AuthSessionRepository
 import grantly.member.application.port.out.MemberRepository
-import grantly.member.domain.AuthSession
-import grantly.member.domain.Member
+import grantly.member.domain.AuthSessionDomain
+import grantly.member.domain.MemberDomain
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContext
@@ -19,8 +19,8 @@ class WithSessionSecurityContextFactory(
         val context = SecurityContextHolder.createEmptyContext()
 
         // 이미 존재하는 유저인지 확인
-        var member: Member
-        var authSession: AuthSession
+        var member: MemberDomain
+        var authSession: AuthSessionDomain
         try {
             val existingMember = memberRepository.getMemberByEmail(annotation.email)
             member = existingMember
@@ -30,7 +30,7 @@ class WithSessionSecurityContextFactory(
             } catch (e: EntityNotFoundException) {
                 // 세션이 존재하지 않으면 새로 생성
                 val newAuthSession =
-                    AuthSession(
+                    AuthSessionDomain(
                         memberId = member.id,
                         token = "testToken",
                         expiresAt = OffsetDateTime.now().plusDays(1),
@@ -62,10 +62,10 @@ class WithSessionSecurityContextFactory(
         return context
     }
 
-    private fun createMemberAndSession(mockMember: WithTestSessionMember): Pair<Member, AuthSession> {
+    private fun createMemberAndSession(mockMember: WithTestSessionMember): Pair<MemberDomain, AuthSessionDomain> {
         val now = OffsetDateTime.now()
         val member =
-            Member(
+            MemberDomain(
                 name = mockMember.name,
                 email = mockMember.email,
                 password = "test123!",
@@ -75,7 +75,7 @@ class WithSessionSecurityContextFactory(
             )
         val createdMember = memberRepository.createMember(member)
         val authSession =
-            AuthSession(
+            AuthSessionDomain(
                 memberId = createdMember.id,
                 token = "testToken",
                 expiresAt = OffsetDateTime.now().plusDays(1),

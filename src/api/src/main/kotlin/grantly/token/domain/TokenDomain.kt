@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 
 @Schema(description = "토큰 도메인 모델")
-class Token(
+class TokenDomain(
     val id: Long = 0L,
     val token: String,
     val expiresAt: OffsetDateTime,

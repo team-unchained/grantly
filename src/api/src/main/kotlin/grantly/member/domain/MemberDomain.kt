@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.OffsetDateTime
 
 @Schema(description = "멤버 도메인 모델")
-data class Member(
+data class MemberDomain(
     val id: Long = 0L,
     val email: String,
     var password: String? = null,
