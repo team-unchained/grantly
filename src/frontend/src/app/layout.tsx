@@ -1,6 +1,6 @@
+import Providers from '@grantly/app/providers';
 import type { Metadata } from 'next';
 import './globals.css';
-import Providers from '@grantly/app/providers';
 
 export const metadata: Metadata = {
   title: 'Grantly',
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body>
         <Providers>{children}</Providers>
       </body>

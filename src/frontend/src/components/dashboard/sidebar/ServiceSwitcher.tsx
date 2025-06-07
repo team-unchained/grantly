@@ -1,13 +1,7 @@
 'use client';
 
+import { ChevronsUpDown, AppWindow, Plus } from 'lucide-react';
 import * as React from 'react';
-import {
-  ChevronsUpDown,
-  Plus,
-  AudioWaveform,
-  Command,
-  GalleryVerticalEnd,
-} from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -23,28 +17,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@grantly/components/ui/sidebar';
-
-const Services: {
-  name: string;
-  logo: React.ElementType;
-}[] = [
-  {
-    name: 'Unchained',
-    logo: GalleryVerticalEnd,
-  },
-  {
-    name: 'B Services',
-    logo: AudioWaveform,
-  },
-  {
-    name: 'C Services',
-    logo: Command,
-  },
-];
+import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
 
 export const ServiceSwitcher = () => {
   const { isMobile } = useSidebar();
-  const [activeServices, setActiveServices] = React.useState(Services[0]);
+  const { services } = useAuth();
+  const [activeServices, setActiveServices] = React.useState(services?.[0]);
 
   if (!activeServices) {
     return null;
@@ -60,7 +38,7 @@ export const ServiceSwitcher = () => {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeServices.logo className="size-4" />
+                <AppWindow className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
@@ -79,14 +57,14 @@ export const ServiceSwitcher = () => {
             <DropdownMenuLabel className="text-xs text-muted-foreground">
               Services
             </DropdownMenuLabel>
-            {Services.map((service) => (
+            {services.map((service) => (
               <DropdownMenuItem
                 key={service.name}
                 onClick={() => setActiveServices(service)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <service.logo className="size-4 shrink-0" />
+                  <AppWindow className="size-4 shrink-0" />
                 </div>
                 {service.name}
               </DropdownMenuItem>
