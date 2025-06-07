@@ -1,13 +1,13 @@
 package grantly.member.adapter.out
 
 import grantly.common.entity.IsMapper
-import grantly.member.domain.Member
+import grantly.member.domain.MemberDomain
 import org.springframework.stereotype.Component
 
 @Component
-class MemberMapper : IsMapper<MemberJpaEntity, Member> {
-    override fun toDomain(entity: MemberJpaEntity): Member =
-        Member(
+class MemberMapper : IsMapper<MemberJpaEntity, MemberDomain> {
+    override fun toDomain(entity: MemberJpaEntity): MemberDomain =
+        MemberDomain(
             id = entity.id ?: 0L,
             email = entity.email,
             name = entity.name,
@@ -17,7 +17,7 @@ class MemberMapper : IsMapper<MemberJpaEntity, Member> {
             modifiedAt = entity.modifiedAt,
         )
 
-    override fun toEntity(domain: Member): MemberJpaEntity =
+    override fun toEntity(domain: MemberDomain): MemberJpaEntity =
         MemberJpaEntity(
             id = if (domain.id == 0L) null else domain.id,
             email = domain.email,

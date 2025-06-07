@@ -1,11 +1,11 @@
 package grantly.token.application.port.out
 
-import grantly.token.domain.Token
+import grantly.token.domain.TokenDomain
 
 interface TokenRepository {
-    fun create(token: Token): Token
+    fun create(token: TokenDomain): TokenDomain
 
-    fun get(value: String): Token
+    fun get(value: String): TokenDomain
 
-    fun deactivate(token: Token): Token
+    fun deactivate(token: TokenDomain): TokenDomain
 }

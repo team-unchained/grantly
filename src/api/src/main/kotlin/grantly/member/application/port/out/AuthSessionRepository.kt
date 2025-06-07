@@ -1,15 +1,15 @@
 package grantly.member.application.port.out
 
-import grantly.member.domain.AuthSession
+import grantly.member.domain.AuthSessionDomain
 
 interface AuthSessionRepository {
-    fun updateSession(session: AuthSession): AuthSession
+    fun updateSession(session: AuthSessionDomain): AuthSessionDomain
 
-    fun getSessionByMemberId(memberId: Long): AuthSession
+    fun getSessionByMemberId(memberId: Long): AuthSessionDomain
 
-    fun getSessionByToken(token: String): AuthSession
+    fun getSessionByToken(token: String): AuthSessionDomain
 
-    fun createSession(session: AuthSession): AuthSession
+    fun createSession(session: AuthSessionDomain): AuthSessionDomain
 
     fun deleteSession(id: Long)
 }

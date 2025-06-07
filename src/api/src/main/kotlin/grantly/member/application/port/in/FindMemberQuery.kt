@@ -1,11 +1,11 @@
 package grantly.member.application.port.`in`
 
-import grantly.member.domain.Member
+import grantly.member.domain.MemberDomain
 
 interface FindMemberQuery {
-    fun findMemberById(id: Long): Member
+    fun findMemberById(id: Long): MemberDomain
 
-    fun findMemberByEmail(email: String): Member
+    fun findMemberByEmail(email: String): MemberDomain
 
-    fun findAllMembers(): List<Member>
+    fun findAllMembers(): List<MemberDomain>
 }

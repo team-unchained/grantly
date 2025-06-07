@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 
 @Schema(description = "서비스 도메인 모델")
-class Service(
+class ServiceDomain(
     val id: Long,
     val slug: String,
     var name: String,

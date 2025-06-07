@@ -17,12 +17,12 @@ import grantly.member.application.port.`in`.dto.SignUpParams
 import grantly.member.application.port.out.MemberRepository
 import grantly.member.application.service.exceptions.DuplicateEmailException
 import grantly.member.application.service.exceptions.PasswordMismatchException
-import grantly.member.domain.AuthSession
-import grantly.member.domain.Member
+import grantly.member.domain.AuthSessionDomain
+import grantly.member.domain.MemberDomain
 import grantly.token.adapter.out.dto.MemberIdTokenPayload
 import grantly.token.application.service.TokenService
 import grantly.token.application.service.exceptions.InvalidTokenException
-import grantly.token.domain.Token
+import grantly.token.domain.TokenDomain
 import jakarta.persistence.EntityNotFoundException
 import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Value
@@ -46,19 +46,19 @@ class MemberService(
     @Value("\${grantly.service.domain}")
     private lateinit var serviceDomain: String
 
-    override fun signUp(params: SignUpParams): Member {
+    override fun signUp(params: SignUpParams): MemberDomain {
         try {
             findMemberByEmail(params.email)
             throw DuplicateEmailException()
         } catch (e: EntityNotFoundException) {
             // 멤버 생성
-            val member = Member(email = params.email, name = params.name, password = params.password)
+            val member = MemberDomain(email = params.email, name = params.name, password = params.password)
             member.hashPassword(passwordEncoder)
             return memberRepository.createMember(member)
         }
     }
 
-    override fun login(params: LoginParams): AuthSession {
+    override fun login(params: LoginParams): AuthSessionDomain {
         val member = findMemberByEmail(params.email)
         if (!member.checkPassword(passwordEncoder, params.password)) {
             throw PasswordMismatchException()
@@ -117,14 +117,14 @@ class MemberService(
 
     override fun findMemberById(id: Long) = memberRepository.getMember(id)
 
-    override fun findMemberByEmail(email: String): Member = memberRepository.getMemberByEmail(email)
+    override fun findMemberByEmail(email: String): MemberDomain = memberRepository.getMemberByEmail(email)
 
-    override fun findAllMembers(): List<Member> = memberRepository.getAllMembers()
+    override fun findAllMembers(): List<MemberDomain> = memberRepository.getAllMembers()
 
     override fun update(
         id: Long,
         name: String,
-    ): Member {
+    ): MemberDomain {
         val member = findMemberById(id)
         member.name = name
         return memberRepository.updateMember(member)
@@ -152,7 +152,7 @@ class MemberService(
         return true
     }
 
-    fun getResetPasswordEmailParams(token: Token): Map<String, Any> =
+    fun getResetPasswordEmailParams(token: TokenDomain): Map<String, Any> =
         mapOf(
             "resetPasswordUrl" to "$serviceDomain/auth/reset-password?token=${token.token}",
         )
@@ -161,7 +161,7 @@ class MemberService(
         token: String,
         newPassword: String,
     ) {
-        val tokenObj: Token
+        val tokenObj: TokenDomain
         try {
             tokenObj = tokenService.findToken(token)
             if (!tokenObj.isValid()) {
