@@ -1,4 +1,3 @@
-
 CREATE TABLE service
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
@@ -9,6 +8,7 @@ CREATE TABLE service
     image_url     VARCHAR(255)          NULL,
     `description` VARCHAR(512)          NULL,
     owner_id      BIGINT                NOT NULL,
+    is_active     BOOLEAN               NOT NULL DEFAULT TRUE,
     CONSTRAINT pk_service PRIMARY KEY (id)
 );
 

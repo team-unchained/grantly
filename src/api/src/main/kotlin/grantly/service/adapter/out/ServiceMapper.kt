@@ -26,5 +26,6 @@ class ServiceMapper : IsMapper<ServiceJpaEntity, ServiceDomain> {
             imageUrl = domain.imageUrl,
             description = domain.description,
             ownerId = domain.ownerId,
+            isActive = domain.isActive,
         )
 }

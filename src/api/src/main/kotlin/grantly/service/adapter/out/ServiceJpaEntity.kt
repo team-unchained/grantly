@@ -33,6 +33,8 @@ class ServiceJpaEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false, referencedColumnName = "id", updatable = false, insertable = false)
     val owner: MemberJpaEntity? = null,
+    @Column(nullable = false)
+    var isActive: Boolean = true,
 ) : BaseEntity() {
     override fun equals(other: Any?) = entityEquals(other, ServiceJpaEntity::id)
 

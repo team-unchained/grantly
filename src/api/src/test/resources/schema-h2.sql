@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS auth_session
     user_agent  VARCHAR(255)          NULL,
     ip          VARCHAR(45)           NULL,
     expires_at  datetime              NOT NULL,
-    member_id     BIGINT                NULL,
+    member_id   BIGINT                NULL,
     CONSTRAINT pk_auth_session PRIMARY KEY (id)
 );
 
@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS service
     image_url     VARCHAR(255)          NULL,
     `description` VARCHAR(512)          NULL,
     owner_id      BIGINT                NOT NULL,
+    is_active     BOOLEAN               NOT NULL DEFAULT TRUE,
     CONSTRAINT pk_service PRIMARY KEY (id)
 );
 

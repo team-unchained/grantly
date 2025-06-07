@@ -11,6 +11,7 @@ class ServiceDomain(
     var imageUrl: String? = null,
     var description: String? = null,
     val ownerId: Long,
+    var isActive: Boolean = true,
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
     var modifiedAt: OffsetDateTime? = null,
 )
