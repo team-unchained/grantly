@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 
 @Schema(description = "앱 도메인 모델")
-class AppDomain(
+data class AppDomain(
     val id: Long,
     val slug: String,
     var name: String,
@@ -14,4 +14,8 @@ class AppDomain(
     var isActive: Boolean = true,
     var createdAt: OffsetDateTime = OffsetDateTime.now(),
     var modifiedAt: OffsetDateTime? = null,
-)
+) {
+    fun deactivate() {
+        isActive = false
+    }
+}
