@@ -1,10 +1,10 @@
-package grantly.service.domain
+package grantly.app.domain
 
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 
-@Schema(description = "서비스 도메인 모델")
-class ServiceDomain(
+@Schema(description = "앱 도메인 모델")
+class AppDomain(
     val id: Long,
     val slug: String,
     var name: String,

@@ -1,13 +1,13 @@
-package grantly.service.adapter.out
+package grantly.app.adapter.out
 
+import grantly.app.domain.AppDomain
 import grantly.common.entity.IsMapper
-import grantly.service.domain.ServiceDomain
 import org.springframework.stereotype.Component
 
 @Component
-class ServiceMapper : IsMapper<ServiceJpaEntity, ServiceDomain> {
-    override fun toDomain(entity: ServiceJpaEntity): ServiceDomain =
-        ServiceDomain(
+class AppMapper : IsMapper<AppJpaEntity, AppDomain> {
+    override fun toDomain(entity: AppJpaEntity): AppDomain =
+        AppDomain(
             id = entity.id ?: 0L,
             slug = entity.slug,
             name = entity.name,
@@ -18,8 +18,8 @@ class ServiceMapper : IsMapper<ServiceJpaEntity, ServiceDomain> {
             modifiedAt = entity.modifiedAt,
         )
 
-    override fun toEntity(domain: ServiceDomain): ServiceJpaEntity =
-        ServiceJpaEntity(
+    override fun toEntity(domain: AppDomain): AppJpaEntity =
+        AppJpaEntity(
             id = if (domain.id == 0L) null else domain.id,
             slug = domain.slug,
             name = domain.name,
