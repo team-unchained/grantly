@@ -4,7 +4,7 @@ import grantly.common.constants.AuthConstants
 import grantly.common.utils.HttpUtil
 import grantly.config.CustomHttpSession
 import grantly.member.application.port.out.AuthSessionRepository
-import grantly.member.domain.AuthSession
+import grantly.member.domain.AuthSessionDomain
 import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -123,7 +123,7 @@ class SessionService(
         return request.getAttribute(AuthConstants.SESSION_ATTR) as CustomHttpSession
     }
 
-    fun persistIfAbsent(request: HttpServletRequest): AuthSession {
+    fun persistIfAbsent(request: HttpServletRequest): AuthSessionDomain {
         val httpSession = getHttpSession(request)
         return try {
             authSessionRepository.getSessionByToken(httpSession.token)
@@ -135,11 +135,11 @@ class SessionService(
     private fun persist(
         request: HttpServletRequest,
         httpSession: CustomHttpSession,
-    ): AuthSession {
+    ): AuthSessionDomain {
         val ip = request.remoteAddr
         val userAgent = request.getHeader("User-Agent")
         val authSession =
-            AuthSession(
+            AuthSessionDomain(
                 token = httpSession.token,
                 deviceId = httpSession.deviceId,
                 expiresAt = OffsetDateTime.now().plusSeconds(AuthConstants.SESSION_TOKEN_EXPIRATION),
@@ -149,11 +149,11 @@ class SessionService(
         return authSessionRepository.createSession(authSession)
     }
 
-    fun findSessionByToken(token: String): AuthSession = authSessionRepository.getSessionByToken(token)
+    fun findSessionByToken(token: String): AuthSessionDomain = authSessionRepository.getSessionByToken(token)
 
-    fun findSessionByMemberId(memberId: Long): AuthSession = authSessionRepository.getSessionByMemberId(memberId)
+    fun findSessionByMemberId(memberId: Long): AuthSessionDomain = authSessionRepository.getSessionByMemberId(memberId)
 
     fun delete(id: Long) = authSessionRepository.deleteSession(id)
 
-    fun update(authSession: AuthSession): AuthSession = authSessionRepository.updateSession(authSession)
+    fun update(authSession: AuthSessionDomain): AuthSessionDomain = authSessionRepository.updateSession(authSession)
 }

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 
 @Schema(description = "세션 도메인 모델")
-data class AuthSession(
+data class AuthSessionDomain(
     val id: Long = 0L,
     var memberId: Long? = null,
     var token: String,

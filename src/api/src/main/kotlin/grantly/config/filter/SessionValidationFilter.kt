@@ -6,8 +6,8 @@ import grantly.common.utils.HttpUtil
 import grantly.config.AuthenticatedMember
 import grantly.member.application.port.out.MemberRepository
 import grantly.member.application.service.SessionService
-import grantly.member.domain.AuthSession
-import grantly.member.domain.Member
+import grantly.member.domain.AuthSessionDomain
+import grantly.member.domain.MemberDomain
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,7 +26,7 @@ class SessionValidationFilter(
         val httpSession =
             sessionService.getHttpSession(request)
 
-        val authSession: AuthSession
+        val authSession: AuthSessionDomain
         try {
             authSession = sessionService.findSessionByToken(httpSession.token)
         } catch (e: EntityNotFoundException) {
@@ -45,7 +45,7 @@ class SessionValidationFilter(
         }
 
         // Security Context 설정
-        val member: Member
+        val member: MemberDomain
         try {
             // 유저 정보 조회
             member = memberRepository.getMember(authSession.memberId!!)

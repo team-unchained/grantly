@@ -2,13 +2,13 @@ package grantly.token.adapter.out
 
 import grantly.common.entity.IsMapper
 import grantly.token.adapter.out.enums.TokenType
-import grantly.token.domain.Token
+import grantly.token.domain.TokenDomain
 import org.springframework.stereotype.Component
 
 @Component
-class TokenMapper : IsMapper<TokenJpaEntity, Token> {
-    override fun toDomain(entity: TokenJpaEntity): Token =
-        Token(
+class TokenMapper : IsMapper<TokenJpaEntity, TokenDomain> {
+    override fun toDomain(entity: TokenJpaEntity): TokenDomain =
+        TokenDomain(
             id = entity.id ?: 0L,
             token = entity.token,
             isActive = entity.isActive,
@@ -19,7 +19,7 @@ class TokenMapper : IsMapper<TokenJpaEntity, Token> {
             modifiedAt = entity.modifiedAt,
         )
 
-    override fun toEntity(domain: Token): TokenJpaEntity =
+    override fun toEntity(domain: TokenDomain): TokenJpaEntity =
         TokenJpaEntity(
             id = if (domain.id == 0L) null else domain.id,
             token = domain.token,
