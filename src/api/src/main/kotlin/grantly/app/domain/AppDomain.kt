@@ -1,11 +1,12 @@
 package grantly.app.domain
 
+import grantly.common.exceptions.PermissionDeniedException
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 
 @Schema(description = "앱 도메인 모델")
 data class AppDomain(
-    val id: Long,
+    val id: Long = 0L,
     val slug: String,
     var name: String,
     var imageUrl: String? = null,
@@ -17,5 +18,11 @@ data class AppDomain(
 ) {
     fun deactivate() {
         isActive = false
+    }
+
+    fun checkOwner(memberId: Long) {
+        if (ownerId != memberId) {
+            throw PermissionDeniedException()
+        }
     }
 }
