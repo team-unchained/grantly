@@ -11,7 +11,7 @@ class AppPersistenceAdapter(
     private val appMapper: AppMapper,
 ) : AppRepository {
     override fun getAppById(id: Long): AppDomain {
-        val appEntity = appJpaRepository.findById(id)
+        val appEntity = appJpaRepository.findByIdAndIsActiveIsTrue(id)
         if (appEntity.isEmpty) {
             throw EntityNotFoundException("Service not found with id: $id")
         }
@@ -19,7 +19,7 @@ class AppPersistenceAdapter(
     }
 
     override fun getAppsByOwnerId(memberId: Long): List<AppDomain> {
-        val appEntities = appJpaRepository.findByOwnerId(memberId)
+        val appEntities = appJpaRepository.findByOwnerIdAndIsActiveIsTrue(memberId)
         if (appEntities.isEmpty) {
             return emptyList()
         }

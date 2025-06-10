@@ -4,5 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import java.util.Optional
 
 interface AppJpaRepository : JpaRepository<AppJpaEntity, Long> {
-    fun findByOwnerId(ownerId: Long): Optional<List<AppJpaEntity>>
+    fun findByIdAndIsActiveIsTrue(id: Long): Optional<AppJpaEntity>
+
+    fun findByOwnerIdAndIsActiveIsTrue(ownerId: Long): Optional<List<AppJpaEntity>>
 }
