@@ -6,5 +6,5 @@ import java.util.Optional
 interface AppJpaRepository : JpaRepository<AppJpaEntity, Long> {
     fun findByIdAndIsActiveIsTrue(id: Long): Optional<AppJpaEntity>
 
-    fun findByOwnerIdAndIsActiveIsTrue(ownerId: Long): Optional<List<AppJpaEntity>>
+    fun findByOwnerIdAndIsActiveIsTrueOrderByIdDesc(ownerId: Long): Optional<List<AppJpaEntity>>
 }

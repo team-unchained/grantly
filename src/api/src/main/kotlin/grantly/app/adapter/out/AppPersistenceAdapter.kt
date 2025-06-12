@@ -19,7 +19,7 @@ class AppPersistenceAdapter(
     }
 
     override fun getAppsByOwnerId(memberId: Long): List<AppDomain> {
-        val appEntities = appJpaRepository.findByOwnerIdAndIsActiveIsTrue(memberId)
+        val appEntities = appJpaRepository.findByOwnerIdAndIsActiveIsTrueOrderByIdDesc(memberId)
         if (appEntities.isEmpty) {
             return emptyList()
         }
