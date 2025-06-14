@@ -1,7 +1,8 @@
 'use client';
 
-import { ChevronsUpDown, AppWindow, Plus } from 'lucide-react';
+import { ChevronsUpDown, AppWindow, Plus, Check } from 'lucide-react';
 import * as React from 'react';
+import Link from 'next/link';
 
 import {
   DropdownMenu,
@@ -22,11 +23,7 @@ import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
 export const AppSwitcher = () => {
   const { isMobile } = useSidebar();
   const { apps } = useAuth();
-  const [activeApps, setActiveApps] = React.useState(apps?.[0]);
-
-  if (!activeApps) {
-    return null;
-  }
+  const { currentApp } = useAuth();
 
   return (
     <SidebarMenu>
@@ -42,7 +39,7 @@ export const AppSwitcher = () => {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeApps.name}
+                  {currentApp.name}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -58,16 +55,17 @@ export const AppSwitcher = () => {
               Apps
             </DropdownMenuLabel>
             {apps.map((app) => (
-              <DropdownMenuItem
-                key={app.name}
-                onClick={() => setActiveApps(app)}
-                className="gap-2 p-2"
-              >
-                <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <AppWindow className="size-4 shrink-0" />
-                </div>
-                {app.name}
-              </DropdownMenuItem>
+              <Link href={`/apps/${app.id}`} key={app.name}>
+                <DropdownMenuItem className="gap-2 p-2">
+                  <div className="flex size-6 items-center justify-center rounded-sm border">
+                    <AppWindow className="size-4 shrink-0" />
+                  </div>
+                  <span className="flex-1">{app.name}</span>
+                  {currentApp.id === app.id && (
+                    <Check className="size-4 text-primary" />
+                  )}
+                </DropdownMenuItem>
+              </Link>
             ))}
             <DropdownMenuSeparator />
             <DropdownMenuItem className="gap-2 p-2">

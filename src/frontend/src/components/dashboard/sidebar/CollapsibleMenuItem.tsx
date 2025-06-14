@@ -16,7 +16,11 @@ import { MenuItem } from '@grantly/constants/DashboardMenu';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
-export const CollapsibleMenuItem = ({ item }: { item: MenuItem }) => {
+interface CollapsibleMenuItemProps {
+  item: MenuItem;
+}
+
+export const CollapsibleMenuItem = ({ item }: CollapsibleMenuItemProps) => {
   return (
     <Collapsible asChild className="group/collapsible">
       <SidebarMenuItem>

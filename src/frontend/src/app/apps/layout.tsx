@@ -1,4 +1,3 @@
-import { Header } from '@grantly/components/dashboard/Header';
 import { DashBoardSideBar } from '@grantly/components/dashboard/sidebar/DashBoardSideBar';
 import React from 'react';
 
@@ -14,10 +13,7 @@ export default function DashboardLayout({
     <AuthProvider>
       <SidebarProvider>
         <DashBoardSideBar />
-        <SidebarInset>
-          <Header />
-          {children}
-        </SidebarInset>
+        <SidebarInset>{children}</SidebarInset>
       </SidebarProvider>
     </AuthProvider>
   );

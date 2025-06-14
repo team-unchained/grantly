@@ -1,24 +1,25 @@
 'use client';
 
+import { AppType } from '@grantly/api/app/app.shcema';
+import { useGetAppsQuery } from '@grantly/api/app/useAppQueries';
+import { UserType } from '@grantly/api/user/user.shcema';
+import { useGetMeQuery } from '@grantly/api/user/useUserQueries';
+import { ErrorComponent } from '@grantly/components/common/Error';
+import { Skeleton } from '@grantly/components/ui/skeleton';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import {
   createContext,
-  useContext,
   ReactNode,
-  useMemo,
+  useContext,
   useEffect,
+  useMemo,
 } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useGetMeQuery } from '@grantly/api/user/useUserQueries';
-import { useGetAppsQuery } from '@grantly/api/app/useAppQueries';
-import { Skeleton } from '@grantly/components/ui/skeleton';
 import { toast } from 'sonner';
-import { UserType } from '@grantly/api/user/user.shcema';
-import { AppType } from '@grantly/api/app/app.shcema';
-import { SentryService } from '@grantly/utils/sentry-service';
 
 interface AuthContextType {
   user: UserType;
   apps: AppType[];
+  currentApp: AppType;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,23 +31,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { data: apps, isLoading: isAppsLoading } = useGetAppsQuery();
 
   const isLoading = isUserMeLoading || isAppsLoading;
+  const appId = parseInt(String(useParams().appId), 10);
+  const currentApp = apps?.find((app) => app.id === appId);
 
   // Login 확인
   useEffect(() => {
     if (isLoading) return;
+
     if (!user) {
       toast.info('로그인이 필요한 페이지입니다.');
       router.replace(`/auth/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
     }
-  }, [user, isLoading, pathname, router]);
+
+    // 앱이 하나도 없는 경우
+    if (!apps || apps.length === 0) {
+      toast.info('앱이 없습니다. 새로운 앱을 만들어보세요!');
+      router.replace('/apps/create');
+      return;
+    }
+
+    // appId가 없는 경우
+    if (!appId) {
+      router.replace(`/apps/${apps[0].id}`);
+    }
+  }, [isLoading, pathname, router, user, currentApp, apps, appId]);
 
   const value = useMemo(
     () => ({
       // FIXME: 타입 추론 오류 해결
       user: user!,
       apps: apps ?? [],
+      currentApp: currentApp!,
     }),
-    [user, apps]
+    [user, apps, currentApp]
   );
 
   if (isLoading) {
@@ -57,14 +75,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
   }
 
-  if (!value.user) {
-    SentryService.captureException(
-      new Error('AuthProvider: user or apps is undefined'),
-      {
-        user,
-        apps,
-      }
-    );
+  if (appId && !value.currentApp) {
+    return <ErrorComponent title="앱을 찾을 수 없습니다." refresh goHome />;
+  }
+
+  if (!value.user || !value.currentApp) {
+    // User 가 없으면 로그인 화면으로 가니까 그냥 로딩만 노출해도 된다.
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Skeleton className="w-8 h-8 rounded-full" />
