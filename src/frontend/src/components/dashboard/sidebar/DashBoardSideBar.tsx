@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import { NavUser } from '@grantly/components/dashboard/sidebar/NavUser';
-import { ServiceSwitcher } from '@grantly/components/dashboard/sidebar/ServiceSwitcher';
+import { AppSwitcher } from '@grantly/components/dashboard/sidebar/AppSwitcher';
 import { NavMenu } from '@grantly/components/dashboard/sidebar/NavMenu';
 import {
   Sidebar,
@@ -17,7 +17,7 @@ export const DashBoardSideBar = () => {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <ServiceSwitcher />
+        <AppSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMenu />
