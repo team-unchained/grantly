@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-export const ServiceSchema = z.object({
+export const AppSchema = z.object({
   id: z.number().int(),
   name: z.string(),
   description: z.string(),
   imageUrl: z.string(),
 });
 
-export type ServiceType = z.infer<typeof ServiceSchema>;
+export type AppType = z.infer<typeof AppSchema>;

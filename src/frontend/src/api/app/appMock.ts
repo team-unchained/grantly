@@ -1,6 +1,6 @@
-import { ServiceType } from './service.shcema';
+import { AppType } from './app.shcema';
 
-export const mockServices: ServiceType[] = [
+export const mockApps: AppType[] = [
   {
     id: 1,
     name: '웹 개발 서비스',
