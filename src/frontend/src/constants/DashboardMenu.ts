@@ -23,10 +23,10 @@ export type MenuGroup = {
 
 export const DashboardMenu: MenuGroup[] = [
   {
-    group: 'Service',
+    group: 'App',
     items: [
       { title: 'Overview', url: '/dashboard/overview', icon: LayoutDashboard },
-      { title: 'Service Info', url: '#', icon: Info },
+      { title: 'App Info', url: '#', icon: Info },
       { title: 'Branding', url: '#', icon: LayoutDashboard },
     ],
   },

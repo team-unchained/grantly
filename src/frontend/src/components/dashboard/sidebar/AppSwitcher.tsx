@@ -19,12 +19,12 @@ import {
 } from '@grantly/components/ui/sidebar';
 import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
 
-export const ServiceSwitcher = () => {
+export const AppSwitcher = () => {
   const { isMobile } = useSidebar();
-  const { services } = useAuth();
-  const [activeServices, setActiveServices] = React.useState(services?.[0]);
+  const { apps } = useAuth();
+  const [activeApps, setActiveApps] = React.useState(apps?.[0]);
 
-  if (!activeServices) {
+  if (!activeApps) {
     return null;
   }
 
@@ -42,7 +42,7 @@ export const ServiceSwitcher = () => {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeServices.name}
+                  {activeApps.name}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -55,18 +55,18 @@ export const ServiceSwitcher = () => {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Services
+              Apps
             </DropdownMenuLabel>
-            {services.map((service) => (
+            {apps.map((app) => (
               <DropdownMenuItem
-                key={service.name}
-                onClick={() => setActiveServices(service)}
+                key={app.name}
+                onClick={() => setActiveApps(app)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
                   <AppWindow className="size-4 shrink-0" />
                 </div>
-                {service.name}
+                {app.name}
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -74,9 +74,7 @@ export const ServiceSwitcher = () => {
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
-              <div className="font-medium text-muted-foreground">
-                Add Service
-              </div>
+              <div className="font-medium text-muted-foreground">Add App</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

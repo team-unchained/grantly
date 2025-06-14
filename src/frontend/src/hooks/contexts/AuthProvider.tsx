@@ -9,16 +9,16 @@ import {
 } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useGetMeQuery } from '@grantly/api/user/useUserQueries';
-import { useGetServicesQuery } from '@grantly/api/service/useServiceQueries';
+import { useGetAppsQuery } from '@grantly/api/app/useAppQueries';
 import { Skeleton } from '@grantly/components/ui/skeleton';
 import { toast } from 'sonner';
 import { UserType } from '@grantly/api/user/user.shcema';
-import { ServiceType } from '@grantly/api/service/service.shcema';
+import { AppType } from '@grantly/api/app/app.shcema';
 import { SentryService } from '@grantly/utils/sentry-service';
 
 interface AuthContextType {
   user: UserType;
-  services: ServiceType[];
+  apps: AppType[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,10 +27,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
   const { data: user, isLoading: isUserMeLoading } = useGetMeQuery();
-  const { data: services, isLoading: isServicesLoading } =
-    useGetServicesQuery();
+  const { data: apps, isLoading: isAppsLoading } = useGetAppsQuery();
 
-  const isLoading = isUserMeLoading || isServicesLoading;
+  const isLoading = isUserMeLoading || isAppsLoading;
 
   // Login 확인
   useEffect(() => {
@@ -45,9 +44,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       // FIXME: 타입 추론 오류 해결
       user: user!,
-      services: services ?? [],
+      apps: apps ?? [],
     }),
-    [user, services]
+    [user, apps]
   );
 
   if (isLoading) {
@@ -60,10 +59,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   if (!value.user) {
     SentryService.captureException(
-      new Error('AuthProvider: user or services is undefined'),
+      new Error('AuthProvider: user or apps is undefined'),
       {
         user,
-        services,
+        apps,
       }
     );
     return (
