@@ -6,6 +6,7 @@ import {
   AppFormData,
   AppFormSchema,
 } from '@grantly/components/app/AppForm';
+import { DeleteAppDialog } from '@grantly/components/app/DeleteAppDialog';
 import { Header } from '@grantly/components/dashboard/Header';
 import { Button } from '@grantly/components/ui/button';
 import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
@@ -62,7 +63,13 @@ export default function AppInfoPage() {
           >
             <AppForm form={form} />
 
-            <div className="flex justify-end">
+            <div className="flex justify-between items-center">
+              <DeleteAppDialog app={currentApp}>
+                <Button type="button" variant="destructive">
+                  앱 삭제
+                </Button>
+              </DeleteAppDialog>
+
               <Button
                 type="submit"
                 disabled={isLoading || !form.formState.isDirty}
