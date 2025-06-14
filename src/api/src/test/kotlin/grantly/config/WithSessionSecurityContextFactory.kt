@@ -5,14 +5,19 @@ import grantly.member.application.port.out.MemberRepository
 import grantly.member.domain.AuthSessionDomain
 import grantly.member.domain.MemberDomain
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestComponent
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.test.context.support.WithSecurityContextFactory
 import java.time.OffsetDateTime
 
+@TestComponent
 class WithSessionSecurityContextFactory(
+    @Autowired
     private val memberRepository: MemberRepository,
+    @Autowired
     private val authSessionRepository: AuthSessionRepository,
 ) : WithSecurityContextFactory<WithTestSessionMember> {
     override fun createSecurityContext(annotation: WithTestSessionMember): SecurityContext {

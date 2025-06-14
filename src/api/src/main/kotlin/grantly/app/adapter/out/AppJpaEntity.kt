@@ -1,4 +1,4 @@
-package grantly.service.adapter.out
+package grantly.app.adapter.out
 
 import grantly.common.entity.BaseEntity
 import grantly.common.entity.entityEquals
@@ -16,8 +16,8 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "service")
-class ServiceJpaEntity(
+@Table(name = "application")
+class AppJpaEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(unique = true, length = 50, nullable = false)
@@ -36,13 +36,13 @@ class ServiceJpaEntity(
     @Column(nullable = false)
     var isActive: Boolean = true,
 ) : BaseEntity() {
-    override fun equals(other: Any?) = entityEquals(other, ServiceJpaEntity::id)
+    override fun equals(other: Any?) = entityEquals(other, AppJpaEntity::id)
 
-    override fun hashCode() = entityHashCode(ServiceJpaEntity::id)
+    override fun hashCode() = entityHashCode(AppJpaEntity::id)
 
     override fun toString() = entityToString(*toStringProperties)
 
     companion object {
-        val toStringProperties = arrayOf(ServiceJpaEntity::id, ServiceJpaEntity::slug, ServiceJpaEntity::name)
+        val toStringProperties = arrayOf(AppJpaEntity::id, AppJpaEntity::slug, AppJpaEntity::name)
     }
 }

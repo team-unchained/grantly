@@ -52,6 +52,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
+    implementation("me.atrox.haikunator:Haikunator:2.0.1")
+
     testImplementation("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
