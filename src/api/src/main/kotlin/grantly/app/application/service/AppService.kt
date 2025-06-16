@@ -46,12 +46,12 @@ class AppService(
         id: Long,
         ownerId: Long,
     ): AppDomain {
+        val app = appRepository.getAppById(id)
+        app.checkOwner(ownerId)
         val appCount = appRepository.getActiveAppCountByOwnerId(ownerId)
         if (appCount <= 1) {
             throw CannotDeleteLastActiveAppException()
         }
-        val app = appRepository.getAppById(id)
-        app.checkOwner(ownerId)
         app.deactivate()
         return appRepository.updateApp(app)
     }
