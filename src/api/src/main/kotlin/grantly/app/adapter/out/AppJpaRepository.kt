@@ -7,4 +7,6 @@ interface AppJpaRepository : JpaRepository<AppJpaEntity, Long> {
     fun findByIdAndIsActiveIsTrue(id: Long): Optional<AppJpaEntity>
 
     fun findByOwnerIdAndIsActiveIsTrueOrderByIdDesc(ownerId: Long): Optional<List<AppJpaEntity>>
+
+    fun countByIsActiveIsTrueAndOwnerId(ownerId: Long): Long
 }
