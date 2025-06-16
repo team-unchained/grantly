@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS token
 ALTER TABLE token
     ADD CONSTRAINT uc_token_token UNIQUE (token);
 
-CREATE TABLE IF NOT EXISTS service
+CREATE TABLE IF NOT EXISTS application
 (
     id            BIGINT AUTO_INCREMENT NOT NULL,
     created_at    datetime              NOT NULL,
@@ -63,8 +63,8 @@ CREATE TABLE IF NOT EXISTS service
     CONSTRAINT pk_service PRIMARY KEY (id)
 );
 
-ALTER TABLE service
-    ADD CONSTRAINT uc_service_slug UNIQUE (slug);
+ALTER TABLE application
+    ADD CONSTRAINT UC_APPLICATION_SLUG UNIQUE (slug);
 
-ALTER TABLE service
-    ADD CONSTRAINT FK_SERVICE_ON_OWNER FOREIGN KEY (owner_id) REFERENCES member (id);
+ALTER TABLE application
+    ADD CONSTRAINT FK_APPLICATION_ON_OWNER FOREIGN KEY (owner_id) REFERENCES member (id);
