@@ -141,6 +141,22 @@ class AppControllerTest(
     }
 
     @Test
+    @DisplayName("활성화 상태의 앱이 1개뿐일 때 삭제 불가")
+    @WithTestSessionMember
+    fun `cannot delete the only active app`() {
+        // given
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val app = createTestApp(true, requestMember.getId())
+
+        // when & then
+        mockMvc
+            .performWithSession(
+                delete("/v1/apps/${app.id}"),
+                TestSessionTokenHolder.get(),
+            ).andExpect(status().isUnprocessableEntity)
+    }
+
+    @Test
     @DisplayName("앱 메타 데이터 수정")
     @WithTestSessionMember
     fun updateApp() {
