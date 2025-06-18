@@ -61,6 +61,8 @@ spring:
 logging:
   level:
     org.springframework.web.servlet.DispatcherServlet: DEBUG
+storage:
+  root-dir: ${user.dir}/src/api/storage
 ---
 spring:
   config:
