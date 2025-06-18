@@ -1,6 +1,8 @@
 package grantly.member.application.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import grantly.app.application.port.`in`.dto.CreateAppParams
+import grantly.app.application.service.AppService
 import grantly.common.annotations.UseCase
 import grantly.common.core.email.EmailJobScope
 import grantly.common.core.email.EmailSender
@@ -27,6 +29,7 @@ import jakarta.persistence.EntityNotFoundException
 import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.transaction.annotation.Transactional
 
 @UseCase
 class MemberService(
@@ -37,6 +40,7 @@ class MemberService(
     private val emailSender: EmailSender,
     private val objectMapper: ObjectMapper,
     private val emailJobScope: EmailJobScope,
+    private val appService: AppService,
 ) : SignUpUseCase,
     LoginUseCase,
     LogoutUseCase,
@@ -46,16 +50,28 @@ class MemberService(
     @Value("\${grantly.service.domain}")
     private lateinit var serviceDomain: String
 
+    @Transactional
     override fun signUp(params: SignUpParams): MemberDomain {
-        try {
-            findMemberByEmail(params.email)
-            throw DuplicateEmailException()
-        } catch (e: EntityNotFoundException) {
-            // 멤버 생성
-            val member = MemberDomain(email = params.email, name = params.name, password = params.password)
-            member.hashPassword(passwordEncoder)
-            return memberRepository.createMember(member)
-        }
+        val newMember: MemberDomain =
+            try {
+                findMemberByEmail(params.email)
+                throw DuplicateEmailException()
+            } catch (e: EntityNotFoundException) {
+                // 멤버 생성
+                val member = MemberDomain(email = params.email, name = params.name, password = params.password)
+                member.hashPassword(passwordEncoder)
+                memberRepository.createMember(member)
+            }
+
+        // 기본 앱 생성
+        appService.createApp(
+            CreateAppParams(
+                name = newMember.name + "'s App",
+                description = "This is the default app created upon sign up.",
+                ownerId = newMember.id,
+            ),
+        )
+        return newMember
     }
 
     override fun login(params: LoginParams): AuthSessionDomain {

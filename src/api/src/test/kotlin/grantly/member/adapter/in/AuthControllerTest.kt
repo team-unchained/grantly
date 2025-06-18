@@ -1,6 +1,7 @@
 package grantly.member.adapter.`in`
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import grantly.app.application.port.out.AppRepository
 import grantly.common.constants.AuthConstants
 import grantly.member.adapter.`in`.dto.LoginRequest
 import grantly.member.adapter.`in`.dto.SignUpRequest
@@ -60,6 +61,8 @@ class AuthControllerTest(
     private val env: Environment,
     @Autowired
     private val passwordEncoder: BCryptPasswordEncoder,
+    @Autowired
+    private val appRepository: AppRepository,
 ) {
     companion object {
         @Container
@@ -100,7 +103,7 @@ class AuthControllerTest(
     }
 
     @Test
-    @DisplayName("회원가입 성공")
+    @DisplayName("회원가입 성공 후 기본 앱 생성")
     fun `should return 201 when sign up is successful`() {
         // given
         val memberEmail = "test2@email.com"
@@ -116,6 +119,15 @@ class AuthControllerTest(
             ).andExpect(status().isCreated)
             .andExpect(jsonPath("$.member").exists())
             .andExpect(jsonPath("$.member.email").value(memberEmail))
+            .andExpect { result ->
+                val response = objectMapper.readTree(result.response.contentAsString)
+                val createdMemberId = response.get("member").get("id").asLong()
+
+                // 기본 앱이 생성되었는지 확인
+                val apps = appRepository.getAppsByOwnerId(createdMemberId)
+                assertThat(apps).isNotEmpty
+                assertThat(apps[0].ownerId).isEqualTo(createdMemberId)
+            }
     }
 
     @Test

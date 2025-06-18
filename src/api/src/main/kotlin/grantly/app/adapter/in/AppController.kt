@@ -10,8 +10,10 @@ import grantly.app.application.port.`in`.FindAppQuery
 import grantly.app.application.port.`in`.UpdateAppUseCase
 import grantly.app.application.port.`in`.dto.CreateAppParams
 import grantly.app.application.port.`in`.dto.UpdateAppParams
+import grantly.app.application.service.exceptions.CannotDeleteLastActiveAppException
 import grantly.common.exceptions.HttpForbiddenException
 import grantly.common.exceptions.HttpNotFoundException
+import grantly.common.exceptions.HttpUnprocessableException
 import grantly.common.exceptions.PermissionDeniedException
 import grantly.common.utils.HttpUtil
 import grantly.config.AuthenticatedMember
@@ -149,6 +151,17 @@ class AppController(
                         ),
                     ),
             ),
+            ApiResponse(
+                responseCode = "422",
+                description = "활성화 상태의 앱이 1개 이하라 삭제가 제한된 경우",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpNotFoundException::class),
+                        ),
+                    ),
+            ),
         ],
     )
     @DeleteMapping("/{appId}")
@@ -162,6 +175,8 @@ class AppController(
             throw HttpNotFoundException("App not found.")
         } catch (_: PermissionDeniedException) {
             throw HttpForbiddenException()
+        } catch (e: CannotDeleteLastActiveAppException) {
+            throw HttpUnprocessableException(e.message)
         }
         return ResponseEntity.noContent().build()
     }

@@ -7,6 +7,7 @@ import grantly.app.application.port.`in`.UpdateAppUseCase
 import grantly.app.application.port.`in`.dto.CreateAppParams
 import grantly.app.application.port.`in`.dto.UpdateAppParams
 import grantly.app.application.port.out.AppRepository
+import grantly.app.application.service.exceptions.CannotDeleteLastActiveAppException
 import grantly.app.domain.AppDomain
 import grantly.common.annotations.UseCase
 import jakarta.validation.ConstraintViolationException
@@ -47,6 +48,10 @@ class AppService(
     ): AppDomain {
         val app = appRepository.getAppById(id)
         app.checkOwner(ownerId)
+        val appCount = appRepository.getActiveAppCountByOwnerId(ownerId)
+        if (appCount <= 1) {
+            throw CannotDeleteLastActiveAppException()
+        }
         app.deactivate()
         return appRepository.updateApp(app)
     }

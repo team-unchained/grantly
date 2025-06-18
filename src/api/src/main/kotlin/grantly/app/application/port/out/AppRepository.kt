@@ -10,4 +10,6 @@ interface AppRepository {
     fun createApp(appDomain: AppDomain): AppDomain
 
     fun updateApp(appDomain: AppDomain): AppDomain
+
+    fun getActiveAppCountByOwnerId(ownerId: Long): Long
 }

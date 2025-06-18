@@ -105,6 +105,7 @@ class AppControllerTest(
         // given
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
         val app = createTestApp(true, requestMember.getId())
+        createTestApp(true, requestMember.getId())
 
         // when & then
         mockMvc
@@ -112,7 +113,7 @@ class AppControllerTest(
                 delete("/v1/apps/${app.id}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isNoContent)
-            .andExpect { result ->
+            .andExpect {
                 assertThrows<EntityNotFoundException> { appRepository.getAppById(app.id) }
             }
     }
@@ -138,6 +139,22 @@ class AppControllerTest(
                 delete("/v1/apps/${app.id}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isForbidden)
+    }
+
+    @Test
+    @DisplayName("활성화 상태의 앱이 1개뿐일 때 삭제 불가")
+    @WithTestSessionMember
+    fun `cannot delete the only active app`() {
+        // given
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val app = createTestApp(true, requestMember.getId())
+
+        // when & then
+        mockMvc
+            .performWithSession(
+                delete("/v1/apps/${app.id}"),
+                TestSessionTokenHolder.get(),
+            ).andExpect(status().isUnprocessableEntity)
     }
 
     @Test

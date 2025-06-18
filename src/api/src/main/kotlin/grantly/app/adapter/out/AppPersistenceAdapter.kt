@@ -36,4 +36,6 @@ class AppPersistenceAdapter(
         val appEntity = appJpaRepository.save(appMapper.toEntity(appDomain))
         return appMapper.toDomain(appEntity)
     }
+
+    override fun getActiveAppCountByOwnerId(ownerId: Long) = appJpaRepository.countByIsActiveIsTrueAndOwnerId(ownerId)
 }
