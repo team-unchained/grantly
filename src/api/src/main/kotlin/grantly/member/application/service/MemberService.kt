@@ -29,6 +29,7 @@ import jakarta.persistence.EntityNotFoundException
 import kotlinx.coroutines.launch
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.transaction.annotation.Transactional
 
 @UseCase
 class MemberService(
@@ -49,6 +50,7 @@ class MemberService(
     @Value("\${grantly.service.domain}")
     private lateinit var serviceDomain: String
 
+    @Transactional
     override fun signUp(params: SignUpParams): MemberDomain {
         val newMember: MemberDomain =
             try {
