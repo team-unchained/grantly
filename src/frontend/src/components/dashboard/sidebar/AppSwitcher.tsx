@@ -22,8 +22,7 @@ import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
 
 export const AppSwitcher = () => {
   const { isMobile } = useSidebar();
-  const { apps } = useAuth();
-  const { currentApp } = useAuth();
+  const { apps, currentApp } = useAuth();
 
   return (
     <SidebarMenu>

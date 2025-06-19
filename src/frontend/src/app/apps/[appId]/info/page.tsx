@@ -16,7 +16,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 export default function AppInfoPage() {
-  const { currentApp } = useAuth();
+  const { currentApp, refetch } = useAuth();
   const breadcrumbs = useMemo(
     () => [
       { title: currentApp.name, url: `/apps/${currentApp.id}` },
@@ -29,9 +29,11 @@ export default function AppInfoPage() {
 
   const form = useForm<AppFormData>({
     resolver: zodResolver(AppFormSchema),
+    mode: 'all',
+    criteriaMode: 'all',
+    shouldFocusError: true,
     defaultValues: {
       name: currentApp.name,
-      description: currentApp.description,
       imageUrl: currentApp.imageUrl,
     },
   });
@@ -41,6 +43,7 @@ export default function AppInfoPage() {
       setIsLoading(true);
       try {
         await updateApp(currentApp.id, data);
+        await refetch();
         toast.success('설정이 저장되었습니다.');
       } catch (error) {
         toast.error('설정 저장 중 오류가 발생했습니다.');
@@ -48,7 +51,7 @@ export default function AppInfoPage() {
         setIsLoading(false);
       }
     },
-    [currentApp.id]
+    [currentApp.id, refetch]
   );
 
   return (
@@ -72,7 +75,7 @@ export default function AppInfoPage() {
 
               <Button
                 type="submit"
-                disabled={isLoading || !form.formState.isDirty}
+                disabled={isLoading || !form.formState.isValid}
               >
                 {isLoading ? '저장 중...' : '저장'}
               </Button>
