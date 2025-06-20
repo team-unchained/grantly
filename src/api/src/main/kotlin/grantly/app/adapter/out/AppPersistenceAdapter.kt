@@ -13,7 +13,7 @@ class AppPersistenceAdapter(
     override fun getAppById(id: Long): AppDomain {
         val appEntity = appJpaRepository.findByIdAndIsActiveIsTrue(id)
         if (appEntity.isEmpty) {
-            throw EntityNotFoundException("Service not found with id: $id")
+            throw EntityNotFoundException("Application not found with id: $id")
         }
         return appMapper.toDomain(appEntity.get())
     }
@@ -38,4 +38,12 @@ class AppPersistenceAdapter(
     }
 
     override fun getActiveAppCountByOwnerId(ownerId: Long) = appJpaRepository.countByIsActiveIsTrueAndOwnerId(ownerId)
+
+    override fun getAppBySlug(slug: String): AppDomain {
+        val appEntity = appJpaRepository.findBySlugAndIsActiveIsTrue(slug)
+        if (appEntity.isEmpty) {
+            throw EntityNotFoundException("Application not found with slug: $slug")
+        }
+        return appMapper.toDomain(appEntity.get())
+    }
 }
