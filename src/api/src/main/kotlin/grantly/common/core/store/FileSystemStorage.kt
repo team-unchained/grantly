@@ -20,7 +20,7 @@ class FileSystemStorage(
 
     private fun resolveStoragePath(): Path = Paths.get(rootDir, storageName)
 
-    private fun resolvePath(key: String): Path = resolveStoragePath().resolve(key)
+    private fun resolvePath(key: String): Path = resolveStoragePath().resolve(key.ensureLeadingSlash())
 
     override suspend fun put(
         key: String,
