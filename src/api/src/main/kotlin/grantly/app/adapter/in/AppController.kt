@@ -3,14 +3,20 @@ package grantly.app.adapter.`in`
 import grantly.app.adapter.`in`.dto.CreateAppRequest
 import grantly.app.adapter.`in`.dto.UpdateAppRequest
 import grantly.app.adapter.out.dto.AppResponse
+import grantly.app.adapter.out.dto.CreateAppResponse
 import grantly.app.adapter.out.dto.SimpleAppResponse
 import grantly.app.application.port.`in`.CreateAppUseCase
+import grantly.app.application.port.`in`.DeleteAppImageUseCase
 import grantly.app.application.port.`in`.DeleteAppUseCase
 import grantly.app.application.port.`in`.FindAppQuery
 import grantly.app.application.port.`in`.UpdateAppUseCase
+import grantly.app.application.port.`in`.UploadAppImageUseCase
 import grantly.app.application.port.`in`.dto.CreateAppParams
 import grantly.app.application.port.`in`.dto.UpdateAppParams
 import grantly.app.application.service.exceptions.CannotDeleteLastActiveAppException
+import grantly.common.core.store.exceptions.ResourceTooLargeException
+import grantly.common.exceptions.HttpContentTooLargeException
+import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.exceptions.HttpForbiddenException
 import grantly.common.exceptions.HttpNotFoundException
 import grantly.common.exceptions.HttpUnprocessableException
@@ -23,8 +29,9 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -32,8 +39,10 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @ResponseBody
@@ -44,6 +53,8 @@ class AppController(
     private val updateAppUseCase: UpdateAppUseCase,
     private val deleteAppUseCase: DeleteAppUseCase,
     private val createAppUseCase: CreateAppUseCase,
+    private val uploadAppImageUseCase: UploadAppImageUseCase,
+    private val deleteAppImageUseCase: DeleteAppImageUseCase,
 ) {
     @Operation(
         summary = "요청자가 owner인 앱 목록 조회",
@@ -62,8 +73,9 @@ class AppController(
         ],
     )
     @GetMapping("")
-    fun getApps(): ResponseEntity<List<SimpleAppResponse>> {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+    fun getApps(
+        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+    ): ResponseEntity<List<SimpleAppResponse>> {
         val apps = findAppQuery.findAppsByOwnerId(requestMember.getId())
         return ResponseEntity.ok(
             apps.map {
@@ -97,28 +109,140 @@ class AppController(
     @PostMapping("")
     fun createApp(
         @RequestBody body: CreateAppRequest,
-    ): ResponseEntity<AppResponse> {
+        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+    ): ResponseEntity<CreateAppResponse> {
         val newApp =
             createAppUseCase.createApp(
                 CreateAppParams(
                     name = body.name,
                     description = body.description,
-                    ownerId = (SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember).getId(),
+                    ownerId = requestMember.getId(),
                 ),
             )
 
         return ResponseEntity.created(HttpUtil.buildLocationURI("/v1/apps/${newApp.id}")).body(
-            AppResponse(
-                id = newApp.id,
-                slug = newApp.slug,
-                name = newApp.name,
-                description = newApp.description,
-                imageUrl = newApp.imageUrl,
-                ownerId = newApp.ownerId,
-                createdAt = newApp.createdAt,
-                modifiedAt = newApp.modifiedAt ?: newApp.createdAt,
+            CreateAppResponse(
+                app =
+                    AppResponse(
+                        id = newApp.id,
+                        slug = newApp.slug,
+                        name = newApp.name,
+                        description = newApp.description,
+                        imageUrl = newApp.imageUrl,
+                        ownerId = newApp.ownerId,
+                        createdAt = newApp.createdAt,
+                        modifiedAt = newApp.modifiedAt ?: newApp.createdAt,
+                    ),
             ),
         )
+    }
+
+    @Operation(
+        summary = "앱 이미지 업로드",
+        responses = [
+            ApiResponse(
+                responseCode = "204",
+                description = "이미지 업로드 성공",
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "앱의 소유자가 아닌 경우",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpExceptionResponse::class),
+                        ),
+                    ),
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "앱이 존재하지 않는 경우",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpExceptionResponse::class),
+                        ),
+                    ),
+            ),
+            ApiResponse(
+                responseCode = "413",
+                description = "이미지 용량 제한 2MB 초과",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = AppResponse::class),
+                        ),
+                    ),
+            ),
+        ],
+    )
+    @PostMapping("{appSlug}/image", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun uploadImage(
+        @PathVariable appSlug: String,
+        @RequestPart(required = true) image: MultipartFile,
+        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+    ): ResponseEntity<Void> {
+        try {
+            uploadAppImageUseCase.uploadImage(appSlug, requestMember.getId(), image)
+        } catch (e: ResourceTooLargeException) {
+            throw HttpContentTooLargeException()
+        } catch (e: EntityNotFoundException) {
+            throw HttpNotFoundException("App not found.")
+        } catch (e: PermissionDeniedException) {
+            throw HttpForbiddenException()
+        }
+
+        return ResponseEntity.noContent().build()
+    }
+
+    @Operation(
+        summary = "앱 이미지 초기화",
+        responses = [
+            ApiResponse(
+                responseCode = "204",
+                description = "이미지 초기화 성공",
+            ),
+            ApiResponse(
+                responseCode = "403",
+                description = "앱의 소유자가 아닌 경우",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpExceptionResponse::class),
+                        ),
+                    ),
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "앱이 존재하지 않는 경우",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpExceptionResponse::class),
+                        ),
+                    ),
+            ),
+        ],
+    )
+    @DeleteMapping("{appSlug}/image")
+    fun deleteImage(
+        @PathVariable appSlug: String,
+        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+    ): ResponseEntity<Void> {
+        try {
+            deleteAppImageUseCase.deleteImage(appSlug, requestMember.getId())
+        } catch (e: EntityNotFoundException) {
+            throw HttpNotFoundException("App not found.")
+        } catch (e: PermissionDeniedException) {
+            throw HttpForbiddenException()
+        }
+
+        return ResponseEntity.noContent().build()
     }
 
     @Operation(
@@ -135,7 +259,7 @@ class AppController(
                     arrayOf(
                         Content(
                             mediaType = "application/json",
-                            schema = Schema(implementation = HttpForbiddenException::class),
+                            schema = Schema(implementation = HttpExceptionResponse::class),
                         ),
                     ),
             ),
@@ -146,7 +270,7 @@ class AppController(
                     arrayOf(
                         Content(
                             mediaType = "application/json",
-                            schema = Schema(implementation = HttpNotFoundException::class),
+                            schema = Schema(implementation = HttpExceptionResponse::class),
                         ),
                     ),
             ),
@@ -157,7 +281,7 @@ class AppController(
                     arrayOf(
                         Content(
                             mediaType = "application/json",
-                            schema = Schema(implementation = HttpNotFoundException::class),
+                            schema = Schema(implementation = HttpExceptionResponse::class),
                         ),
                     ),
             ),
@@ -166,8 +290,8 @@ class AppController(
     @DeleteMapping("/{slug}")
     fun deleteApp(
         @PathVariable slug: String,
+        @AuthenticationPrincipal requestMember: AuthenticatedMember,
     ): ResponseEntity<Void> {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
         try {
             deleteAppUseCase.deleteApp(slug, requestMember.getId())
         } catch (_: EntityNotFoundException) {
@@ -200,7 +324,7 @@ class AppController(
                     arrayOf(
                         Content(
                             mediaType = "application/json",
-                            schema = Schema(implementation = HttpForbiddenException::class),
+                            schema = Schema(implementation = HttpExceptionResponse::class),
                         ),
                     ),
             ),
@@ -211,7 +335,7 @@ class AppController(
                     arrayOf(
                         Content(
                             mediaType = "application/json",
-                            schema = Schema(implementation = HttpNotFoundException::class),
+                            schema = Schema(implementation = HttpExceptionResponse::class),
                         ),
                     ),
             ),
@@ -220,8 +344,8 @@ class AppController(
     @GetMapping("/{slug}")
     fun getApp(
         @PathVariable slug: String,
+        @AuthenticationPrincipal requestMember: AuthenticatedMember,
     ): ResponseEntity<AppResponse> {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
         val app =
             try {
                 findAppQuery.findAppById(slug, requestMember.getId())
@@ -265,7 +389,7 @@ class AppController(
                     arrayOf(
                         Content(
                             mediaType = "application/json",
-                            schema = Schema(implementation = HttpForbiddenException::class),
+                            schema = Schema(implementation = HttpExceptionResponse::class),
                         ),
                     ),
             ),
@@ -276,7 +400,7 @@ class AppController(
                     arrayOf(
                         Content(
                             mediaType = "application/json",
-                            schema = Schema(implementation = HttpNotFoundException::class),
+                            schema = Schema(implementation = HttpExceptionResponse::class),
                         ),
                     ),
             ),
@@ -286,6 +410,7 @@ class AppController(
     fun updateApp(
         @PathVariable slug: String,
         @RequestBody body: UpdateAppRequest,
+        @AuthenticationPrincipal requestMember: AuthenticatedMember,
     ): ResponseEntity<AppResponse> {
         val app =
             try {
@@ -294,7 +419,7 @@ class AppController(
                         slug = slug,
                         name = body.name,
                         description = body.description,
-                        ownerId = (SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember).getId(),
+                        ownerId = requestMember.getId(),
                     ),
                 )
             } catch (_: EntityNotFoundException) {
