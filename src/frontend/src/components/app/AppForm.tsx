@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 
 // AppSchema에서 id를 제외한 스키마를 사용
-export const AppFormSchema = AppSchema.omit({ id: true });
+export const AppFormSchema = AppSchema.omit({ id: true, slug: true });
 
 export type AppFormData = z.infer<typeof AppFormSchema>;
 
@@ -101,22 +101,6 @@ export function AppForm({ form }: AppFormProps) {
         <Input id="name" {...register('name')} className="mt-1" />
         {errors.name && (
           <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>
-        )}
-      </div>
-
-      <div>
-        <Label htmlFor="description">설명</Label>
-        <textarea
-          id="description"
-          {...register('description')}
-          className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          rows={4}
-          placeholder="앱에 대한 설명을 입력하세요"
-        />
-        {errors.description && (
-          <p className="mt-1 text-sm text-destructive">
-            {errors.description.message}
-          </p>
         )}
       </div>
     </div>

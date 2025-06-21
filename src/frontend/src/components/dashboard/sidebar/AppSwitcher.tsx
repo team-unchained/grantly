@@ -19,11 +19,18 @@ import {
   useSidebar,
 } from '@grantly/components/ui/sidebar';
 import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@grantly/components/ui/dialog';
+import { CreateAppForm } from '@grantly/components/app/CreateAppForm';
 
 export const AppSwitcher = () => {
   const { isMobile } = useSidebar();
-  const { apps } = useAuth();
-  const { currentApp } = useAuth();
+  const { apps, currentApp } = useAuth();
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   return (
     <SidebarMenu>
@@ -68,7 +75,10 @@ export const AppSwitcher = () => {
               </Link>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            <DropdownMenuItem
+              className="gap-2 p-2"
+              onClick={() => setDialogOpen(true)}
+            >
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
@@ -77,6 +87,15 @@ export const AppSwitcher = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>앱 추가</DialogTitle>
+          </DialogHeader>
+
+          <CreateAppForm onClose={() => setDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </SidebarMenu>
   );
 };

@@ -10,6 +10,7 @@ import { useParams, usePathname, useRouter } from 'next/navigation';
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -20,6 +21,7 @@ interface AuthContextType {
   user: UserType;
   apps: AppType[];
   currentApp: AppType;
+  refetch: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,11 +30,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
   const { data: user, isLoading: isUserMeLoading } = useGetMeQuery();
-  const { data: apps, isLoading: isAppsLoading } = useGetAppsQuery();
+  const {
+    data: apps,
+    refetch: refetchApps,
+    isLoading: isAppsLoading,
+  } = useGetAppsQuery();
 
   const isLoading = isUserMeLoading || isAppsLoading;
   const appId = parseInt(String(useParams().appId), 10);
   const currentApp = apps?.find((app) => app.id === appId);
+
+  const refetch = useCallback(() => {
+    refetchApps();
+  }, [refetchApps]);
 
   // Login 확인
   useEffect(() => {
@@ -63,8 +73,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       user: user!,
       apps: apps ?? [],
       currentApp: currentApp!,
+      refetch,
     }),
-    [user, apps, currentApp]
+    [user, apps, currentApp, refetch]
   );
 
   if (isLoading) {
