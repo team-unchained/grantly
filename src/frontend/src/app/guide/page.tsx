@@ -26,6 +26,11 @@ const steps: TourStep[] = [
     title: '사용자 정보',
     description: '여기서 계정 정보를 확인할 수 있습니다.',
   },
+  {
+    key: 'dashboard',
+    title: '대시보드',
+    description: '여기서 대시보드를 확인할 수 있습니다.',
+  },
 ];
 
 // 테스트용 간단한 사이드바 컴포넌트
@@ -87,7 +92,7 @@ export default function GuidePage() {
           user: tour.register(3),
         }}
       />
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-8" ref={tour.register(4)}>
         <h1 className="text-2xl font-bold">가이드 투어 테스트</h1>
         <button
           type="button"
@@ -105,8 +110,8 @@ export default function GuidePage() {
         onClose={tour.end}
         onNext={tour.next}
         onPrev={tour.prev}
-        isFirst={tour.current === 0}
-        isLast={tour.current === steps.length - 1}
+        currentStep={tour.currentStep}
+        steps={tour.steps}
       />
     </div>
   );

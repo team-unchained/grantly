@@ -10,8 +10,8 @@ interface TourOverlayProps {
   onClose: () => void;
   onNext: () => void;
   onPrev: () => void;
-  isFirst: boolean;
-  isLast: boolean;
+  currentStep: number;
+  steps: TourStep[];
 }
 
 export const TourOverlay: React.FC<TourOverlayProps> = ({
@@ -21,8 +21,8 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({
   onClose,
   onNext,
   onPrev,
-  isFirst,
-  isLast,
+  currentStep,
+  steps,
 }) => {
   if (!isOpen || !step) return null;
 
@@ -31,6 +31,10 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({
 
   const rect = targetElement.getBoundingClientRect();
   const padding = 8; // 강조 영역 주변 여백
+
+  // 내부에서 계산
+  const isFirst = currentStep === 0;
+  const isLast = currentStep === steps.length - 1;
 
   return (
     <div className="fixed inset-0 bg-black/50 z-[1000]">
