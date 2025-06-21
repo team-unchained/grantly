@@ -3,6 +3,8 @@ package grantly.app.adapter.`in`
 import com.fasterxml.jackson.databind.ObjectMapper
 import grantly.app.application.port.out.AppRepository
 import grantly.app.domain.AppDomain
+import grantly.common.core.store.FileSystemStorage
+import grantly.common.core.store.exceptions.NoSuchResourceException
 import grantly.common.utils.performWithSession
 import grantly.config.AuthenticatedMember
 import grantly.config.TestSessionTokenHolder
@@ -11,6 +13,7 @@ import grantly.member.application.port.out.MemberRepository
 import grantly.member.domain.MemberDomain
 import jakarta.persistence.EntityNotFoundException
 import jakarta.transaction.Transactional
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -20,11 +23,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -46,6 +51,8 @@ class AppControllerTest(
     private val memberRepository: MemberRepository,
     @Autowired
     private val objectMapper: ObjectMapper,
+    @Autowired
+    private val fileSystemStorage: FileSystemStorage,
 ) {
     @Test
     @DisplayName("활성화된 애플리케이션만 목록에 포함하여 조회")
@@ -78,7 +85,6 @@ class AppControllerTest(
                 mapOf(
                     "name" to "Test App",
                     "description" to "Test Description",
-                    "imageUrl" to "https://example.com/image.png",
                 ),
             )
         // when & then
@@ -91,9 +97,10 @@ class AppControllerTest(
             ).andExpect(status().isCreated)
             .andExpect { result ->
                 val response = objectMapper.readTree(result.response.contentAsString)
-                val createdAppId = response.get("id").asLong()
+                val appNode = response.get("app")
+                val createdAppId = appNode.get("id").asLong()
                 assertDoesNotThrow { appRepository.getAppById(createdAppId) }
-                val createdAppOwnerId = response.get("ownerId").asLong()
+                val createdAppOwnerId = appNode.get("ownerId").asLong()
                 assert(requestMember.getId() == createdAppOwnerId)
             }
     }
@@ -175,7 +182,6 @@ class AppControllerTest(
                             mapOf(
                                 "name" to "Updated App",
                                 "description" to "Updated Description",
-                                "imageUrl" to "https://example.com/updated_image.png",
                             ),
                         ),
                     ),
@@ -188,6 +194,68 @@ class AppControllerTest(
             }
     }
 
+    @Test
+    @DisplayName("이미지 업로드 시 이미지 경로가 올바르게 저장된다.")
+    @WithTestSessionMember
+    fun uploadApplicationImage() {
+        // given
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val app = createTestApp(true, requestMember.getId())
+
+        val mockFile =
+            MockMultipartFile(
+                "image", // 요청 파라미터 이름
+                "someImage.png", // 파일 이름
+                "image/png", // MIME 타입
+                "dummy image content".toByteArray(), // 바이트 배열로 된 파일 내용
+            )
+
+        // when & then
+        mockMvc
+            .performWithSession(
+                multipart("/v1/apps/${app.slug}/image")
+                    .file(mockFile),
+                TestSessionTokenHolder.get(),
+            ).andExpect(status().isNoContent)
+            .andExpect {
+                val app = appRepository.getAppById(app.id)
+                assert(app.imageUrl == "/applications/images/${app.slug}.png")
+            }
+    }
+
+    @Test
+    @DisplayName("이미지 초기화 시 이미지 경로가 null 로 저장되고 파일이 제거된다.")
+    @WithTestSessionMember
+    fun deleteApplicationImage() {
+        // given
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val app = createTestApp(true, requestMember.getId())
+        // 이미지 저장
+        runBlocking {
+            fileSystemStorage.put(
+                "applications/images/${app.slug}.png",
+                "dummy image content".toByteArray(),
+                overwrite = true,
+            )
+        }
+        app.imageUrl = "/applications/images/${app.slug}.png"
+        appRepository.updateApp(app)
+
+        // when & then
+        mockMvc
+            .performWithSession(
+                delete("/v1/apps/${app.slug}/image"),
+                TestSessionTokenHolder.get(),
+            ).andExpect(status().isNoContent)
+            .andExpect {
+                val updatedApp = appRepository.getAppById(app.id)
+                assert(updatedApp.imageUrl == null)
+                assertThrows<NoSuchResourceException> {
+                    runBlocking { fileSystemStorage.get("/applications/images/${app.slug}.png") }
+                }
+            }
+    }
+
     private fun createTestApp(
         isActive: Boolean = true,
         ownerId: Long,
@@ -196,7 +264,6 @@ class AppControllerTest(
             AppDomain(
                 name = "Test App",
                 description = "Test Description",
-                imageUrl = "https://example.com/image.png",
                 isActive = isActive,
                 slug = UUID.randomUUID().toString(),
                 ownerId = ownerId,
