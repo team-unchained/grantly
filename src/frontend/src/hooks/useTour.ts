@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useMemo } from 'react';
 
 export interface TourStep {
   key: string;
@@ -8,9 +8,8 @@ export interface TourStep {
 
 export function useTour(steps: TourStep[]) {
   const [isOpen, setIsOpen] = useState(false);
-  const [current, setCurrent] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
   const targets = useRef<(HTMLElement | null)[]>([]);
-  const targetRef = useRef<HTMLElement | null>(null);
 
   // 스크롤 잠금
   const lockScroll = useCallback(() => {
@@ -22,51 +21,44 @@ export function useTour(steps: TourStep[]) {
 
   const start = useCallback(() => {
     setIsOpen(true);
-    setCurrent(0);
+    setCurrentStep(0);
     lockScroll();
   }, [lockScroll]);
 
   const end = useCallback(() => {
     setIsOpen(false);
-    setCurrent(0);
+    setCurrentStep(0);
     unlockScroll();
   }, [unlockScroll]);
 
   const next = useCallback(() => {
-    if (current < steps.length - 1) {
-      setCurrent(current + 1);
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
-  }, [current, steps.length]);
+  }, [currentStep, steps.length]);
 
   const prev = useCallback(() => {
-    if (current > 0) {
-      setCurrent(current - 1);
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
     }
-  }, [current]);
+  }, [currentStep]);
 
   // 각 타겟 ref 등록용 콜백
   const register = useCallback(
     (idx: number) => (el: HTMLElement | null) => {
       targets.current[idx] = el;
-      if (idx === current) {
-        targetRef.current = el;
-      }
     },
-    [current]
+    []
   );
 
-  // current가 변경될 때마다 targetRef 업데이트
-  const updateTargetRef = useCallback(() => {
-    targetRef.current = targets.current[current];
-  }, [current]);
-
-  // current가 변경될 때마다 targetRef 업데이트
-  updateTargetRef();
+  const targetRef = useMemo(() => {
+    return { current: targets.current[currentStep] };
+  }, [currentStep]);
 
   return {
     isOpen,
-    current,
-    step: steps[current],
+    currentStep,
+    step: steps[currentStep],
     steps,
     start,
     end,
