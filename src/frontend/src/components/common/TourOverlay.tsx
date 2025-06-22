@@ -1,33 +1,19 @@
 'use client';
 
 import React from 'react';
-import { TourStep } from '@grantly/hooks/useTour';
+import { useTourContext } from '@grantly/hooks/contexts/TourProvider';
 
-interface TourOverlayProps {
-  isOpen: boolean;
-  step: TourStep | null;
-  targetRef: React.RefObject<HTMLElement | null>;
-  onClose: () => void;
-  onNext: () => void;
-  onPrev: () => void;
-  currentStep: number;
-  steps: TourStep[];
-}
-
-export const TourOverlay: React.FC<TourOverlayProps> = ({
-  isOpen,
-  step,
-  targetRef,
-  onClose,
-  onNext,
-  onPrev,
-  currentStep,
-  steps,
-}) => {
-  if (!isOpen || !step) return null;
+export const TourOverlay: React.FC = () => {
+  const { isOpen, step, targetRef, end, next, prev, currentStep, steps } =
+    useTourContext();
+  if (!isOpen || !step) {
+    return null;
+  }
 
   const targetElement = targetRef.current;
-  if (!targetElement) return null;
+  if (!targetElement) {
+    return null;
+  }
 
   const rect = targetElement.getBoundingClientRect();
   const padding = 8; // 강조 영역 주변 여백
@@ -62,14 +48,14 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({
         <div className="flex gap-2 justify-end">
           <button
             type="button"
-            onClick={onClose}
+            onClick={end}
             className="px-3 py-1.5 bg-gray-100 border-none rounded cursor-pointer hover:bg-gray-200"
           >
             종료
           </button>
           <button
             type="button"
-            onClick={onPrev}
+            onClick={prev}
             disabled={isFirst}
             className={`px-3 py-1.5 bg-gray-100 border-none rounded ${
               isFirst
@@ -81,7 +67,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({
           </button>
           <button
             type="button"
-            onClick={onNext}
+            onClick={next}
             disabled={isLast}
             className={`px-3 py-1.5 bg-blue-600 text-white border-none rounded ${
               isLast

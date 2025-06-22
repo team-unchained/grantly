@@ -5,7 +5,7 @@ import { useRedirectUrl } from '@grantly/hooks/useRedirectUrl';
 import { Suspense } from 'react';
 
 const LoginFromWrapper = () => {
-  const redirectUrl = useRedirectUrl('/dashboard');
+  const redirectUrl = useRedirectUrl('/apps');
 
   return <LoginForm redirectUrl={redirectUrl} />;
 };

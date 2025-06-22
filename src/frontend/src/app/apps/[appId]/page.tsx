@@ -1,6 +1,6 @@
 'use client';
 
-import { Header } from '@grantly/components/dashboard/Header';
+import { Header } from '@grantly/components/app/Header';
 import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
 import { useMemo } from 'react';
 

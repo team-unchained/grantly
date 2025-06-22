@@ -7,7 +7,7 @@ import {
   AppFormSchema,
 } from '@grantly/components/app/AppForm';
 import { DeleteAppDialog } from '@grantly/components/app/DeleteAppDialog';
-import { Header } from '@grantly/components/dashboard/Header';
+import { Header } from '@grantly/components/app/Header';
 import { Button } from '@grantly/components/ui/button';
 import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
 import { zodResolver } from '@hookform/resolvers/zod';

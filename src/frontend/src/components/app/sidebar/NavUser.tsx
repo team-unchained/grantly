@@ -31,11 +31,13 @@ import { useRouter } from 'next/navigation';
 import { useLogoutMutation } from '@grantly/api/auth/useAuthQueries';
 import { queryClient } from '@grantly/app/providers';
 import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
+import { useTourContext } from '@grantly/hooks/contexts/TourProvider';
 
 export const NavUser = () => {
   const router = useRouter();
   const { user } = useAuth();
   const { isMobile } = useSidebar();
+  const { register } = useTourContext();
 
   const { mutate: logout } = useLogoutMutation({
     onSuccess: () => {
@@ -54,6 +56,7 @@ export const NavUser = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
+              ref={register(2)}
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
