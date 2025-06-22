@@ -11,11 +11,14 @@ import java.nio.file.Paths
 private val log = KotlinLogging.logger {}
 
 class FileSystemStorage(
+    private val storageName: String,
     private val rootDir: String,
 ) : FileStorage {
     private fun String.ensureLeadingSlash(): String = if (this.startsWith("/")) this else "/$this"
 
-    private fun resolvePath(key: String): Path = Paths.get(rootDir, key)
+    private fun resolveStoragePath(): Path = Paths.get(rootDir, storageName)
+
+    private fun resolvePath(key: String): Path = resolveStoragePath().resolve(key)
 
     override fun put(
         key: String,
@@ -54,5 +57,5 @@ class FileSystemStorage(
         }
     }
 
-    override fun exists(key: String): Boolean = Files.exists(Paths.get(rootDir, key))
+    override fun exists(key: String): Boolean = Files.exists(resolvePath(key))
 }

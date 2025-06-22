@@ -7,9 +7,12 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class FileStorageConfig {
+    @Value("\${storage.name:storage}")
+    private lateinit var storageName: String
+
     @Value("\${storage.root-dir:/tmp/grantly-storage}")
     private lateinit var rootDir: String
 
     @Bean
-    fun fileSystemStorage(): FileSystemStorage = FileSystemStorage(rootDir)
+    fun fileSystemStorage(): FileSystemStorage = FileSystemStorage(storageName, rootDir)
 }

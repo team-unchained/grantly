@@ -12,8 +12,9 @@ import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FileSystemStorageTest {
-    private val rootDir: String = "test-storage"
-    private val fileSystemStorage = FileSystemStorage(rootDir)
+    private val storageName: String = "storage"
+    private val rootDir: String = "test"
+    private val fileSystemStorage = FileSystemStorage(storageName, rootDir)
 
     @AfterEach
     fun cleanup() {
@@ -33,25 +34,25 @@ class FileSystemStorageTest {
         // when
         fileSystemStorage.put(key, content)
         // then
-        assertDoesNotThrow { readFile("$rootDir/$key") }
+        assertDoesNotThrow { readFile("${getStoragePath()}/$key") }
     }
 
     @Test
     @DisplayName("파일 덮어쓰면서 저장")
     fun `overwrite file on put`() {
         // given
-        writeFile("$rootDir/test.txt", "Initial content")
+        writeFile("${getStoragePath()}/test.txt", "Initial content")
         // when
         fileSystemStorage.put("test.txt", "Overwritten".toByteArray(), true)
         // then
-        assert(readFile("$rootDir/test.txt") == "Overwritten")
+        assert(readFile("${getStoragePath()}/test.txt") == "Overwritten")
     }
 
     @Test
     @DisplayName("overwrite가 비활성화된 상태에서 파일 덮어쓰기를 시도할 때 예외 발생")
     fun `throw exception when overwrite is disabled`() {
         // given
-        writeFile("$rootDir/test.txt", "Initial content")
+        writeFile("${getStoragePath()}/test.txt", "Initial content")
         // when & then
         assertThrows<StoreOperationFailedException> {
             fileSystemStorage.put(
@@ -68,7 +69,7 @@ class FileSystemStorageTest {
         // given
         val key = "test.txt"
         val content = "Hello, World!"
-        writeFile("$rootDir/$key", content)
+        writeFile("${getStoragePath()}/$key", content)
         // when
         val result = fileSystemStorage.get(key)
         // then
@@ -92,7 +93,7 @@ class FileSystemStorageTest {
         // given
         val key = "test.txt"
         val content = "Hello, World!"
-        writeFile("$rootDir/$key", content)
+        writeFile("${getStoragePath()}/$key", content)
         // when
         fileSystemStorage.delete(key)
         // then
@@ -105,7 +106,7 @@ class FileSystemStorageTest {
         // given
         val key = "test.txt"
         val content = "Hello, World!"
-        writeFile("$rootDir/$key", content)
+        writeFile("${getStoragePath()}/$key", content)
         // when
         val exists = fileSystemStorage.exists(key)
         // then
@@ -128,4 +129,6 @@ class FileSystemStorageTest {
         file.parentFile.mkdirs() // Ensure parent directories exist
         file.writeText(content, Charsets.UTF_8)
     }
+
+    private fun getStoragePath() = "$rootDir/$storageName"
 }
