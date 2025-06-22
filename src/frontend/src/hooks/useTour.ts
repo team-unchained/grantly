@@ -12,7 +12,6 @@ export function useTour(steps: TourStep[]) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(-1);
   const targets = useRef<(HTMLElement | null)[]>([]);
-
   // 스크롤 잠금
   const lockScroll = useCallback(() => {
     document.body.style.overflow = 'hidden';
