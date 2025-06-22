@@ -14,6 +14,7 @@ import grantly.app.application.port.`in`.UploadAppImageUseCase
 import grantly.app.application.port.`in`.dto.CreateAppParams
 import grantly.app.application.port.`in`.dto.UpdateAppParams
 import grantly.app.application.service.exceptions.CannotDeleteLastActiveAppException
+import grantly.common.core.store.FileSystemStorage
 import grantly.common.core.store.exceptions.ResourceTooLargeException
 import grantly.common.exceptions.HttpContentTooLargeException
 import grantly.common.exceptions.HttpExceptionResponse
@@ -29,6 +30,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -55,6 +57,9 @@ class AppController(
     private val createAppUseCase: CreateAppUseCase,
     private val uploadAppImageUseCase: UploadAppImageUseCase,
     private val deleteAppImageUseCase: DeleteAppImageUseCase,
+    @Value("\${grantly.service.api-domain}")
+    private val serverDomain: String,
+    private val fileSystemStorage: FileSystemStorage,
 ) {
     @Operation(
         summary = "요청자가 owner인 앱 목록 조회",
@@ -83,7 +88,7 @@ class AppController(
                     id = it.id,
                     slug = it.slug,
                     name = it.name,
-                    imageUrl = it.imageUrl,
+                    imageUrl = it.resolveFullImageUrl(serverDomain, fileSystemStorage.getStorageName()),
                     ownerId = it.ownerId,
                 )
             },
@@ -128,7 +133,7 @@ class AppController(
                         slug = newApp.slug,
                         name = newApp.name,
                         description = newApp.description,
-                        imageUrl = newApp.imageUrl,
+                        imageUrl = newApp.resolveFullImageUrl(serverDomain, fileSystemStorage.getStorageName()),
                         ownerId = newApp.ownerId,
                         createdAt = newApp.createdAt,
                         modifiedAt = newApp.modifiedAt ?: newApp.createdAt,
@@ -361,7 +366,13 @@ class AppController(
                 slug = app.slug,
                 name = app.name,
                 description = app.description,
-                imageUrl = app.imageUrl,
+                imageUrl =
+                    app.imageUrl?.let {
+                        app.resolveFullImageUrl(
+                            serverDomain,
+                            fileSystemStorage.getStorageName(),
+                        )
+                    },
                 ownerId = app.ownerId,
                 createdAt = app.createdAt,
                 modifiedAt = app.modifiedAt ?: app.createdAt,
@@ -434,7 +445,7 @@ class AppController(
                 slug = app.slug,
                 name = app.name,
                 description = app.description,
-                imageUrl = app.imageUrl,
+                imageUrl = app.resolveFullImageUrl(serverDomain, fileSystemStorage.getStorageName()),
                 ownerId = app.ownerId,
                 createdAt = app.createdAt,
                 modifiedAt = app.modifiedAt ?: app.createdAt,

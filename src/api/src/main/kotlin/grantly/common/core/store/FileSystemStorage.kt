@@ -64,4 +64,6 @@ class FileSystemStorage(
         }
 
     override suspend fun exists(key: String): Boolean = withContext(Dispatchers.IO) { Files.exists(resolvePath(key)) }
+
+    fun getStorageName() = storageName
 }
