@@ -103,7 +103,6 @@ class AppController(
                 CreateAppParams(
                     name = body.name,
                     description = body.description,
-                    imageUrl = body.imageUrl,
                     ownerId = (SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember).getId(),
                 ),
             )
@@ -164,13 +163,13 @@ class AppController(
             ),
         ],
     )
-    @DeleteMapping("/{appId}")
+    @DeleteMapping("/{slug}")
     fun deleteApp(
-        @PathVariable appId: Long,
+        @PathVariable slug: String,
     ): ResponseEntity<Void> {
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
         try {
-            deleteAppUseCase.deleteApp(appId, requestMember.getId())
+            deleteAppUseCase.deleteApp(slug, requestMember.getId())
         } catch (_: EntityNotFoundException) {
             throw HttpNotFoundException("App not found.")
         } catch (_: PermissionDeniedException) {
@@ -218,14 +217,14 @@ class AppController(
             ),
         ],
     )
-    @GetMapping("/{appId}")
+    @GetMapping("/{slug}")
     fun getApp(
-        @PathVariable appId: Long,
+        @PathVariable slug: String,
     ): ResponseEntity<AppResponse> {
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
         val app =
             try {
-                findAppQuery.findAppById(appId, requestMember.getId())
+                findAppQuery.findAppById(slug, requestMember.getId())
             } catch (_: EntityNotFoundException) {
                 throw HttpNotFoundException("App not found.")
             } catch (_: PermissionDeniedException) {
@@ -283,19 +282,18 @@ class AppController(
             ),
         ],
     )
-    @PutMapping("/{appId}")
+    @PutMapping("/{slug}")
     fun updateApp(
-        @PathVariable appId: Long,
+        @PathVariable slug: String,
         @RequestBody body: UpdateAppRequest,
     ): ResponseEntity<AppResponse> {
         val app =
             try {
                 updateAppUseCase.updateApp(
                     UpdateAppParams(
-                        id = appId,
+                        slug = slug,
                         name = body.name,
                         description = body.description,
-                        imageUrl = body.imageUrl,
                         ownerId = (SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember).getId(),
                     ),
                 )

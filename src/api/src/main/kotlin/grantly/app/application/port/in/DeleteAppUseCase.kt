@@ -4,7 +4,7 @@ import grantly.app.domain.AppDomain
 
 interface DeleteAppUseCase {
     fun deleteApp(
-        id: Long,
+        slug: String,
         ownerId: Long,
     ): AppDomain
 }

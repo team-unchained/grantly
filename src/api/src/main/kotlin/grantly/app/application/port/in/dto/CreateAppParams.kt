@@ -4,5 +4,4 @@ data class CreateAppParams(
     val name: String,
     val description: String? = null,
     val ownerId: Long,
-    val imageUrl: String? = null,
 )

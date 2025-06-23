@@ -23,10 +23,10 @@ class AppService(
     DeleteAppUseCase,
     CreateAppUseCase {
     override fun findAppById(
-        id: Long,
+        slug: String,
         ownerId: Long,
     ): AppDomain {
-        val app = appRepository.getAppById(id)
+        val app = appRepository.getAppBySlug(slug)
         app.checkOwner(ownerId)
         return app
     }
@@ -34,19 +34,18 @@ class AppService(
     override fun findAppsByOwnerId(memberId: Long): List<AppDomain> = appRepository.getAppsByOwnerId(memberId)
 
     override fun updateApp(params: UpdateAppParams): AppDomain {
-        val app = appRepository.getAppById(params.id)
+        val app = appRepository.getAppBySlug(params.slug)
         app.checkOwner(params.ownerId)
         app.name = params.name
         app.description = params.description
-        app.imageUrl = params.imageUrl
         return appRepository.updateApp(app)
     }
 
     override fun deleteApp(
-        id: Long,
+        slug: String,
         ownerId: Long,
     ): AppDomain {
-        val app = appRepository.getAppById(id)
+        val app = appRepository.getAppBySlug(slug)
         app.checkOwner(ownerId)
         val appCount = appRepository.getActiveAppCountByOwnerId(ownerId)
         if (appCount <= 1) {
@@ -65,7 +64,6 @@ class AppService(
                     description = params.description,
                     slug = generateAppSlug(),
                     ownerId = params.ownerId,
-                    imageUrl = params.imageUrl,
                 )
 
             try {
@@ -73,11 +71,12 @@ class AppService(
             } catch (e: ConstraintViolationException) {
                 retries--
             } catch (e: Exception) {
-                break
+                throw IllegalStateException("Failed to create app", e)
             }
         }
-        log.error { "Failed to create unique slug for app, aborting..." }
-        throw IllegalStateException("Failed to create app")
+
+        log.error { "Failed to create app, unique slug generation failed" }
+        throw IllegalStateException("Failed to create app after multiple attempts")
     }
 
     private fun generateAppSlug(): String {

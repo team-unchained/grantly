@@ -110,7 +110,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.id}"),
+                delete("/v1/apps/${app.slug}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isNoContent)
             .andExpect {
@@ -136,7 +136,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.id}"),
+                delete("/v1/apps/${app.slug}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isForbidden)
     }
@@ -152,7 +152,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.id}"),
+                delete("/v1/apps/${app.slug}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isUnprocessableEntity)
     }
@@ -168,7 +168,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                put("/v1/apps/${app.id}")
+                put("/v1/apps/${app.slug}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         objectMapper.writeValueAsString(
