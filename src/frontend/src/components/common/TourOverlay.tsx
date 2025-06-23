@@ -1,11 +1,55 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTourContext } from '@grantly/hooks/contexts/TourProvider';
 
 export const TourOverlay: React.FC = () => {
   const { isOpen, step, targetRef, end, next, prev, currentStep, steps } =
     useTourContext();
+
+  // 모달 위치 계산 (화면 경계 고려)
+  const modalPosition = useMemo(() => {
+    if (!isOpen || !step || !targetRef.current) {
+      return { top: 0, left: 0 };
+    }
+
+    const rect = targetRef.current.getBoundingClientRect();
+    const modalWidth = 300; // max-w-[300px]
+    const modalHeight = 200; // 예상 높이
+    const margin = 20;
+
+    // 화면 크기
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let top = rect.bottom + margin;
+    let { left } = rect;
+
+    // 하단 경계 체크 - 모달이 화면 하단을 벗어나는 경우
+    if (top + modalHeight > viewportHeight) {
+      // 타겟 요소 위에 배치
+      top = rect.top - modalHeight - margin;
+    }
+
+    // 상단 경계 체크 - 모달이 화면 상단을 벗어나는 경우
+    if (top < 0) {
+      // 화면 중앙에 배치
+      top = Math.max(20, (viewportHeight - modalHeight) / 2);
+    }
+
+    // 좌측 경계 체크 - 모달이 화면 좌측을 벗어나는 경우
+    if (left < 0) {
+      left = margin;
+    }
+
+    // 우측 경계 체크 - 모달이 화면 우측을 벗어나는 경우
+    if (left + modalWidth > viewportWidth) {
+      left = viewportWidth - modalWidth - margin;
+    }
+
+    return { top, left };
+  }, [isOpen, step, targetRef]);
+
   if (!isOpen || !step) {
     return null;
   }
@@ -39,8 +83,8 @@ export const TourOverlay: React.FC = () => {
       <div
         className="fixed bg-white p-5 rounded-lg shadow-md z-[1002] max-w-[300px]"
         style={{
-          top: rect.bottom + 20,
-          left: rect.left,
+          top: modalPosition.top,
+          left: modalPosition.left,
         }}
       >
         <h2 className="text-xl font-semibold mb-2">{step.title}</h2>

@@ -23,6 +23,11 @@ const dashboardTourSteps: TourStep[] = [
     title: '사용자 프로필',
     description: '계정 정보, 결제, 알림 등을 관리할 수 있습니다.',
   },
+  {
+    key: 'dashboard-overview',
+    title: '대시보드 개요',
+    description: '대시보드의 개요를 확인할 수 있습니다.',
+  },
 ];
 
 export default function DashboardLayout({

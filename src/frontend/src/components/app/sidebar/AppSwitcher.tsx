@@ -34,15 +34,12 @@ export const AppSwitcher = () => {
   const { apps, currentApp } = useAuth();
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
-  const registerRef = register(0);
-
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
+      <SidebarMenuItem ref={register(0)}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
-              ref={registerRef}
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
