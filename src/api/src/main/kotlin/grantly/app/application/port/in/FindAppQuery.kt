@@ -4,7 +4,7 @@ import grantly.app.domain.AppDomain
 
 interface FindAppQuery {
     fun findAppById(
-        id: Long,
+        slug: String,
         ownerId: Long,
     ): AppDomain
 

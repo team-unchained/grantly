@@ -12,4 +12,6 @@ interface AppRepository {
     fun updateApp(appDomain: AppDomain): AppDomain
 
     fun getActiveAppCountByOwnerId(ownerId: Long): Long
+
+    fun getAppBySlug(slug: String): AppDomain
 }
