@@ -7,16 +7,16 @@ export const TourOverlay: React.FC = () => {
   const { isOpen, step, targetRef, end, next, prev, currentStep, steps } =
     useTourContext();
 
-  // 모달 위치 계산 (화면 경계 고려)
   const modalPosition = useMemo(() => {
-    if (!isOpen || !step || !targetRef.current) {
-      return { top: 0, left: 0 };
+    if (!targetRef.current) {
+      return null;
     }
 
-    const rect = targetRef.current.getBoundingClientRect();
+    const targetElement = targetRef.current;
+    const rect = targetElement.getBoundingClientRect();
     const modalWidth = 300; // max-w-[300px]
     const modalHeight = 200; // 예상 높이
-    const margin = 20;
+    const margin = 16;
 
     // 화면 크기
     const viewportWidth = window.innerWidth;
@@ -48,34 +48,29 @@ export const TourOverlay: React.FC = () => {
     }
 
     return { top, left };
-  }, [isOpen, step, targetRef]);
+  }, [targetRef]);
 
-  if (!isOpen || !step) {
+  if (!isOpen || !step || !targetRef.current || !modalPosition) {
     return null;
   }
 
   const targetElement = targetRef.current;
-  if (!targetElement) {
-    return null;
-  }
-
   const rect = targetElement.getBoundingClientRect();
-  const padding = 8; // 강조 영역 주변 여백
 
   // 내부에서 계산
   const isFirst = currentStep === 0;
   const isLast = currentStep === steps.length - 1;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[1000]">
+    <div className="fixed inset-0 z-[1000]">
       {/* 강조 영역 */}
       <div
-        className="absolute border-2 border-white rounded shadow-[0_0_0_9999px_rgba(0,0,0,0.5)] z-[1001]"
+        className="absolute border-2 border-black rounded shadow-[0_0_0_9999px_rgba(0,0,0,0.5)] z-[1001]"
         style={{
-          top: rect.top - padding,
-          left: rect.left - padding,
-          width: rect.width + padding * 2,
-          height: rect.height + padding * 2,
+          top: rect.top,
+          left: rect.left,
+          width: rect.width,
+          height: rect.height,
         }}
       />
 
