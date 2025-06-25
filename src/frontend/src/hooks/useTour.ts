@@ -1,10 +1,12 @@
-import { useCallback, useRef, useState, useMemo } from 'react';
+import { useCallback, useRef, useState, useMemo, useEffect } from 'react';
 
 export interface TourStep {
   key: string;
   title: string;
   description: string;
 }
+
+const TOUR_COMPLETED_KEY = 'grantly_tour_completed';
 
 export function useTour(steps: TourStep[]) {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +31,7 @@ export function useTour(steps: TourStep[]) {
     setIsOpen(false);
     setCurrentStep(0);
     unlockScroll();
+    localStorage.setItem(TOUR_COMPLETED_KEY, 'true');
   }, [unlockScroll]);
 
   const next = useCallback(() => {
@@ -54,6 +57,16 @@ export function useTour(steps: TourStep[]) {
   const targetRef = useMemo(() => {
     return { current: targets.current[currentStep] };
   }, [currentStep]);
+
+  useEffect(() => {
+    if (localStorage.getItem(TOUR_COMPLETED_KEY) === 'true') return undefined;
+    // 약간의 지연을 두어 페이지가 완전히 로드된 후 시작
+    const timer = setTimeout(() => {
+      start();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [start]);
 
   return {
     isOpen,

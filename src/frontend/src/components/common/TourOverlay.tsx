@@ -90,7 +90,7 @@ export const TourOverlay: React.FC = () => {
             onClick={end}
             className="px-3 py-1.5 bg-gray-100 border-none rounded cursor-pointer hover:bg-gray-200"
           >
-            종료
+            Skip
           </button>
           <button
             type="button"
@@ -104,18 +104,23 @@ export const TourOverlay: React.FC = () => {
           >
             이전
           </button>
-          <button
-            type="button"
-            onClick={next}
-            disabled={isLast}
-            className={`px-3 py-1.5 bg-blue-600 text-white border-none rounded ${
-              isLast
-                ? 'cursor-not-allowed opacity-50'
-                : 'cursor-pointer hover:bg-blue-700'
-            }`}
-          >
-            다음
-          </button>
+          {isLast ? (
+            <button
+              type="button"
+              onClick={end}
+              className="px-3 py-1.5 bg-blue-600 text-white border-none rounded cursor-pointer hover:bg-blue-700"
+            >
+              종료
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={next}
+              className="px-3 py-1.5 bg-blue-600 text-white border-none rounded cursor-pointer hover:bg-blue-700"
+            >
+              다음
+            </button>
+          )}
         </div>
       </div>
     </div>
