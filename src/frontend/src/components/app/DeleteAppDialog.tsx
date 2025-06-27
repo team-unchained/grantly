@@ -35,7 +35,7 @@ export function DeleteAppDialog({ app, children }: DeleteAppDialogProps) {
 
     setIsDeleting(true);
     try {
-      await deleteApp(app.id);
+      await deleteApp(app.slug);
       toast.success('앱이 삭제되었습니다.');
       router.push('/apps');
     } catch (error) {

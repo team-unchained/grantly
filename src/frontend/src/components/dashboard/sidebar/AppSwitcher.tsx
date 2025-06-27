@@ -62,13 +62,13 @@ export const AppSwitcher = () => {
               Apps
             </DropdownMenuLabel>
             {apps.map((app) => (
-              <Link href={`/apps/${app.id}`} key={app.name}>
+              <Link href={`/apps/${app.slug}`} key={app.name}>
                 <DropdownMenuItem className="gap-2 p-2">
                   <div className="flex size-6 items-center justify-center rounded-sm border">
                     <AppWindow className="size-4 shrink-0" />
                   </div>
                   <span className="flex-1">{app.name}</span>
-                  {currentApp.id === app.id && (
+                  {currentApp.slug === app.slug && (
                     <Check className="size-4 text-primary" />
                   )}
                 </DropdownMenuItem>

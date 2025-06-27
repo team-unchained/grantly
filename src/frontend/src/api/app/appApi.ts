@@ -8,14 +8,14 @@ export const getApps = async (): Promise<AppType[]> => {
 };
 
 // 서비스 상세 조회
-export const getApp = async (id: number): Promise<AppType> => {
-  const response = await axiosInstance.get(`/v1/apps/${id}`);
+export const getApp = async (slug: string): Promise<AppType> => {
+  const response = await axiosInstance.get(`/v1/apps/${slug}`);
   return response.data;
 };
 
 // 서비스 추가
 export const createApp = async (
-  app: Omit<AppType, 'id' | 'slug'>
+  app: Omit<AppType, 'slug'>
 ): Promise<AppType> => {
   const response = await axiosInstance.post('/v1/apps', app);
   return response.data;
@@ -23,14 +23,14 @@ export const createApp = async (
 
 // 서비스 수정
 export const updateApp = async (
-  id: number,
+  slug: string,
   app: Partial<Omit<AppType, 'id'>>
 ): Promise<AppType> => {
-  const response = await axiosInstance.put(`/v1/apps/${id}`, app);
+  const response = await axiosInstance.put(`/v1/apps/${slug}`, app);
   return response.data;
 };
 
 // 서비스 삭제
-export const deleteApp = async (id: number): Promise<void> => {
-  return axiosInstance.delete(`/v1/apps/${id}`);
+export const deleteApp = async (slug: string): Promise<void> => {
+  return axiosInstance.delete(`/v1/apps/${slug}`);
 };

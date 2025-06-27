@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import * as z from 'zod';
 
 // AppSchema에서 id를 제외한 스키마를 사용
-export const AppFormSchema = AppSchema.omit({ id: true, slug: true });
+export const AppFormSchema = AppSchema.omit({ slug: true });
 
 export type AppFormData = z.infer<typeof AppFormSchema>;
 
