@@ -18,9 +18,11 @@ class FileSystemStorage(
 ) : Storage {
     private fun String.ensureLeadingSlash(): String = if (this.startsWith("/")) this else "/$this"
 
+    private fun String.removeLeadingSlash(): String = if (this.startsWith("/")) this.substring(1) else this
+
     private fun resolveStoragePath(): Path = Paths.get(rootDir, storageName)
 
-    private fun resolvePath(key: String): Path = resolveStoragePath().resolve(key.ensureLeadingSlash())
+    private fun resolvePath(key: String): Path = resolveStoragePath().resolve(key.removeLeadingSlash())
 
     override suspend fun put(
         key: String,
