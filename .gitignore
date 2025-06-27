@@ -146,3 +146,6 @@ __pycache__
 
 .DS_Store
 .husky
+
+# data
+storage

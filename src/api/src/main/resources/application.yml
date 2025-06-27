@@ -52,7 +52,7 @@ grantly:
     domain: https://grantly.work
 storage:
   name: storage
-  root-dir: ${user.dir}/src/api
+  root-dir: ${user.dir}
 ---
 spring:
   config:

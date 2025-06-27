@@ -1,0 +1,26 @@
+{
+	admin off
+	log {
+		output stdout
+	}
+}
+
+(tls) {
+	encode gzip
+	tls /etc/caddy/cert/grantly.work+1.pem /etc/caddy/cert/grantly.work+1-key.pem
+}
+
+api.grantly.work {
+	import tls
+	reverse_proxy host.docker.internal:6000
+
+	handle_path /storage* {
+		root * /storage
+		file_server
+	}
+}
+
+grantly.work {
+	import tls
+	reverse_proxy host.docker.internal:6001
+}

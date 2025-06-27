@@ -38,3 +38,15 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - .tmp/localstack:/tmp/localstack
+
+  grantly-caddy:
+    image: caddy:2
+    container_name: grantly-caddy-local
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./docs/infra/local/cert:/etc/caddy/cert
+      - ./storage:/storage
