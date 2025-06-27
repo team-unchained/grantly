@@ -16,8 +16,8 @@ export const NavMenu = () => {
   const { currentApp } = useAuth();
   const { register } = useTourContext();
   const menus = useMemo(
-    () => createDashboardMenu({ appId: currentApp.id }),
-    [currentApp.id]
+    () => createDashboardMenu({ appSlug: currentApp.slug }),
+    [currentApp.slug]
   );
 
   return (

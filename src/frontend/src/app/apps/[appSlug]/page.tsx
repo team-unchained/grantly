@@ -10,8 +10,8 @@ export default function AppPage() {
   const { register } = useTourContext();
 
   const breadcrumbs = useMemo(
-    () => [{ title: currentApp.name, url: `/apps/${currentApp.id}` }],
-    [currentApp.name, currentApp.id]
+    () => [{ title: currentApp.name, url: `/apps/${currentApp.slug}` }],
+    [currentApp.name, currentApp.slug]
   );
 
   return (

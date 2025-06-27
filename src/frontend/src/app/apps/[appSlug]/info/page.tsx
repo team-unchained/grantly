@@ -19,10 +19,10 @@ export default function AppInfoPage() {
   const { currentApp, refetch } = useAuth();
   const breadcrumbs = useMemo(
     () => [
-      { title: currentApp.name, url: `/apps/${currentApp.id}` },
-      { title: 'Info', url: `/apps/${currentApp.id}/info` },
+      { title: currentApp.name, url: `/apps/${currentApp.slug}` },
+      { title: 'Info', url: `/apps/${currentApp.slug}/info` },
     ],
-    [currentApp.name, currentApp.id]
+    [currentApp.name, currentApp.slug]
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function AppInfoPage() {
     async (data: AppFormData) => {
       setIsLoading(true);
       try {
-        await updateApp(currentApp.id, data);
+        await updateApp(currentApp.slug, data);
         await refetch();
         toast.success('설정이 저장되었습니다.');
       } catch (error) {
@@ -51,7 +51,7 @@ export default function AppInfoPage() {
         setIsLoading(false);
       }
     },
-    [currentApp.id, refetch]
+    [currentApp.slug, refetch]
   );
 
   return (

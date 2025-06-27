@@ -13,23 +13,23 @@ export type MenuGroup = {
 };
 
 type CreateMenuParams = {
-  appId: number;
+  appSlug: string;
 };
 
 export const createDashboardMenu = ({
-  appId,
+  appSlug,
 }: CreateMenuParams): MenuGroup[] => [
   {
     title: 'App',
     items: [
       {
         title: 'Overview',
-        url: `/apps/${appId}`,
+        url: `/apps/${appSlug}`,
         icon: LayoutDashboard,
       },
       {
         title: 'App Info',
-        url: `/apps/${appId}/info`,
+        url: `/apps/${appSlug}/info`,
         icon: Info,
       },
     ],
