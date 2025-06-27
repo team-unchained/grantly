@@ -39,7 +39,7 @@ export function CreateAppForm({ onClose }: { onClose?: () => void }) {
         await refetchApps();
         toast.success('저장되었습니다.');
         if (onClose) onClose();
-        router.push(`/apps/${app.id}`);
+        router.push(`/apps/${app.slug}`);
       } catch (error) {
         toast.error('저장 중 오류가 발생했습니다.');
       } finally {

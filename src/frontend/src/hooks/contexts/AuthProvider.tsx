@@ -37,8 +37,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   } = useGetAppsQuery();
 
   const isLoading = isUserMeLoading || isAppsLoading;
-  const appId = parseInt(String(useParams().appId), 10);
-  const currentApp = apps?.find((app) => app.id === appId);
+  const appSlug = String(useParams().appSlug);
+  const currentApp = apps?.find((app) => app.slug === appSlug);
 
   const refetch = useCallback(() => {
     refetchApps();
@@ -61,11 +61,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    // appId가 없는 경우
-    if (!appId) {
-      router.replace(`/apps/${apps[0].id}`);
+    // appSlug가 없는 경우
+    if (!appSlug) {
+      router.replace(`/apps/${apps[0].slug}`);
     }
-  }, [isLoading, pathname, router, user, currentApp, apps, appId]);
+  }, [isLoading, pathname, router, user, currentApp, apps, appSlug]);
 
   const value = useMemo(
     () => ({
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
   }
 
-  if (appId && !value.currentApp) {
+  if (appSlug && !value.currentApp) {
     return <ErrorComponent title="앱을 찾을 수 없습니다." refresh goHome />;
   }
 

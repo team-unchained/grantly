@@ -14,8 +14,8 @@ import { useMemo } from 'react';
 export const NavMenu = () => {
   const { currentApp } = useAuth();
   const menus = useMemo(
-    () => createDashboardMenu({ appId: currentApp.id }),
-    [currentApp.id]
+    () => createDashboardMenu({ appSlug: currentApp.slug }),
+    [currentApp.slug]
   );
 
   return (
