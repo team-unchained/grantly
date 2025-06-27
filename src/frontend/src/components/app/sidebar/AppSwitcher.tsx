@@ -19,6 +19,7 @@ import {
   useSidebar,
 } from '@grantly/components/ui/sidebar';
 import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
+import { useTourContext } from '@grantly/hooks/contexts/TourProvider';
 import {
   Dialog,
   DialogContent,
@@ -29,12 +30,13 @@ import { CreateAppForm } from '@grantly/components/app/CreateAppForm';
 
 export const AppSwitcher = () => {
   const { isMobile } = useSidebar();
+  const { register } = useTourContext();
   const { apps, currentApp } = useAuth();
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
+      <SidebarMenuItem ref={register(0)}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
