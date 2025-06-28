@@ -16,6 +16,8 @@ import grantly.app.application.port.`in`.dto.UpdateAppParams
 import grantly.app.application.service.exceptions.CannotDeleteLastActiveAppException
 import grantly.common.core.store.FileSystemStorage
 import grantly.common.core.store.exceptions.ResourceTooLargeException
+import grantly.common.core.store.exceptions.UnprocessableResourceException
+import grantly.common.exceptions.HttpBadRequestException
 import grantly.common.exceptions.HttpContentTooLargeException
 import grantly.common.exceptions.HttpExceptionResponse
 import grantly.common.exceptions.HttpForbiddenException
@@ -150,6 +152,17 @@ class AppController(
                 description = "이미지 업로드 성공",
             ),
             ApiResponse(
+                responseCode = "400",
+                description = "이미지 형식이 잘못된 경우",
+                content =
+                    arrayOf(
+                        Content(
+                            mediaType = "application/json",
+                            schema = Schema(implementation = HttpExceptionResponse::class),
+                        ),
+                    ),
+            ),
+            ApiResponse(
                 responseCode = "403",
                 description = "앱의 소유자가 아닌 경우",
                 content =
@@ -194,6 +207,8 @@ class AppController(
             uploadAppImageUseCase.uploadImage(appSlug, requestMember.getId(), image)
         } catch (e: ResourceTooLargeException) {
             throw HttpContentTooLargeException()
+        } catch (e: UnprocessableResourceException) {
+            throw HttpBadRequestException(e.message)
         } catch (e: EntityNotFoundException) {
             throw HttpNotFoundException("App not found.")
         } catch (e: PermissionDeniedException) {

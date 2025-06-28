@@ -13,12 +13,14 @@ import grantly.app.application.service.exceptions.CannotDeleteLastActiveAppExcep
 import grantly.app.domain.AppDomain
 import grantly.common.annotations.UseCase
 import grantly.common.core.store.FileSystemStorage
+import grantly.common.core.store.FileTypeInspector
 import grantly.common.core.store.exceptions.ResourceTooLargeException
-import grantly.common.core.store.exceptions.StoreOperationFailedException
+import grantly.common.core.store.exceptions.UnprocessableResourceException
 import jakarta.validation.ConstraintViolationException
 import kotlinx.coroutines.runBlocking
 import me.atrox.haikunator.Haikunator
 import org.springframework.web.multipart.MultipartFile
+import java.util.UUID
 
 private val log = mu.KotlinLogging.logger {}
 
@@ -107,11 +109,20 @@ class AppService(
         if (image.size > MAX_IMAGE_SIZE) {
             throw ResourceTooLargeException("Image size exceeds the limit of 2MB")
         }
-        val fileName = image.originalFilename ?: throw StoreOperationFailedException("Image file name is missing")
-        val key = "applications/images/${app.slug}.${fileName.substringAfterLast('.')}"
+        // mime type 추론
+        val fileExt =
+            FileTypeInspector.detectExtension(image.inputStream)
+                ?: throw UnprocessableResourceException("Unable to read image file type")
+        val key = "applications/images/${UUID.randomUUID()}.$fileExt"
         val imageUrl = runBlocking { fileSystemStorage.put(key, image.bytes, overwrite = true) }
         app.imageUrl = imageUrl
-        appRepository.updateApp(app)
+        try {
+            appRepository.updateApp(app)
+        } catch (e: Exception) {
+            log.error { "Failed to update image for app ${app.slug}: ${e.message}" }
+            runBlocking { fileSystemStorage.delete(imageUrl) }
+            throw e
+        }
         return imageUrl
     }
 
