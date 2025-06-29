@@ -6,5 +6,4 @@ import io.swagger.v3.oas.annotations.media.Schema
 data class CreateAppRequest(
     val name: String,
     val description: String? = null,
-    val imageUrl: String? = null,
 )

@@ -19,6 +19,12 @@ api.grantly.work {
 
     # 인증서 설정
     tls /etc/caddy/cert/grantly.work+1.pem /etc/caddy/cert/grantly.work+1-key.pem
+
+    # 파일 서빙
+    handle_path /storage* {
+        root * ../../../storage
+        file_server
+    }
 }
 
 grantly.work {
