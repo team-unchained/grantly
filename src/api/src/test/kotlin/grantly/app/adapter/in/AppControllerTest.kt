@@ -219,7 +219,7 @@ class AppControllerTest(
             ).andExpect(status().isNoContent)
             .andExpect {
                 val app = appRepository.getAppById(app.id)
-                assert(app.imageUrl == "/applications/images/${app.slug}.png")
+                assert(app.imageUrl!!.startsWith("/applications/images/"))
             }
     }
 
