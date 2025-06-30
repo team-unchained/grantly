@@ -19,6 +19,12 @@ grantly-api.w0nder.land {
 
     # gzip 압축
     encode gzip
+
+    # 파일 서빙
+    handle_path /storage* {
+        root * ../../../storage
+        file_server
+    }
 }
 
 grantly.w0nder.land {

@@ -25,4 +25,9 @@ data class AppDomain(
             throw PermissionDeniedException()
         }
     }
+
+    fun resolveFullImageUrl(
+        domain: String,
+        storageName: String,
+    ) = "$domain/$storageName$imageUrl"
 }

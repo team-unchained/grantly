@@ -12,12 +12,6 @@ spring:
     password: test
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    properties:
-      hibernate:
-        show_sql: true
-        highlight_sql: true
-        format_sql: true
-        use_sql_comments: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
   thymeleaf:
     prefix: classpath:/templates/
@@ -31,6 +25,11 @@ management:
     web:
       exposure:
         include: health,info
+logging:
+  level:
+    org.hibernate.SQL: off
+    org.hibernate.type.descriptor.sql.BasicBinder: off
+    org.hibernate.orm.jdbc.bind: off
 
 # Swagger UI 설정
 springdoc:
@@ -50,6 +49,7 @@ grantly:
     domain: grantly.work
   service:
     domain: https://grantly.work
+    api-domain: https://api.grantly.work
 storage:
   name: storage
   root-dir: ${user.dir}
@@ -91,6 +91,7 @@ grantly:
     domain: w0nder.land
   service:
     domain: https://grantly.w0nder.land
+    api-domain: https://grantly-api.w0nder.land
   aws:
     ses:
       profile-name: ${AWS_SES_PROFILE_NAME}
