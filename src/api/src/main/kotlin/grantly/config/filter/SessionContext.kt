@@ -1,7 +1,7 @@
 package grantly.config.filter
 
 import grantly.config.CustomHttpSession
-import grantly.member.application.service.SessionService
+import grantly.session.application.service.SessionService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

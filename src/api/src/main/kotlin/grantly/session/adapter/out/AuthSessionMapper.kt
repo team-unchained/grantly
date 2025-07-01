@@ -1,7 +1,7 @@
-package grantly.member.adapter.out
+package grantly.session.adapter.out
 
 import grantly.common.entity.IsMapper
-import grantly.member.domain.AuthSessionDomain
+import grantly.session.domain.AuthSessionDomain
 import org.springframework.stereotype.Component
 
 @Component

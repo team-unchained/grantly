@@ -1,4 +1,4 @@
-package grantly.member.application.port.`in`
+package grantly.session.application.port.`in`
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

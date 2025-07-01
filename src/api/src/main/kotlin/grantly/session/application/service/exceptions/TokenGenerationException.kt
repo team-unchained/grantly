@@ -1,3 +1,3 @@
-package grantly.member.application.service.exceptions
+package grantly.session.application.service.exceptions
 
 class TokenGenerationException : RuntimeException("Failed to generate token")
