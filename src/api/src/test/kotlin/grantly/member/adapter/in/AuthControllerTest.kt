@@ -5,10 +5,10 @@ import grantly.app.application.port.out.AppRepository
 import grantly.common.constants.AuthConstants
 import grantly.member.adapter.`in`.dto.LoginRequest
 import grantly.member.adapter.`in`.dto.SignUpRequest
-import grantly.member.application.port.out.AuthSessionRepository
 import grantly.member.application.port.out.MemberRepository
-import grantly.member.domain.AuthSessionDomain
 import grantly.member.domain.MemberDomain
+import grantly.session.application.port.out.AuthSessionRepository
+import grantly.session.domain.AuthSessionDomain
 import grantly.token.adapter.out.enums.TokenType
 import grantly.token.application.port.out.TokenRepository
 import grantly.token.domain.TokenDomain

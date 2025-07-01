@@ -1,9 +1,10 @@
-package grantly.member.adapter.out
+package grantly.session.adapter.out
 
 import grantly.common.entity.BaseEntity
 import grantly.common.entity.entityEquals
 import grantly.common.entity.entityHashCode
 import grantly.common.entity.entityToString
+import grantly.member.adapter.out.MemberJpaEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType

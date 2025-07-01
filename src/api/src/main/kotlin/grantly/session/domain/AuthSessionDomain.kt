@@ -1,4 +1,4 @@
-package grantly.member.domain
+package grantly.session.domain
 
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime

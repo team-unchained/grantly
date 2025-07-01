@@ -19,8 +19,9 @@ import grantly.member.application.port.`in`.dto.SignUpParams
 import grantly.member.application.port.out.MemberRepository
 import grantly.member.application.service.exceptions.DuplicateEmailException
 import grantly.member.application.service.exceptions.PasswordMismatchException
-import grantly.member.domain.AuthSessionDomain
 import grantly.member.domain.MemberDomain
+import grantly.session.application.service.SessionService
+import grantly.session.domain.AuthSessionDomain
 import grantly.token.adapter.out.dto.MemberIdTokenPayload
 import grantly.token.application.service.TokenService
 import grantly.token.application.service.exceptions.InvalidTokenException

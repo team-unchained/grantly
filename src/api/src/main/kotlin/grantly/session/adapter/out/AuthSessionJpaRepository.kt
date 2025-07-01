@@ -1,4 +1,4 @@
-package grantly.member.adapter.out
+package grantly.session.adapter.out
 
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.Optional

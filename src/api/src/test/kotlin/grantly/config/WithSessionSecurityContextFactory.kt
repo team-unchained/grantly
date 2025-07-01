@@ -1,9 +1,9 @@
 package grantly.config
 
-import grantly.member.application.port.out.AuthSessionRepository
 import grantly.member.application.port.out.MemberRepository
-import grantly.member.domain.AuthSessionDomain
 import grantly.member.domain.MemberDomain
+import grantly.session.application.port.out.AuthSessionRepository
+import grantly.session.domain.AuthSessionDomain
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestComponent

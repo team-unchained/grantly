@@ -1,8 +1,8 @@
-package grantly.member.adapter.out
+package grantly.session.adapter.out
 
 import grantly.common.annotations.PersistenceAdapter
-import grantly.member.application.port.out.AuthSessionRepository
-import grantly.member.domain.AuthSessionDomain
+import grantly.session.application.port.out.AuthSessionRepository
+import grantly.session.domain.AuthSessionDomain
 import jakarta.persistence.EntityNotFoundException
 
 @PersistenceAdapter
