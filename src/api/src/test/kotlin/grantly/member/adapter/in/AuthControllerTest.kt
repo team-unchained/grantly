@@ -375,7 +375,7 @@ class AuthControllerTest(
                 token = UUID.randomUUID().toString(),
                 deviceId = UUID.randomUUID().toString(),
                 expiresAt = OffsetDateTime.now().plusSeconds(3600),
-                memberId = memberId,
+                subjectId = memberId,
             )
         return authSessionRepository.createSession(session)
     }

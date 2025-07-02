@@ -6,7 +6,8 @@ import java.time.OffsetDateTime
 @Schema(description = "세션 도메인 모델")
 data class AuthSessionDomain(
     val id: Long = 0L,
-    var memberId: Long? = null,
+    var subjectId: Long? = null,
+    var subjectType: SubjectType? = null,
     var token: String,
     var deviceId: String,
     var ip: String? = null,
@@ -17,7 +18,7 @@ data class AuthSessionDomain(
 ) {
     fun isValid(): Boolean = expiresAt.isAfter(OffsetDateTime.now())
 
-    fun isAnonymous(): Boolean = memberId == null
+    fun isAnonymous(): Boolean = subjectId == null
 
     fun updateMeta(
         ip: String?,
@@ -30,7 +31,7 @@ data class AuthSessionDomain(
     }
 
     fun connectMember(userId: Long) {
-        this.memberId = userId
+        this.subjectId = userId
     }
 
     fun replaceToken(
