@@ -36,7 +36,7 @@ class WithSessionSecurityContextFactory(
                 // 세션이 존재하지 않으면 새로 생성
                 val newAuthSession =
                     AuthSessionDomain(
-                        memberId = member.id,
+                        subjectId = member.id,
                         token = "testToken",
                         expiresAt = OffsetDateTime.now().plusDays(1),
                         deviceId = "testDeviceId",
@@ -81,7 +81,7 @@ class WithSessionSecurityContextFactory(
         val createdMember = memberRepository.createMember(member)
         val authSession =
             AuthSessionDomain(
-                memberId = createdMember.id,
+                subjectId = createdMember.id,
                 token = "testToken",
                 expiresAt = OffsetDateTime.now().plusDays(1),
                 deviceId = "testDeviceId",

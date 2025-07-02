@@ -48,7 +48,7 @@ class SessionValidationFilter(
         val member: MemberDomain
         try {
             // 유저 정보 조회
-            member = memberRepository.getMember(authSession.memberId!!)
+            member = memberRepository.getMember(authSession.subjectId!!)
         } catch (e: EntityNotFoundException) {
             sessionService.delete(authSession.id)
             // 세션 쿠키 삭제

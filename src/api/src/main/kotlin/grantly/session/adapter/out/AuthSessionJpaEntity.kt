@@ -4,15 +4,11 @@ import grantly.common.entity.BaseEntity
 import grantly.common.entity.entityEquals
 import grantly.common.entity.entityHashCode
 import grantly.common.entity.entityToString
-import grantly.member.adapter.out.MemberJpaEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import java.time.OffsetDateTime
 
@@ -33,11 +29,10 @@ class AuthSessionJpaEntity(
     val ip: String? = null,
     @Column(nullable = false)
     val expiresAt: OffsetDateTime,
-    @Column(name = "member_id", nullable = true)
-    val memberId: Long? = null,
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = true, referencedColumnName = "id", updatable = false, insertable = false)
-    val member: MemberJpaEntity? = null,
+    @Column(nullable = true)
+    val subjectId: Long? = null,
+    @Column(nullable = true)
+    val subjectType: Int? = null,
 ) : BaseEntity() {
     override fun toString() = entityToString(*toStringProperties)
 
@@ -47,6 +42,11 @@ class AuthSessionJpaEntity(
 
     companion object {
         val toStringProperties =
-            arrayOf(AuthSessionJpaEntity::id, AuthSessionJpaEntity::memberId, AuthSessionJpaEntity::token)
+            arrayOf(
+                AuthSessionJpaEntity::id,
+                AuthSessionJpaEntity::subjectId,
+                AuthSessionJpaEntity::subjectType,
+                AuthSessionJpaEntity::token,
+            )
     }
 }
