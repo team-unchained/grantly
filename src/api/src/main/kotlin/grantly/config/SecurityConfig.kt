@@ -4,7 +4,7 @@ import grantly.config.filter.CsrfValidationFilter
 import grantly.config.filter.SessionContext
 import grantly.config.filter.SessionValidationFilter
 import grantly.member.application.port.out.MemberRepository
-import grantly.member.application.service.SessionService
+import grantly.session.application.service.SessionService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile

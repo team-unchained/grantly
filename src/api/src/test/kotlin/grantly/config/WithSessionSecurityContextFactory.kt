@@ -1,9 +1,9 @@
 package grantly.config
 
-import grantly.member.application.port.out.AuthSessionRepository
 import grantly.member.application.port.out.MemberRepository
-import grantly.member.domain.AuthSessionDomain
 import grantly.member.domain.MemberDomain
+import grantly.session.application.port.out.AuthSessionRepository
+import grantly.session.domain.AuthSessionDomain
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestComponent
@@ -36,7 +36,7 @@ class WithSessionSecurityContextFactory(
                 // 세션이 존재하지 않으면 새로 생성
                 val newAuthSession =
                     AuthSessionDomain(
-                        memberId = member.id,
+                        subjectId = member.id,
                         token = "testToken",
                         expiresAt = OffsetDateTime.now().plusDays(1),
                         deviceId = "testDeviceId",
@@ -81,7 +81,7 @@ class WithSessionSecurityContextFactory(
         val createdMember = memberRepository.createMember(member)
         val authSession =
             AuthSessionDomain(
-                memberId = createdMember.id,
+                subjectId = createdMember.id,
                 token = "testToken",
                 expiresAt = OffsetDateTime.now().plusDays(1),
                 deviceId = "testDeviceId",
