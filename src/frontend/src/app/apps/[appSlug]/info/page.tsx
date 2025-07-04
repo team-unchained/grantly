@@ -20,7 +20,7 @@ export default function AppInfoPage() {
   const breadcrumbs = useMemo(
     () => [
       { title: currentApp.name, url: `/apps/${currentApp.slug}` },
-      { title: 'Info', url: `/apps/${currentApp.slug}/info` },
+      { title: 'App Info', url: `/apps/${currentApp.slug}/info` },
     ],
     [currentApp.name, currentApp.slug]
   );

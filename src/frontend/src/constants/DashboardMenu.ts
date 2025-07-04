@@ -1,4 +1,4 @@
-import { Info, LayoutDashboard, LucideIcon } from 'lucide-react';
+import { Info, LayoutDashboard, LucideIcon, Key } from 'lucide-react';
 
 export type MenuItem = {
   title: string;
@@ -26,6 +26,11 @@ export const createDashboardMenu = ({
         title: 'Overview',
         url: `/apps/${appSlug}`,
         icon: LayoutDashboard,
+      },
+      {
+        title: 'Client',
+        url: `/apps/${appSlug}/clients`,
+        icon: Key,
       },
       {
         title: 'App Info',
