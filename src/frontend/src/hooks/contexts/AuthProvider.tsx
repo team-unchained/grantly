@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   } = useGetAppsQuery();
 
   const isLoading = isUserMeLoading || isAppsLoading;
-  const appSlug = String(useParams().appSlug);
+  const { appSlug } = useParams();
   const currentApp = apps?.find((app) => app.slug === appSlug);
 
   const refetch = useCallback(() => {
