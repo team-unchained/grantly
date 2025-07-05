@@ -20,7 +20,7 @@ export default function AppInfoPage() {
   const breadcrumbs = useMemo(
     () => [
       { title: currentApp.name, url: `/apps/${currentApp.slug}` },
-      { title: 'Info', url: `/apps/${currentApp.slug}/info` },
+      { title: 'App Info', url: `/apps/${currentApp.slug}/info` },
     ],
     [currentApp.name, currentApp.slug]
   );
@@ -34,7 +34,8 @@ export default function AppInfoPage() {
     shouldFocusError: true,
     defaultValues: {
       name: currentApp.name,
-      imageUrl: currentApp.imageUrl,
+      // TODO: 이미지 관련 버그 있어서 도메인 지정 및 버그 수정 후 주석 해제
+      // imageUrl: currentApp.imageUrl,
     },
   });
 
