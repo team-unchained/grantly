@@ -59,6 +59,7 @@ class AppController(
     private val createAppUseCase: CreateAppUseCase,
     private val uploadAppImageUseCase: UploadAppImageUseCase,
     private val deleteAppImageUseCase: DeleteAppImageUseCase,
+    private val appGuard: AppGuard,
     @Value("\${grantly.service.api-domain}")
     private val serverDomain: String,
     private val fileSystemStorage: FileSystemStorage,
@@ -366,14 +367,7 @@ class AppController(
         @PathVariable slug: String,
         @AuthenticationPrincipal requestMember: AuthenticatedMember,
     ): ResponseEntity<AppResponse> {
-        val app =
-            try {
-                findAppQuery.findAppById(slug, requestMember.getId())
-            } catch (_: EntityNotFoundException) {
-                throw HttpNotFoundException("App not found.")
-            } catch (_: PermissionDeniedException) {
-                throw HttpForbiddenException()
-            }
+        val app = appGuard.checkAccess(slug, requestMember.getId())
 
         return ResponseEntity.ok(
             AppResponse(

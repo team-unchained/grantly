@@ -3,7 +3,7 @@ package grantly.app.application.port.`in`
 import grantly.app.domain.AppDomain
 
 interface FindAppQuery {
-    fun findAppById(
+    fun findAppBySlugAndOwnerId(
         slug: String,
         ownerId: Long,
     ): AppDomain
