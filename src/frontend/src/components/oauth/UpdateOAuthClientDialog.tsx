@@ -12,32 +12,28 @@ import {
 import { Button } from '@grantly/components/ui/button';
 import { OAuthClientForm } from '@grantly/components/oauth/OAuthClientForm';
 import {
-  CreateOAuthClientSchema,
   CreateOAuthClientType,
+  UpdateOAuthClientType,
+  OAuthClientType,
+  CreateOAuthClientSchema,
 } from '@grantly/api/oauth/oauth.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-interface CreateOAuthClientDialogProps {
-  onSubmit: (data: CreateOAuthClientType) => void;
+interface UpdateOAuthClientDialogProps {
+  client: OAuthClientType;
+  onSubmit: (data: UpdateOAuthClientType) => Promise<void>;
   children: React.ReactNode;
 }
 
-export function CreateOAuthClientDialog({
+export function UpdateOAuthClientDialog({
+  client,
   onSubmit,
   children,
-}: CreateOAuthClientDialogProps) {
+}: UpdateOAuthClientDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [open, setOpen] = useState(false);
-
-  const handleOpenChange = (newOpen: boolean) => {
-    setOpen(newOpen);
-    if (!newOpen) {
-      // 다이얼로그가 닫힐 때 폼 초기화
-      form.reset();
-    }
-  };
 
   const form = useForm<CreateOAuthClientType>({
     resolver: zodResolver(CreateOAuthClientSchema),
@@ -45,13 +41,22 @@ export function CreateOAuthClientDialog({
     criteriaMode: 'all',
     shouldFocusError: true,
     defaultValues: {
-      title: '',
-      redirectUris: [],
-      scopes: [],
+      title: client.title,
+      redirectUris: client.redirectUris || [],
+      scopes: client.scopes || [],
     },
   });
 
-  const handleSubmit = async (data: CreateOAuthClientType) => {
+  // 클라이언트가 변경될 때 폼 값 업데이트
+  useEffect(() => {
+    form.reset({
+      title: client.title,
+      redirectUris: client.redirectUris || [],
+      scopes: client.scopes || [],
+    });
+  }, [client, form]);
+
+  const handleSubmit = async (data: UpdateOAuthClientType) => {
     setIsSubmitting(true);
     try {
       await onSubmit(data);
@@ -61,15 +66,22 @@ export function CreateOAuthClientDialog({
     }
   };
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      // 다이얼로그가 닫힐 때 폼 초기화
+      form.reset();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>OAuth 클라이언트 생성</DialogTitle>
+          <DialogTitle>OAuth 클라이언트 수정</DialogTitle>
           <DialogDescription>
-            새로운 OAuth 클라이언트를 생성하세요. 클라이언트 이름을 입력하면
-            자동으로 Client ID와 Secret이 생성됩니다.
+            OAuth 클라이언트 정보를 수정하세요.
           </DialogDescription>
         </DialogHeader>
 
@@ -89,7 +101,7 @@ export function CreateOAuthClientDialog({
               type="submit"
               disabled={isSubmitting || !form.formState.isValid}
             >
-              {isSubmitting ? '생성 중...' : '생성'}
+              {isSubmitting ? '수정 중...' : '수정'}
             </Button>
           </DialogFooter>
         </form>

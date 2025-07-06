@@ -15,11 +15,10 @@ import { OAuthClientList } from '@grantly/components/oauth/OAuthClientList';
 import { Button } from '@grantly/components/ui/button';
 import { useAuth } from '@grantly/hooks/contexts/AuthProvider';
 import { Plus } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export default function ClientsPage() {
   const { currentApp } = useAuth();
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const breadcrumbs = useMemo(
     () => [
@@ -33,7 +32,6 @@ export default function ClientsPage() {
   const handleCreate = useCallback(
     async (data: CreateOAuthClientType) => {
       await createMutation.mutateAsync(data);
-      setIsCreateDialogOpen(false);
     },
     [createMutation]
   );
@@ -65,12 +63,8 @@ export default function ClientsPage() {
               앱에서 사용할 OAuth 클라이언트를 관리하세요.
             </p>
           </div>
-          <CreateOAuthClientDialog
-            onSubmit={handleCreate}
-            open={isCreateDialogOpen}
-            onOpenChange={setIsCreateDialogOpen}
-          >
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
+          <CreateOAuthClientDialog onSubmit={handleCreate}>
+            <Button>
               <Plus className="h-4 w-4 mr-2" />
               OAuth 클라이언트 생성
             </Button>
