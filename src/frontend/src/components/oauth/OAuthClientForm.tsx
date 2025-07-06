@@ -15,7 +15,6 @@ import { Plus, X } from 'lucide-react';
 
 interface OAuthClientFormProps {
   form: UseFormReturn<CreateOAuthClientType>;
-  isEditing?: boolean;
 }
 
 export function OAuthClientForm({ form }: OAuthClientFormProps) {
