@@ -2,6 +2,11 @@ spring:
   config:
     activate:
       on-profile: test
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 6000
   datasource:
     username: sa
     password:
