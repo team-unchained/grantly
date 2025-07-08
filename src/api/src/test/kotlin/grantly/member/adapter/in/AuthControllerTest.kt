@@ -28,6 +28,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
@@ -49,6 +50,7 @@ import java.util.UUID
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class AuthControllerTest(
     @Autowired
     private val memberRepository: MemberRepository,
@@ -83,7 +85,7 @@ class AuthControllerTest(
     private lateinit var existingMember: MemberDomain
 
     @BeforeAll
-    fun setUp() {
+    fun createTestMember() {
         existingMember = createTestMember("test@email.com", "test", "test123!")
     }
 
