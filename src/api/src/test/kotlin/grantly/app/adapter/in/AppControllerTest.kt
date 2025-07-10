@@ -69,7 +69,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                get("/v1/apps"),
+                get("/admin/v1/apps"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isOk)
             .andExpect(jsonPath("$.length()").value(2))
@@ -91,7 +91,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                post("/v1/apps")
+                post("/admin/v1/apps")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestData),
                 TestSessionTokenHolder.get(),
@@ -117,7 +117,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.slug}"),
+                delete("/admin/v1/apps/${app.slug}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isNoContent)
             .andExpect {
@@ -142,7 +142,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.slug}"),
+                delete("/admin/v1/apps/${app.slug}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isForbidden)
     }
@@ -157,7 +157,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.slug}"),
+                delete("/admin/v1/apps/${app.slug}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isUnprocessableEntity)
     }
@@ -172,7 +172,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                put("/v1/apps/${app.slug}")
+                put("/admin/v1/apps/${app.slug}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         objectMapper.writeValueAsString(
@@ -209,7 +209,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                multipart("/v1/apps/${app.slug}/image")
+                multipart("/admin/v1/apps/${app.slug}/image")
                     .file(mockFile),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isNoContent)
@@ -239,7 +239,7 @@ class AppControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.slug}/image"),
+                delete("/admin/v1/apps/${app.slug}/image"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isNoContent)
             .andExpect {
