@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController
 private val log = KotlinLogging.logger {}
 
 @RestController
-@RequestMapping("/v1/members")
+@RequestMapping("/admin/v1/members")
 @Tag(name = "서비스 멤버 API", description = "멤버 관련 API")
 class MemberController(
     private val signUpUseCase: SignUpUseCase,

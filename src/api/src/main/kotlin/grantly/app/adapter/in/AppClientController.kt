@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @ResponseBody
-@RequestMapping("/v1/apps/{appSlug}/clients")
+@RequestMapping("/admin/v1/apps/{appSlug}/clients")
 @Tag(name = "OAuth 클라이언트", description = "멤버가 등록한 앱의 OAuth 클라이언트 관련 API")
 class AppClientController(
     private val createAppClientUseCase: CreateAppClientUseCase,

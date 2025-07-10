@@ -50,7 +50,7 @@ import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @ResponseBody
-@RequestMapping("/v1/apps")
+@RequestMapping("/admin/v1/apps")
 @Tag(name = "앱", description = "멤버가 등록한 앱 관련 API")
 class AppController(
     private val findAppQuery: FindAppQuery,

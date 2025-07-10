@@ -42,8 +42,8 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @ResponseBody
-@RequestMapping("/v1/auth")
-@Tag(name = "인증", description = "인증 관련 API")
+@RequestMapping("/admin/v1/auth")
+@Tag(name = "인증", description = "멤버 인증 관련 API")
 class MemberAuthController(
     private val signUpUseCase: SignUpUseCase,
     private val loginUseCase: LoginUseCase,
