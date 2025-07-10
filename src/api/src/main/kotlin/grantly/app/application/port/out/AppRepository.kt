@@ -5,7 +5,7 @@ import grantly.app.domain.AppDomain
 interface AppRepository {
     fun getAppById(id: Long): AppDomain
 
-    fun getAppsByOwnerId(memberId: Long): List<AppDomain>
+    fun getAppsByOwnerId(ownerId: Long): List<AppDomain>
 
     fun createApp(appDomain: AppDomain): AppDomain
 
