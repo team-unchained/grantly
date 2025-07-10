@@ -37,7 +37,7 @@ class MemberControllerTest(
         // when & then
         mockMvc
             .performWithSession(
-                get("/v1/members/me"),
+                get("/admin/v1/members/me"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isOk)
             .andExpect(jsonPath("$.email").value("test@email.com"))

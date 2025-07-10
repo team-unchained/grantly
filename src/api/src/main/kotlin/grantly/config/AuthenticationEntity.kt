@@ -1,14 +1,20 @@
 package grantly.config
 
+import grantly.session.domain.SubjectType
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
-class AuthenticatedMember(
+class AuthenticationEntity(
     private val id: Long,
     private val name: String,
     private val email: String,
+    private val role: SubjectType,
 ) : UserDetails {
-    override fun getAuthorities() = emptyList<GrantedAuthority>()
+    override fun getAuthorities() =
+        listOf<GrantedAuthority>(
+            SimpleGrantedAuthority("ROLE_${role.name}"),
+        )
 
     override fun getPassword() = null
 
