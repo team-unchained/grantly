@@ -38,7 +38,7 @@ class AppService(
         private const val MAX_IMAGE_SIZE = 2 * 1024 * 1024 // 2MB
     }
 
-    override fun findAppById(
+    override fun findAppBySlugAndOwnerId(
         slug: String,
         ownerId: Long,
     ): AppDomain {
@@ -105,7 +105,7 @@ class AppService(
         ownerId: Long,
         image: MultipartFile,
     ): String {
-        val app = findAppById(appSlug, ownerId)
+        val app = findAppBySlugAndOwnerId(appSlug, ownerId)
         if (image.size > MAX_IMAGE_SIZE) {
             throw ResourceTooLargeException("Image size exceeds the limit of 2MB")
         }
@@ -130,7 +130,7 @@ class AppService(
         appSlug: String,
         ownerId: Long,
     ) {
-        val app = findAppById(appSlug, ownerId)
+        val app = findAppBySlugAndOwnerId(appSlug, ownerId)
         val imageKey = app.imageUrl
         app.imageUrl = null
         appRepository.updateApp(app)
