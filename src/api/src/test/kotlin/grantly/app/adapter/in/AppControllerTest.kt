@@ -12,7 +12,6 @@ import grantly.config.WithTestSessionMember
 import grantly.member.application.port.out.MemberRepository
 import grantly.member.domain.MemberDomain
 import jakarta.persistence.EntityNotFoundException
-import jakarta.transaction.Transactional
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -25,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
@@ -34,14 +34,17 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.transaction.annotation.Transactional
 import java.time.OffsetDateTime
 import java.util.UUID
 
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@WithTestSessionMember
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@Transactional
 class AppControllerTest(
     @Autowired
     private val mockMvc: MockMvc,
@@ -56,7 +59,6 @@ class AppControllerTest(
 ) {
     @Test
     @DisplayName("활성화된 애플리케이션만 목록에 포함하여 조회")
-    @WithTestSessionMember
     fun `should exclude deactivated apps on list action`() {
         // given
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
@@ -76,7 +78,6 @@ class AppControllerTest(
 
     @Test
     @DisplayName("앱 생성")
-    @WithTestSessionMember
     fun createApp() {
         // given
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
@@ -107,7 +108,6 @@ class AppControllerTest(
 
     @Test
     @DisplayName("앱 삭제")
-    @WithTestSessionMember
     fun deleteApp() {
         // given
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
@@ -127,7 +127,6 @@ class AppControllerTest(
 
     @Test
     @DisplayName("앱의 소유자만 삭제 가능")
-    @WithTestSessionMember
     fun `should only allow app owner to delete`() {
         // given
         val newMember =
@@ -150,7 +149,6 @@ class AppControllerTest(
 
     @Test
     @DisplayName("활성화 상태의 앱이 1개뿐일 때 삭제 불가")
-    @WithTestSessionMember
     fun `cannot delete the only active app`() {
         // given
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
@@ -166,7 +164,6 @@ class AppControllerTest(
 
     @Test
     @DisplayName("앱 메타 데이터 수정")
-    @WithTestSessionMember
     fun updateApp() {
         // given
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
@@ -196,7 +193,6 @@ class AppControllerTest(
 
     @Test
     @DisplayName("이미지 업로드 시 이미지 경로가 올바르게 저장된다.")
-    @WithTestSessionMember
     fun uploadApplicationImage() {
         // given
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
@@ -225,7 +221,6 @@ class AppControllerTest(
 
     @Test
     @DisplayName("이미지 초기화 시 이미지 경로가 null 로 저장되고 파일이 제거된다.")
-    @WithTestSessionMember
     fun deleteApplicationImage() {
         // given
         val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember

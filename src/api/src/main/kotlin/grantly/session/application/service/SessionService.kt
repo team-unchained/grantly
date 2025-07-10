@@ -1,10 +1,10 @@
-package grantly.member.application.service
+package grantly.session.application.service
 
 import grantly.common.constants.AuthConstants
 import grantly.common.utils.HttpUtil
 import grantly.config.CustomHttpSession
-import grantly.member.application.port.out.AuthSessionRepository
-import grantly.member.domain.AuthSessionDomain
+import grantly.session.application.port.out.AuthSessionRepository
+import grantly.session.domain.AuthSessionDomain
 import jakarta.persistence.EntityNotFoundException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
