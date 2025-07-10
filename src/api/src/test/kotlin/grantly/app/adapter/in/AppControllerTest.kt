@@ -6,7 +6,7 @@ import grantly.app.domain.AppDomain
 import grantly.common.core.store.FileSystemStorage
 import grantly.common.core.store.exceptions.NoSuchResourceException
 import grantly.common.utils.performWithSession
-import grantly.config.AuthenticatedMember
+import grantly.config.AuthenticationEntity
 import grantly.config.TestSessionTokenHolder
 import grantly.config.WithTestSessionMember
 import grantly.member.application.port.out.MemberRepository
@@ -61,7 +61,7 @@ class AppControllerTest(
     @DisplayName("활성화된 애플리케이션만 목록에 포함하여 조회")
     fun `should exclude deactivated apps on list action`() {
         // given
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         createTestApp(true, requestMember.getId())
         createTestApp(false, requestMember.getId())
         val latestApp = createTestApp(true, requestMember.getId())
@@ -80,7 +80,7 @@ class AppControllerTest(
     @DisplayName("앱 생성")
     fun createApp() {
         // given
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val requestData =
             objectMapper.writeValueAsString(
                 mapOf(
@@ -110,7 +110,7 @@ class AppControllerTest(
     @DisplayName("앱 삭제")
     fun deleteApp() {
         // given
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         createTestApp(true, requestMember.getId())
 
@@ -151,7 +151,7 @@ class AppControllerTest(
     @DisplayName("활성화 상태의 앱이 1개뿐일 때 삭제 불가")
     fun `cannot delete the only active app`() {
         // given
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
 
         // when & then
@@ -166,7 +166,7 @@ class AppControllerTest(
     @DisplayName("앱 메타 데이터 수정")
     fun updateApp() {
         // given
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
 
         // when & then
@@ -195,7 +195,7 @@ class AppControllerTest(
     @DisplayName("이미지 업로드 시 이미지 경로가 올바르게 저장된다.")
     fun uploadApplicationImage() {
         // given
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
 
         val mockFile =
@@ -223,7 +223,7 @@ class AppControllerTest(
     @DisplayName("이미지 초기화 시 이미지 경로가 null 로 저장되고 파일이 제거된다.")
     fun deleteApplicationImage() {
         // given
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         // 이미지 저장
         runBlocking {

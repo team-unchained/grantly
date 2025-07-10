@@ -1,7 +1,7 @@
 package grantly.member.adapter.`in`
 
 import grantly.common.exceptions.HttpNotFoundException
-import grantly.config.AuthenticatedMember
+import grantly.config.AuthenticationEntity
 import grantly.member.adapter.`in`.dto.SignUpRequest
 import grantly.member.adapter.`in`.dto.UpdateMemberRequest
 import grantly.member.adapter.out.dto.MemberResponse
@@ -35,7 +35,7 @@ class MemberController(
 ) {
     @GetMapping("/me")
     fun getCurrentMember(): ResponseEntity<MemberResponse> {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val member: MemberDomain
         try {
             member = findMemberQuery.findMemberById(requestMember.getId())

@@ -6,7 +6,7 @@ import grantly.app.application.port.out.AppRepository
 import grantly.app.domain.AppClientDomain
 import grantly.app.domain.AppDomain
 import grantly.common.utils.performWithSession
-import grantly.config.AuthenticatedMember
+import grantly.config.AuthenticationEntity
 import grantly.config.TestSessionTokenHolder
 import grantly.config.WithTestSessionMember
 import grantly.member.application.port.out.MemberRepository
@@ -55,7 +55,7 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 생성")
     @WithTestSessionMember
     fun createAppClient() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val requestData =
             objectMapper.writeValueAsString(
@@ -82,7 +82,7 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 수정")
     @WithTestSessionMember
     fun updateAppClient() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val appClient = createTestAppClient(app)
         val requestData =
@@ -111,7 +111,7 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 삭제")
     @WithTestSessionMember
     fun deleteAppClient() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val appClient = createTestAppClient(app)
         mockMvc
@@ -126,7 +126,7 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 단일 조회")
     @WithTestSessionMember
     fun getAppClient() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val appClient = createTestAppClient(app)
         mockMvc
@@ -144,7 +144,7 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 목록 조회")
     @WithTestSessionMember
     fun getAppClients() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         createTestAppClient(app)
         createTestAppClient(app)
@@ -288,7 +288,7 @@ class AppClientControllerTest(
     @DisplayName("존재하지 않는 OAuth 클라이언트 수정 시 404 에러")
     @WithTestSessionMember
     fun `should return 404 when updating non-existent app client`() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val nonExistentClientId = "non-existent-client-id"
 
@@ -315,7 +315,7 @@ class AppClientControllerTest(
     @DisplayName("존재하지 않는 OAuth 클라이언트 삭제 시 404 에러")
     @WithTestSessionMember
     fun `should return 404 when deleting non-existent app client`() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val nonExistentClientId = "non-existent-client-id"
 
@@ -330,7 +330,7 @@ class AppClientControllerTest(
     @DisplayName("존재하지 않는 OAuth 클라이언트 조회 시 404 에러")
     @WithTestSessionMember
     fun `should return 404 when getting non-existent app client`() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val nonExistentClientId = "non-existent-client-id"
 

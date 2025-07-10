@@ -56,7 +56,7 @@ class WithSessionSecurityContextFactory(
         // context 에 설정
         context.authentication =
             UsernamePasswordAuthenticationToken(
-                AuthenticatedMember(
+                AuthenticationEntity(
                     id = member.id,
                     name = member.name,
                     email = member.email,
