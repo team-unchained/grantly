@@ -4,6 +4,7 @@ import grantly.member.application.port.out.MemberRepository
 import grantly.member.domain.MemberDomain
 import grantly.session.application.port.out.AuthSessionRepository
 import grantly.session.domain.AuthSessionDomain
+import grantly.session.domain.SubjectType
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestComponent
@@ -14,7 +15,7 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 import java.time.OffsetDateTime
 
 @TestComponent
-class WithSessionSecurityContextFactory(
+class WithMemberSessionSecurityContextFactory(
     @Autowired
     private val memberRepository: MemberRepository,
     @Autowired
@@ -36,11 +37,11 @@ class WithSessionSecurityContextFactory(
                 // 세션이 존재하지 않으면 새로 생성
                 val newAuthSession =
                     AuthSessionDomain(
-                        subjectId = member.id,
                         token = "testToken",
                         expiresAt = OffsetDateTime.now().plusDays(1),
                         deviceId = "testDeviceId",
                     )
+                newAuthSession.connectMember(member.id)
                 authSessionRepository.createSession(newAuthSession)
                 authSession = newAuthSession
             }
@@ -54,15 +55,18 @@ class WithSessionSecurityContextFactory(
         TestSessionTokenHolder.set(authSession.token)
 
         // context 에 설정
+        val requestEntity =
+            AuthenticationEntity(
+                id = member.id,
+                name = member.name,
+                email = member.email,
+                role = SubjectType.MEMBER,
+            )
         context.authentication =
             UsernamePasswordAuthenticationToken(
-                AuthenticationEntity(
-                    id = member.id,
-                    name = member.name,
-                    email = member.email,
-                ),
+                requestEntity,
                 authSession.token, // 임시로 세션 토큰을 credentials 에 넣어줌
-                emptyList(),
+                requestEntity.authorities,
             )
         return context
     }
@@ -81,11 +85,11 @@ class WithSessionSecurityContextFactory(
         val createdMember = memberRepository.createMember(member)
         val authSession =
             AuthSessionDomain(
-                subjectId = createdMember.id,
                 token = "testToken",
                 expiresAt = OffsetDateTime.now().plusDays(1),
                 deviceId = "testDeviceId",
             )
+        authSession.connectMember(createdMember.id)
         val createdSession = authSessionRepository.createSession(authSession)
         return Pair(createdMember, createdSession)
     }

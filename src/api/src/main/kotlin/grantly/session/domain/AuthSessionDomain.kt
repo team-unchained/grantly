@@ -30,8 +30,9 @@ data class AuthSessionDomain(
         this.deviceId = deviceId ?: this.deviceId
     }
 
-    fun connectMember(userId: Long) {
-        this.subjectId = userId
+    fun connectMember(memberId: Long) {
+        this.subjectType = SubjectType.MEMBER
+        this.subjectId = memberId
     }
 
     fun replaceToken(
