@@ -92,9 +92,9 @@ class MemberService(
         // 익명 세션으로 요청이 들어온 경우, 현재 멤버와 연결된 세션이 있는지 확인
         if (authSession.isAnonymous()) {
             try {
-                val existingmemberSession = sessionService.findSessionByMemberId(member.id)
+                val existingMemberSession = sessionService.findSessionByMemberId(member.id)
                 // 이미 로그인된 세션이 있는 경우 제거함
-                sessionService.delete(existingmemberSession.id)
+                sessionService.delete(existingMemberSession.id)
             } catch (e: EntityNotFoundException) {
                 // do nothing
             }
