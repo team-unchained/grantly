@@ -25,7 +25,7 @@ import grantly.common.exceptions.HttpNotFoundException
 import grantly.common.exceptions.HttpUnprocessableException
 import grantly.common.exceptions.PermissionDeniedException
 import grantly.common.utils.HttpUtil
-import grantly.config.AuthenticatedMember
+import grantly.config.AuthenticationEntity
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -82,7 +82,7 @@ class AppController(
     )
     @GetMapping("")
     fun getApps(
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<List<SimpleAppResponse>> {
         val apps = findAppQuery.findAppsByOwnerId(requestMember.getId())
         return ResponseEntity.ok(
@@ -117,7 +117,7 @@ class AppController(
     @PostMapping("")
     fun createApp(
         @RequestBody body: CreateAppRequest,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<CreateAppResponse> {
         val newApp =
             createAppUseCase.createApp(
@@ -202,7 +202,7 @@ class AppController(
     fun uploadImage(
         @PathVariable appSlug: String,
         @RequestPart(required = true) image: MultipartFile,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<Void> {
         try {
             uploadAppImageUseCase.uploadImage(appSlug, requestMember.getId(), image)
@@ -253,7 +253,7 @@ class AppController(
     @DeleteMapping("{appSlug}/image")
     fun deleteImage(
         @PathVariable appSlug: String,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<Void> {
         try {
             deleteAppImageUseCase.deleteImage(appSlug, requestMember.getId())
@@ -311,7 +311,7 @@ class AppController(
     @DeleteMapping("/{slug}")
     fun deleteApp(
         @PathVariable slug: String,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<Void> {
         try {
             deleteAppUseCase.deleteApp(slug, requestMember.getId())
@@ -365,7 +365,7 @@ class AppController(
     @GetMapping("/{slug}")
     fun getApp(
         @PathVariable slug: String,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<AppResponse> {
         val app = appGuard.checkAccess(slug, requestMember.getId())
 
@@ -430,7 +430,7 @@ class AppController(
     fun updateApp(
         @PathVariable slug: String,
         @RequestBody body: UpdateAppRequest,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<AppResponse> {
         val app =
             try {

@@ -3,7 +3,7 @@ package grantly.config.filter
 import grantly.common.constants.AuthConstants
 import grantly.common.exceptions.HttpUnauthorizedException
 import grantly.common.utils.HttpUtil
-import grantly.config.AuthenticatedMember
+import grantly.config.AuthenticationEntity
 import grantly.member.application.port.out.MemberRepository
 import grantly.member.domain.MemberDomain
 import grantly.session.application.service.SessionService
@@ -58,15 +58,19 @@ class SessionValidationFilter(
             HttpUtil.writeErrorResponse(response, HttpUnauthorizedException("User not found"))
             return
         }
+        val authenticationEntity =
+            AuthenticationEntity(
+                id = member.id,
+                name = member.name,
+                email = member.email,
+                role = authSession.subjectType!!,
+            )
+
         SecurityContextHolder.getContext().authentication =
             UsernamePasswordAuthenticationToken(
-                AuthenticatedMember(
-                    id = member.id,
-                    name = member.name,
-                    email = member.email,
-                ),
+                authenticationEntity,
                 null,
-                emptyList(), // TODO: 추후 member 와 user 의 Role 구분?
+                authenticationEntity.authorities,
             )
         // 다음 필터로 진행
         filterChain.doFilter(request, response)

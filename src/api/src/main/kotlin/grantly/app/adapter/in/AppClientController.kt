@@ -1,6 +1,5 @@
 package grantly.app.adapter.`in`
 
-import grantly.app.adapter.`in`.AppGuard
 import grantly.app.adapter.`in`.dto.AppClientResponse
 import grantly.app.adapter.`in`.dto.CreateAppClientRequest
 import grantly.app.adapter.`in`.dto.UpdateAppClientRequest
@@ -13,7 +12,7 @@ import grantly.app.application.port.`in`.dto.DeleteAppClientParams
 import grantly.app.application.port.`in`.dto.FindAppClientParams
 import grantly.app.application.port.`in`.dto.UpdateAppClientParams
 import grantly.common.exceptions.HttpNotFoundException
-import grantly.config.AuthenticatedMember
+import grantly.config.AuthenticationEntity
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -64,7 +63,7 @@ class AppClientController(
     @PostMapping
     fun createAppClient(
         @PathVariable appSlug: String,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
         @Valid @RequestBody request: CreateAppClientRequest,
     ): ResponseEntity<AppClientResponse> {
         val app = appGuard.checkAccess(appSlug, requestMember.getId())
@@ -103,7 +102,7 @@ class AppClientController(
     fun updateAppClient(
         @PathVariable appSlug: String,
         @PathVariable clientId: String,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
         @Valid @RequestBody request: UpdateAppClientRequest,
     ): ResponseEntity<AppClientResponse> {
         val app = appGuard.checkAccess(appSlug, requestMember.getId())
@@ -141,7 +140,7 @@ class AppClientController(
     fun deleteAppClient(
         @PathVariable appSlug: String,
         @PathVariable clientId: String,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<Unit> {
         val app = appGuard.checkAccess(appSlug, requestMember.getId())
 
@@ -179,7 +178,7 @@ class AppClientController(
     fun getAppClient(
         @PathVariable appSlug: String,
         @PathVariable clientId: String,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<AppClientResponse> {
         val app = appGuard.checkAccess(appSlug, requestMember.getId())
 
@@ -217,7 +216,7 @@ class AppClientController(
     @GetMapping
     fun getAppClients(
         @PathVariable appSlug: String,
-        @AuthenticationPrincipal requestMember: AuthenticatedMember,
+        @AuthenticationPrincipal requestMember: AuthenticationEntity,
     ): ResponseEntity<List<AppClientResponse>> {
         val app = appGuard.checkAccess(appSlug, requestMember.getId())
 
