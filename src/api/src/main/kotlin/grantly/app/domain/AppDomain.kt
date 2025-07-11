@@ -29,5 +29,8 @@ data class AppDomain(
     fun resolveFullImageUrl(
         domain: String,
         storageName: String,
-    ) = "$domain/$storageName$imageUrl"
+    ): String? =
+        imageUrl?.let {
+            "$domain/$storageName$it"
+        }
 }
