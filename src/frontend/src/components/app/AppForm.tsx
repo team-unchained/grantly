@@ -1,13 +1,15 @@
 'use client';
 
 import { AppSchema } from '@grantly/api/app/app.shcema';
+import { Button } from '@grantly/components/ui/button';
 import { Input } from '@grantly/components/ui/input';
 import { Label } from '@grantly/components/ui/label';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
+import { ImageCropModal } from './ImageCropModal';
 
 // AppSchema에서 id를 제외한 스키마를 사용
 export const AppFormSchema = AppSchema.omit({ slug: true });
@@ -19,7 +21,9 @@ interface AppFormProps {
 }
 
 export function AppForm({ form }: AppFormProps) {
-  const [isUploading, setIsUploading] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [tempImageUrl, setTempImageUrl] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     register,
     setValue,
@@ -29,7 +33,7 @@ export function AppForm({ form }: AppFormProps) {
 
   const imageUrl = watch('imageUrl');
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -38,24 +42,42 @@ export function AppForm({ form }: AppFormProps) {
       return;
     }
 
-    setIsUploading(true);
-    try {
-      // TODO: 이미지 업로드 API 구현
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setValue('imageUrl', reader.result as string, { shouldDirty: true });
-      };
-      reader.readAsDataURL(file);
-      toast.success('이미지가 업로드되었습니다.');
-    } catch (error) {
-      toast.error('이미지 업로드 중 오류가 발생했습니다.');
-    } finally {
-      setIsUploading(false);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setTempImageUrl(reader.result as string);
+      setShowCropModal(true);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropComplete = (croppedImageUrl: string) => {
+    setValue('imageUrl', croppedImageUrl, { shouldDirty: true });
+    setShowCropModal(false);
+    setTempImageUrl('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    toast.success('이미지가 업로드되었습니다.');
+  };
+
+  const handleCropCancel = () => {
+    setShowCropModal(false);
+    setTempImageUrl('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
   return (
     <div className="space-y-4">
+      {showCropModal && tempImageUrl && (
+        <ImageCropModal
+          srcImage={tempImageUrl}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+        />
+      )}
+
       <div>
         <Label htmlFor="logo">앱 로고</Label>
         <div className="mt-2 flex items-center gap-4">
@@ -75,20 +97,19 @@ export function AppForm({ form }: AppFormProps) {
           </div>
           <div className="flex flex-col gap-2">
             <Input
-              id="logo"
               type="file"
               accept="image/*"
               onChange={handleImageUpload}
+              ref={fileInputRef}
               className="hidden"
             />
-            <button
+            <Button
               type="button"
-              onClick={() => document.getElementById('logo')?.click()}
-              disabled={isUploading}
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+              onClick={() => fileInputRef.current?.click()}
+              variant="outline"
             >
-              {isUploading ? '업로드 중...' : '이미지 업로드'}
-            </button>
+              이미지 업로드
+            </Button>
             <p className="text-sm text-muted-foreground">
               PNG, JPG, GIF 파일 (최대 2MB)
             </p>
