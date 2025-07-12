@@ -27,7 +27,7 @@ export const ImageCropModal = ({
   const [imageRef, setImageRef] = useState<HTMLImageElement | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const onImageLoaded = useCallback((img: HTMLImageElement) => {
+  const handleImageLoaded = useCallback((img: HTMLImageElement) => {
     setImageRef(img);
     const imgWidth = img.width;
     const imgHeight = img.height;
@@ -98,7 +98,7 @@ export const ImageCropModal = ({
             src={srcImage}
             alt="Crop"
             style={{ maxHeight: '60vh', maxWidth: '60vw', display: 'block' }}
-            onLoad={(e) => onImageLoaded(e.currentTarget)}
+            onLoad={(e) => handleImageLoaded(e.currentTarget)}
           />
         </ReactCrop>
         <div className="flex gap-2 mt-4 justify-end">
