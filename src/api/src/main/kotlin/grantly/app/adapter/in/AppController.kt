@@ -376,12 +376,10 @@ class AppController(
                 name = app.name,
                 description = app.description,
                 imageUrl =
-                    app.imageUrl?.let {
-                        app.resolveFullImageUrl(
-                            serverDomain,
-                            fileSystemStorage.getStorageName(),
-                        )
-                    },
+                    app.resolveFullImageUrl(
+                        serverDomain,
+                        fileSystemStorage.getStorageName(),
+                    ),
                 ownerId = app.ownerId,
                 createdAt = app.createdAt,
                 modifiedAt = app.modifiedAt ?: app.createdAt,
