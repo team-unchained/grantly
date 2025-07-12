@@ -1,9 +1,9 @@
-package grantly.member.application.service
+package grantly.session.application.service
 
 import grantly.common.annotations.UseCase
 import grantly.common.constants.AuthConstants
 import grantly.common.utils.HttpUtil
-import grantly.member.application.port.`in`.CsrfTokenUseCase
+import grantly.session.application.port.`in`.CsrfTokenUseCase
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value

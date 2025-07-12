@@ -11,7 +11,6 @@ import grantly.member.adapter.`in`.dto.SendEmailRequest
 import grantly.member.adapter.`in`.dto.SignUpRequest
 import grantly.member.adapter.out.dto.MemberResponse
 import grantly.member.adapter.out.dto.SignUpResponse
-import grantly.member.application.port.`in`.CsrfTokenUseCase
 import grantly.member.application.port.`in`.LoginUseCase
 import grantly.member.application.port.`in`.LogoutUseCase
 import grantly.member.application.port.`in`.PasswordResetUseCase
@@ -22,6 +21,7 @@ import grantly.member.application.port.`in`.dto.SignUpParams
 import grantly.member.application.service.exceptions.DuplicateEmailException
 import grantly.member.application.service.exceptions.PasswordMismatchException
 import grantly.member.domain.MemberDomain
+import grantly.session.application.port.`in`.CsrfTokenUseCase
 import grantly.token.application.service.exceptions.InvalidTokenException
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController
 @ResponseBody
 @RequestMapping("/v1/auth")
 @Tag(name = "인증", description = "인증 관련 API")
-class AuthController(
+class MemberAuthController(
     private val signUpUseCase: SignUpUseCase,
     private val loginUseCase: LoginUseCase,
     private val csrfTokenUseCase: CsrfTokenUseCase,

@@ -5,10 +5,11 @@ import grantly.app.application.port.out.AppRepository
 import grantly.common.constants.AuthConstants
 import grantly.member.adapter.`in`.dto.LoginRequest
 import grantly.member.adapter.`in`.dto.SignUpRequest
-import grantly.member.application.port.out.AuthSessionRepository
 import grantly.member.application.port.out.MemberRepository
-import grantly.member.domain.AuthSessionDomain
 import grantly.member.domain.MemberDomain
+import grantly.session.application.port.out.AuthSessionRepository
+import grantly.session.domain.AuthSessionDomain
+import grantly.session.domain.SubjectType
 import grantly.token.adapter.out.enums.TokenType
 import grantly.token.application.port.out.TokenRepository
 import grantly.token.domain.TokenDomain
@@ -25,10 +26,12 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.core.env.Environment
 import org.springframework.http.MediaType
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -38,6 +41,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.DockerImageName
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -46,6 +50,7 @@ import java.util.UUID
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class AuthControllerTest(
     @Autowired
     private val memberRepository: MemberRepository,
@@ -58,24 +63,29 @@ class AuthControllerTest(
     @Autowired
     private val objectMapper: ObjectMapper,
     @Autowired
-    private val env: Environment,
-    @Autowired
     private val passwordEncoder: BCryptPasswordEncoder,
     @Autowired
     private val appRepository: AppRepository,
 ) {
     companion object {
         @Container
-        val redisContainer =
-            GenericContainer("redis:7.0").apply {
-                withExposedPorts(6379)
-            }
+        val redis =
+            GenericContainer(DockerImageName.parse("redis:7"))
+                .withExposedPorts(6379)
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun overrideRedisProperties(registry: DynamicPropertyRegistry) {
+            redis.start()
+            registry.add("spring.data.redis.host") { redis.host }
+            registry.add("spring.data.redis.port") { redis.getMappedPort(6379) }
+        }
     }
 
     private lateinit var existingMember: MemberDomain
 
     @BeforeAll
-    fun setUp() {
+    fun createTestMember() {
         existingMember = createTestMember("test@email.com", "test", "test123!")
     }
 
@@ -362,6 +372,7 @@ class AuthControllerTest(
     fun createAnonymousAuthSession(): AuthSessionDomain {
         val session =
             AuthSessionDomain(
+                subjectType = SubjectType.MEMBER,
                 token = UUID.randomUUID().toString(),
                 deviceId = UUID.randomUUID().toString(),
                 expiresAt = OffsetDateTime.now().plusSeconds(3600),
@@ -375,7 +386,8 @@ class AuthControllerTest(
                 token = UUID.randomUUID().toString(),
                 deviceId = UUID.randomUUID().toString(),
                 expiresAt = OffsetDateTime.now().plusSeconds(3600),
-                memberId = memberId,
+                subjectId = memberId,
+                subjectType = SubjectType.MEMBER,
             )
         return authSessionRepository.createSession(session)
     }

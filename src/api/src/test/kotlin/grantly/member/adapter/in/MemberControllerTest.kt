@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -20,6 +21,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@WithTestSessionMember(email = "test@email.com", name = "testUser")
 class MemberControllerTest(
     @Autowired
     private val mockMvc: MockMvc,
@@ -29,7 +32,6 @@ class MemberControllerTest(
 
     @Test
     @DisplayName("요청 사용자 정보 조회")
-    @WithTestSessionMember(email = "test@email.com", name = "test")
     fun `should get request member data`() {
         // given
         // when & then
@@ -39,6 +41,6 @@ class MemberControllerTest(
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isOk)
             .andExpect(jsonPath("$.email").value("test@email.com"))
-            .andExpect(jsonPath("$.name").value("test"))
+            .andExpect(jsonPath("$.name").value("testUser"))
     }
 }

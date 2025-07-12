@@ -2,15 +2,19 @@ spring:
   config:
     activate:
       on-profile: test
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 6000
   datasource:
     username: sa
     password:
     driver-class-name: org.h2.Driver
     hikari:
-      jdbc-url: jdbc:h2:mem:test;NON_KEYWORDS=user;DB_CLOSE_DELAY=-1;MODE=MYSQL;SCHEMA=PUBLIC;DATABASE_TO_LOWER=TRUE
+      jdbc-url: jdbc:h2:mem:test;NON_KEYWORDS=user;MODE=MYSQL;SCHEMA=PUBLIC;DATABASE_TO_LOWER=TRUE
   sql:
     init:
-      mode: always
       schema-locations: classpath:schema-h2.sql
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
