@@ -106,7 +106,7 @@ class AuthControllerTest(
         val jsonBody = objectMapper.writeValueAsString(SignUpRequest(existingMember.email, "test2", "test123!"))
         mockMvc
             .perform(
-                post("/v1/auth/signup")
+                post("/admin/v1/auth/signup")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isConflict)
@@ -123,7 +123,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/signup")
+                post("/admin/v1/auth/signup")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isCreated)
@@ -149,7 +149,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/signup")
+                post("/admin/v1/auth/signup")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isUnprocessableEntity)
@@ -165,7 +165,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/login")
+                post("/admin/v1/auth/login")
                     .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, session.token))
                     .cookie(Cookie(AuthConstants.DEVICE_ID_COOKIE_NAME, session.deviceId))
                     .contentType(MediaType.APPLICATION_JSON)
@@ -190,7 +190,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/login")
+                post("/admin/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .cookie(
                         Cookie(AuthConstants.DEVICE_ID_COOKIE_NAME, anonSession.deviceId),
@@ -215,7 +215,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/login")
+                post("/admin/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isUnauthorized)
@@ -230,7 +230,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/login")
+                post("/admin/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isUnauthorized)
@@ -242,7 +242,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                get("/v1/auth/csrf-token"),
+                get("/admin/v1/auth/csrf-token"),
             ).andExpect(status().isNoContent)
             .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
     }
@@ -256,7 +256,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                get("/v1/auth/csrf-token")
+                get("/admin/v1/auth/csrf-token")
                     .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, authSession.token)),
             ).andExpect(status().isNoContent)
             .andExpect(cookie().exists(AuthConstants.CSRF_COOKIE_NAME))
@@ -271,7 +271,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/logout")
+                post("/admin/v1/auth/logout")
                     .cookie(Cookie(AuthConstants.SESSION_COOKIE_NAME, authSession.token)),
             ).andExpect(status().isNoContent)
             .andExpect { result ->
@@ -295,7 +295,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/request-password-reset")
+                post("/admin/v1/auth/request-password-reset")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isNoContent)
@@ -315,7 +315,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/request-password-reset")
+                post("/admin/v1/auth/request-password-reset")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isNoContent)
@@ -348,7 +348,7 @@ class AuthControllerTest(
         // when & then
         mockMvc
             .perform(
-                post("/v1/auth/reset-password")
+                post("/admin/v1/auth/reset-password")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isNoContent)

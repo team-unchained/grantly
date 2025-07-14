@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @ResponseBody
-@RequestMapping("/v1/system")
+@RequestMapping("/admin/v1/system")
 @Tag(name = "시스템", description = "시스템 관련 API")
 class SystemController {
     @Operation(

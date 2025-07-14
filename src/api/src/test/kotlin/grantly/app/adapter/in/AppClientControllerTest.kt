@@ -6,7 +6,7 @@ import grantly.app.application.port.out.AppRepository
 import grantly.app.domain.AppClientDomain
 import grantly.app.domain.AppDomain
 import grantly.common.utils.performWithSession
-import grantly.config.AuthenticatedMember
+import grantly.config.AuthenticationEntity
 import grantly.config.TestSessionTokenHolder
 import grantly.config.WithTestSessionMember
 import grantly.member.application.port.out.MemberRepository
@@ -55,7 +55,7 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 생성")
     @WithTestSessionMember
     fun createAppClient() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val requestData =
             objectMapper.writeValueAsString(
@@ -68,7 +68,7 @@ class AppClientControllerTest(
             )
         mockMvc
             .performWithSession(
-                post("/v1/apps/${app.slug}/clients")
+                post("/admin/v1/apps/${app.slug}/clients")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestData),
                 TestSessionTokenHolder.get(),
@@ -82,7 +82,7 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 수정")
     @WithTestSessionMember
     fun updateAppClient() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val appClient = createTestAppClient(app)
         val requestData =
@@ -96,7 +96,7 @@ class AppClientControllerTest(
             )
         mockMvc
             .performWithSession(
-                put("/v1/apps/${app.slug}/clients/${appClient.clientId}")
+                put("/admin/v1/apps/${app.slug}/clients/${appClient.clientId}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestData),
                 TestSessionTokenHolder.get(),
@@ -111,12 +111,12 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 삭제")
     @WithTestSessionMember
     fun deleteAppClient() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val appClient = createTestAppClient(app)
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.slug}/clients/${appClient.clientId}"),
+                delete("/admin/v1/apps/${app.slug}/clients/${appClient.clientId}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isNoContent)
         // 실제 삭제 검증은 별도 repository에서 확인 필요
@@ -126,12 +126,12 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 단일 조회")
     @WithTestSessionMember
     fun getAppClient() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val appClient = createTestAppClient(app)
         mockMvc
             .performWithSession(
-                get("/v1/apps/${app.slug}/clients/${appClient.clientId}"),
+                get("/admin/v1/apps/${app.slug}/clients/${appClient.clientId}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isOk)
             .andExpect(jsonPath("$.clientId").value(appClient.clientId))
@@ -144,14 +144,14 @@ class AppClientControllerTest(
     @DisplayName("OAuth 클라이언트 목록 조회")
     @WithTestSessionMember
     fun getAppClients() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         createTestAppClient(app)
         createTestAppClient(app)
         createTestAppClient(app)
         mockMvc
             .performWithSession(
-                get("/v1/apps/${app.slug}/clients"),
+                get("/admin/v1/apps/${app.slug}/clients"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isOk)
             .andExpect(jsonPath("$.length()").value(3))
@@ -183,7 +183,7 @@ class AppClientControllerTest(
             )
         mockMvc
             .performWithSession(
-                post("/v1/apps/${app.slug}/clients")
+                post("/admin/v1/apps/${app.slug}/clients")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestData),
                 TestSessionTokenHolder.get(),
@@ -215,7 +215,7 @@ class AppClientControllerTest(
             )
         mockMvc
             .performWithSession(
-                put("/v1/apps/${app.slug}/clients/${appClient.clientId}")
+                put("/admin/v1/apps/${app.slug}/clients/${appClient.clientId}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestData),
                 TestSessionTokenHolder.get(),
@@ -238,7 +238,7 @@ class AppClientControllerTest(
         val appClient = createTestAppClient(app)
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.slug}/clients/${appClient.clientId}"),
+                delete("/admin/v1/apps/${app.slug}/clients/${appClient.clientId}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isForbidden)
     }
@@ -259,7 +259,7 @@ class AppClientControllerTest(
         val appClient = createTestAppClient(app)
         mockMvc
             .performWithSession(
-                get("/v1/apps/${app.slug}/clients/${appClient.clientId}"),
+                get("/admin/v1/apps/${app.slug}/clients/${appClient.clientId}"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isForbidden)
     }
@@ -279,7 +279,7 @@ class AppClientControllerTest(
         val app = createTestApp(true, ownerMember.id)
         mockMvc
             .performWithSession(
-                get("/v1/apps/${app.slug}/clients"),
+                get("/admin/v1/apps/${app.slug}/clients"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isForbidden)
     }
@@ -288,7 +288,7 @@ class AppClientControllerTest(
     @DisplayName("존재하지 않는 OAuth 클라이언트 수정 시 404 에러")
     @WithTestSessionMember
     fun `should return 404 when updating non-existent app client`() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val nonExistentClientId = "non-existent-client-id"
 
@@ -304,7 +304,7 @@ class AppClientControllerTest(
 
         mockMvc
             .performWithSession(
-                put("/v1/apps/${app.slug}/clients/$nonExistentClientId")
+                put("/admin/v1/apps/${app.slug}/clients/$nonExistentClientId")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestData),
                 TestSessionTokenHolder.get(),
@@ -315,13 +315,13 @@ class AppClientControllerTest(
     @DisplayName("존재하지 않는 OAuth 클라이언트 삭제 시 404 에러")
     @WithTestSessionMember
     fun `should return 404 when deleting non-existent app client`() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val nonExistentClientId = "non-existent-client-id"
 
         mockMvc
             .performWithSession(
-                delete("/v1/apps/${app.slug}/clients/$nonExistentClientId"),
+                delete("/admin/v1/apps/${app.slug}/clients/$nonExistentClientId"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isNotFound)
     }
@@ -330,13 +330,13 @@ class AppClientControllerTest(
     @DisplayName("존재하지 않는 OAuth 클라이언트 조회 시 404 에러")
     @WithTestSessionMember
     fun `should return 404 when getting non-existent app client`() {
-        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticatedMember
+        val requestMember = SecurityContextHolder.getContext().authentication.principal as AuthenticationEntity
         val app = createTestApp(true, requestMember.getId())
         val nonExistentClientId = "non-existent-client-id"
 
         mockMvc
             .performWithSession(
-                get("/v1/apps/${app.slug}/clients/$nonExistentClientId"),
+                get("/admin/v1/apps/${app.slug}/clients/$nonExistentClientId"),
                 TestSessionTokenHolder.get(),
             ).andExpect(status().isNotFound)
     }
@@ -358,7 +358,7 @@ class AppClientControllerTest(
 
         mockMvc
             .performWithSession(
-                post("/v1/apps/$nonExistentAppSlug/clients")
+                post("/admin/v1/apps/$nonExistentAppSlug/clients")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(requestData),
                 TestSessionTokenHolder.get(),

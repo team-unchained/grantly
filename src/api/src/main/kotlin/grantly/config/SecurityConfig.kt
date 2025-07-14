@@ -5,6 +5,7 @@ import grantly.config.filter.SessionContext
 import grantly.config.filter.SessionValidationFilter
 import grantly.member.application.port.out.MemberRepository
 import grantly.session.application.service.SessionService
+import grantly.session.domain.SubjectType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -54,11 +55,11 @@ class SecurityConfig(
         http
             .securityMatcher(
                 "/v*/system/**",
-                "/v*/auth/login",
-                "/v*/auth/signup",
-                "/v*/auth/csrf-token",
-                "/v*/auth/request-password-reset",
-                "/v*/auth/reset-password",
+                "/admin/v*/auth/login",
+                "/admin/v*/auth/signup",
+                "/admin/v*/auth/csrf-token",
+                "/admin/v*/auth/request-password-reset",
+                "/admin/v*/auth/reset-password",
                 "/docs/**",
             ).authorizeHttpRequests { it.anyRequest().permitAll() }
             .addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
@@ -77,8 +78,15 @@ class SecurityConfig(
     ): SecurityFilterChain {
         // SessionContext -> CsrfValidationFilter -> SessionValidationFilter
         http
-            .authorizeHttpRequests { it.anyRequest().authenticated() }
-            .addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
+            .authorizeHttpRequests { auth ->
+                auth
+                    .requestMatchers("/admin/**")
+                    .hasRole(SubjectType.MEMBER.name)
+                    .requestMatchers("/**")
+                    .hasRole("USER")
+                    .anyRequest()
+                    .authenticated()
+            }.addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
         csrfValidationFilter?.let {
             http.addFilterAfter(it, UsernamePasswordAuthenticationFilter::class.java)
         }
