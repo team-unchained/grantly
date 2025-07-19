@@ -15,7 +15,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "app_clients")
+@Table(name = "app_client")
 class AppClientJpaEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -28,11 +28,11 @@ class AppClientJpaEntity(
     @Column(name = "client_secret", nullable = false)
     var clientSecret: String,
     @ElementCollection
-    @CollectionTable(name = "app_client_redirect_uris", joinColumns = [JoinColumn(name = "client_id")])
+    @CollectionTable(name = "app_client_redirect_uri", joinColumns = [JoinColumn(name = "client_id")])
     @Column(name = "redirect_uri")
     var redirectUris: MutableList<String> = mutableListOf(),
     @ElementCollection
-    @CollectionTable(name = "app_client_scopes", joinColumns = [JoinColumn(name = "client_id")])
+    @CollectionTable(name = "app_client_scope", joinColumns = [JoinColumn(name = "client_id")])
     @Column(name = "scope")
     var scopes: MutableList<String> = mutableListOf(),
     @Column(name = "grant_type", nullable = false)
