@@ -17,7 +17,7 @@ class AppClientMapper : IsMapper<AppClientJpaEntity, AppClientDomain> {
             clientSecret = entity.clientSecret,
             redirectUris = entity.redirectUris.toMutableList(),
             scopes = entity.scopes.mapNotNull { OAuthClientScope.fromValue(it) }.toMutableList(),
-            grantType = OAuthGrantType.fromValue(entity.grantType)!!,
+            grantType = OAuthGrantType.fromValue(entity.grantType) ?: OAuthGrantType.AUTHORIZATION_CODE,
             createdAt = entity.createdAt,
             modifiedAt = entity.modifiedAt,
         )

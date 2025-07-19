@@ -80,7 +80,7 @@ export function OAuthClientList({
     <div className="space-y-4">
       {clients.map((client) => (
         <OAuthClientItem
-          key={client.id}
+          key={client.clientId}
           client={client}
           onUpdate={onUpdate}
           onDelete={onDelete}

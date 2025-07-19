@@ -20,6 +20,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
+import { OAuthGrantType, OAuthScope } from '@grantly/constants/oauth';
 
 interface UpdateOAuthClientDialogProps {
   client: OAuthClientType;
@@ -43,7 +44,8 @@ export function UpdateOAuthClientDialog({
     defaultValues: {
       title: client.title,
       redirectUris: client.redirectUris || [],
-      scopes: client.scopes || [],
+      scopes: client.scopes || [OAuthScope.ALL],
+      grantType: client.grantType || OAuthGrantType.AUTHORIZATION_CODE,
     },
   });
 
@@ -52,7 +54,8 @@ export function UpdateOAuthClientDialog({
     form.reset({
       title: client.title,
       redirectUris: client.redirectUris || [],
-      scopes: client.scopes || [],
+      scopes: client.scopes || [OAuthScope.ALL],
+      grantType: client.grantType || OAuthGrantType.AUTHORIZATION_CODE,
     });
   }, [client, form]);
 

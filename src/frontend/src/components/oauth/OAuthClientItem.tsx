@@ -17,6 +17,10 @@ import { UpdateOAuthClientDialog } from '@grantly/components/oauth/UpdateOAuthCl
 import { Edit, Trash2, Copy, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import {
+  OAUTH_SCOPE_LABELS,
+  OAUTH_GRANT_TYPE_LABELS,
+} from '@grantly/constants/oauth';
 
 interface OAuthClientItemProps {
   client: OAuthClientType;
@@ -45,11 +49,11 @@ export function OAuthClientItem({
   };
 
   const handleDelete = () => {
-    onDelete(client.id);
+    onDelete(client.clientId);
   };
 
   const handleUpdate = async (data: UpdateOAuthClientType) => {
-    await onUpdate(client.id, data);
+    await onUpdate(client.clientId, data);
   };
 
   const handleCopyClientId = () => {
@@ -58,6 +62,22 @@ export function OAuthClientItem({
 
   const handleCopyClientSecret = () => {
     copyToClipboard(client.clientSecret, 'Client Secret');
+  };
+
+  // 스코프 라벨 가져오기
+  const getScopeLabel = (scope: string) => {
+    return (
+      OAUTH_SCOPE_LABELS[scope as keyof typeof OAUTH_SCOPE_LABELS] || scope
+    );
+  };
+
+  // 그랜트 타입 라벨 가져오기
+  const getGrantTypeLabel = (grantType: string) => {
+    return (
+      OAUTH_GRANT_TYPE_LABELS[
+        grantType as keyof typeof OAUTH_GRANT_TYPE_LABELS
+      ] || grantType
+    );
   };
 
   return (
@@ -90,7 +110,7 @@ export function OAuthClientItem({
               Client ID
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <code className="flex-1 px-3 py-2 bg-muted rounded-md text-sm font-mono">
+              <code className="flex-1 px-3 py-2 bg-muted rounded-md text-sm font-mono break-all">
                 {client.clientId}
               </code>
               <Button variant="outline" size="sm" onClick={handleCopyClientId}>
@@ -104,7 +124,7 @@ export function OAuthClientItem({
               Client Secret
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <code className="flex-1 px-3 py-2 bg-muted rounded-md text-sm font-mono">
+              <code className="flex-1 px-3 py-2 bg-muted rounded-md text-sm font-mono break-all">
                 {showSecret
                   ? client.clientSecret
                   : '•'.repeat(client.clientSecret.length)}
@@ -136,7 +156,7 @@ export function OAuthClientItem({
               {client.redirectUris.map((uri) => (
                 <code
                   key={uri}
-                  className="block px-3 py-2 bg-muted rounded-md text-sm font-mono"
+                  className="block px-3 py-2 bg-muted rounded-md text-sm font-mono break-all"
                 >
                   {uri}
                 </code>
@@ -153,22 +173,25 @@ export function OAuthClientItem({
             <div className="flex flex-wrap gap-1 mt-1">
               {client.scopes.map((scope) => (
                 <Badge key={scope} variant="outline">
-                  {scope}
+                  {getScopeLabel(scope)}
                 </Badge>
               ))}
             </div>
           </div>
         )}
 
-        <div className="text-xs text-muted-foreground">
-          생성일: {new Date(client.createdAt).toLocaleDateString('ko-KR')}
-          {client.updatedAt !== client.createdAt && (
-            <>
-              {' '}
-              | 수정일: {new Date(client.updatedAt).toLocaleDateString('ko-KR')}
-            </>
-          )}
-        </div>
+        {client.grantType && client.grantType.length > 0 && (
+          <div>
+            <div className="text-sm font-medium text-muted-foreground">
+              그랜트 타입
+            </div>
+            <div className="flex flex-wrap gap-1 mt-1">
+              <Badge variant="outline">
+                {getGrantTypeLabel(client.grantType)}
+              </Badge>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

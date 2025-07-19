@@ -18,6 +18,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useState } from 'react';
+import { OAuthGrantType, OAuthScope } from '@grantly/constants/oauth';
 
 interface CreateOAuthClientDialogProps {
   onSubmit: (data: CreateOAuthClientType) => void;
@@ -47,7 +48,8 @@ export function CreateOAuthClientDialog({
     defaultValues: {
       title: '',
       redirectUris: [],
-      scopes: [],
+      scopes: [OAuthScope.ALL],
+      grantType: OAuthGrantType.AUTHORIZATION_CODE,
     },
   });
 
