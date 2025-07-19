@@ -68,3 +68,46 @@ ALTER TABLE application
     DROP CONSTRAINT IF EXISTS fk_application_on_owner;
 ALTER TABLE application
     ADD CONSTRAINT fk_application_on_owner FOREIGN KEY (owner_id) REFERENCES member (id);
+
+CREATE TABLE app_client
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_at    datetime              NOT NULL,
+    modified_at   datetime              NOT NULL,
+    app_id        BIGINT                NOT NULL,
+    title         VARCHAR(255)          NOT NULL,
+    client_id     VARCHAR(255)          NOT NULL,
+    client_secret VARCHAR(255)          NOT NULL,
+    grant_type    VARCHAR(255)          NOT NULL,
+    CONSTRAINT pk_app_clients PRIMARY KEY (id),
+    CONSTRAINT uc_app_clients_client_id UNIQUE (client_id)
+);
+
+CREATE TABLE app_client_redirect_uri
+(
+    client_id    VARCHAR(255) NOT NULL,
+    redirect_uri VARCHAR(255),
+    CONSTRAINT fk_app_client_redirect_uris_client_id FOREIGN KEY (client_id) REFERENCES app_client (client_id)
+);
+
+CREATE TABLE app_client_scope
+(
+    client_id VARCHAR(255) NOT NULL,
+    scope     VARCHAR(255),
+    CONSTRAINT fk_app_client_scopes_client_id FOREIGN KEY (client_id) REFERENCES app_client (client_id)
+);
+
+CREATE TABLE user
+(
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_at    datetime              NOT NULL,
+    modified_at   datetime              NOT NULL,
+    email         VARCHAR(100)          NOT NULL,
+    password      VARCHAR(255)          NULL,
+    name          VARCHAR(255)          NOT NULL,
+    last_login_at datetime              NULL,
+    CONSTRAINT pk_user PRIMARY KEY (id)
+);
+
+ALTER TABLE user
+    ADD CONSTRAINT uc_user_email UNIQUE (email);
