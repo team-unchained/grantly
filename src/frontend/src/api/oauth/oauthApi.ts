@@ -8,9 +8,7 @@ import {
 export const getOAuthClients = async (
   appSlug: string
 ): Promise<OAuthClientType[]> => {
-  const response = await axiosInstance.get(
-    `/api/apps/${appSlug}/oauth-clients`
-  );
+  const response = await axiosInstance.get(`/api/apps/${appSlug}/clients`);
   return response.data;
 };
 
@@ -19,7 +17,7 @@ export const getOAuthClient = async (
   clientId: string
 ): Promise<OAuthClientType> => {
   const response = await axiosInstance.get(
-    `/api/apps/${appSlug}/oauth-clients/${clientId}`
+    `/api/apps/${appSlug}/clients/${clientId}`
   );
   return response.data;
 };
@@ -29,7 +27,7 @@ export const createOAuthClient = async (
   data: CreateOAuthClientType
 ): Promise<OAuthClientType> => {
   const response = await axiosInstance.post(
-    `/api/apps/${appSlug}/oauth-clients`,
+    `/api/apps/${appSlug}/clients`,
     data
   );
   return response.data;
@@ -41,7 +39,7 @@ export const updateOAuthClient = async (
   data: UpdateOAuthClientType
 ): Promise<OAuthClientType> => {
   const response = await axiosInstance.put(
-    `/api/apps/${appSlug}/oauth-clients/${clientId}`,
+    `/api/apps/${appSlug}/clients/${clientId}`,
     data
   );
   return response.data;
@@ -51,5 +49,5 @@ export const deleteOAuthClient = async (
   appSlug: string,
   clientId: string
 ): Promise<void> => {
-  await axiosInstance.delete(`/api/apps/${appSlug}/oauth-clients/${clientId}`);
+  await axiosInstance.delete(`/api/apps/${appSlug}/clients/${clientId}`);
 };
