@@ -3,7 +3,7 @@
     admin off
 }
 
-grantly-api.w0nder.land {
+grantly-api.unchainedevs.app {
     # TLS 설정 (자동으로 Let's Encrypt 인증서 발급)
     tls {
         protocols tls1.2 tls1.3
@@ -27,7 +27,7 @@ grantly-api.w0nder.land {
     }
 }
 
-grantly.w0nder.land {
+grantly.unchainedevs.app {
 
     # TLS 설정 (자동으로 Let's Encrypt 인증서 발급)
     tls {
@@ -46,7 +46,7 @@ grantly.w0nder.land {
     encode gzip
 }
 
-grantly-grafana.w0nder.land {
+grantly-grafana.unchainedevs.app {
 
     # TLS 설정 (자동으로 Let's Encrypt 인증서 발급)
     tls {
