@@ -17,7 +17,7 @@ export const getOAuthClient = async (
   clientId: string
 ): Promise<OAuthClientType> => {
   const response = await axiosInstance.get(
-    `/v1/apps/${appSlug}/clients/${clientId}`
+    `/admin/v1/apps/${appSlug}/clients/${clientId}`
   );
   return response.data;
 };
