@@ -88,10 +88,10 @@ sentry:
 
 grantly:
   cookie:
-    domain: w0nder.land
+    domain: unchainedevs.app
   service:
-    domain: https://grantly.w0nder.land
-    api-domain: https://grantly-api.w0nder.land
+    domain: https://grantly.unchainedevs.app
+    api-domain: https://grantly-api.unchainedevs.app
   aws:
     ses:
       profile-name: ${AWS_SES_PROFILE_NAME}
