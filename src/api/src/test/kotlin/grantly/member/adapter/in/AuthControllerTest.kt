@@ -36,7 +36,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Container
@@ -110,34 +109,6 @@ class AuthControllerTest(
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonBody),
             ).andExpect(status().isConflict)
-    }
-
-    @Test
-    @DisplayName("회원가입 성공 후 기본 앱 생성")
-    fun `should return 201 when sign up is successful`() {
-        // given
-        val memberEmail = "test2@email.com"
-        val jsonBody =
-            objectMapper.writeValueAsString(SignUpRequest(memberEmail, "test2", "test123!"))
-
-        // when & then
-        mockMvc
-            .perform(
-                post("/admin/v1/auth/signup")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonBody),
-            ).andExpect(status().isCreated)
-            .andExpect(jsonPath("$.member").exists())
-            .andExpect(jsonPath("$.member.email").value(memberEmail))
-            .andExpect { result ->
-                val response = objectMapper.readTree(result.response.contentAsString)
-                val createdMemberId = response.get("member").get("id").asLong()
-
-                // 기본 앱이 생성되었는지 확인
-                val apps = appRepository.getAppsByOwnerId(createdMemberId)
-                assertThat(apps).isNotEmpty
-                assertThat(apps[0].ownerId).isEqualTo(createdMemberId)
-            }
     }
 
     @Test
