@@ -1,7 +1,7 @@
 package grantly.app.domain
 
-import grantly.oauth.adapter.out.enums.OAuthClientScope
-import grantly.oauth.adapter.out.enums.OAuthGrantType
+import grantly.oauth.domain.enums.OAuthClientScope
+import grantly.oauth.domain.enums.OAuthGrantType
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 

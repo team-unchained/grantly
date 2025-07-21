@@ -1,4 +1,4 @@
-package grantly.oauth.adapter.out.enums
+package grantly.oauth.domain.enums
 
 import com.fasterxml.jackson.annotation.JsonValue
 import io.swagger.v3.oas.annotations.media.Schema
@@ -16,10 +16,10 @@ enum class OAuthGrantType(
     ;
 
     companion object {
-        fun fromValue(value: String): OAuthGrantType? = values().find { it.value == value }
+        fun fromValue(value: String): OAuthGrantType? = OAuthGrantType.entries.find { it.value == value }
 
         fun isValid(value: String): Boolean = fromValue(value) != null
 
-        fun getAllValues(): List<String> = values().map { it.value }
+        fun getAllValues(): List<String> = OAuthGrantType.entries.map { it.value }
     }
 }

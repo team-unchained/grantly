@@ -11,8 +11,8 @@ import grantly.config.TestSessionTokenHolder
 import grantly.config.WithTestSessionMember
 import grantly.member.application.port.out.MemberRepository
 import grantly.member.domain.MemberDomain
-import grantly.oauth.adapter.out.enums.OAuthClientScope
-import grantly.oauth.adapter.out.enums.OAuthGrantType
+import grantly.oauth.domain.enums.OAuthClientScope
+import grantly.oauth.domain.enums.OAuthGrantType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

@@ -1,8 +1,8 @@
 package grantly.oauth.adapter.out
 
 import grantly.common.entity.IsMapper
-import grantly.oauth.adapter.out.enums.OAuthClientScope
 import grantly.oauth.domain.OAuthConsentDomain
+import grantly.oauth.domain.enums.OAuthClientScope
 import org.springframework.stereotype.Component
 
 @Component

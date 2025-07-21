@@ -1,7 +1,7 @@
 package grantly.app.application.port.`in`.dto
 
-import grantly.oauth.adapter.out.enums.OAuthClientScope
-import grantly.oauth.adapter.out.enums.OAuthGrantType
+import grantly.oauth.domain.enums.OAuthClientScope
+import grantly.oauth.domain.enums.OAuthGrantType
 
 data class CreateAppClientParams(
     val appId: Long,
