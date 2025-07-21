@@ -5,7 +5,6 @@ import grantly.config.filter.SessionContext
 import grantly.config.filter.SessionValidationFilter
 import grantly.member.application.port.out.MemberRepository
 import grantly.session.application.service.SessionService
-import grantly.session.domain.SubjectType
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
@@ -80,10 +79,6 @@ class SecurityConfig(
         http
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/admin/**")
-                    .hasRole(SubjectType.MEMBER.name)
-                    .requestMatchers("/**")
-                    .hasRole("USER")
                     .anyRequest()
                     .authenticated()
             }.addFilterBefore(sessionContext, UsernamePasswordAuthenticationFilter::class.java)
