@@ -3,7 +3,7 @@ package grantly.app.application.port.out
 import grantly.app.domain.AppClientDomain
 
 interface AppClientRepository {
-    fun save(appClient: AppClientDomain): AppClientDomain
+    fun createAppClient(appClient: AppClientDomain): AppClientDomain
 
     fun findByClientId(clientId: String): AppClientDomain
 

@@ -37,7 +37,7 @@ class AppClientService(
                 grantType = params.grantType,
             )
 
-        return appClientRepository.save(appClient)
+        return appClientRepository.createAppClient(appClient)
     }
 
     override fun updateAppClient(params: UpdateAppClientParams): AppClientDomain {
@@ -48,7 +48,7 @@ class AppClientService(
         existingClient.scopes = params.scopes.toMutableList()
         existingClient.grantType = params.grantType
 
-        return appClientRepository.save(existingClient)
+        return appClientRepository.createAppClient(existingClient)
     }
 
     override fun deleteAppClient(params: DeleteAppClientParams) {

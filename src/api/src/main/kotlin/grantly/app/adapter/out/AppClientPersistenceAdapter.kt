@@ -12,7 +12,7 @@ class AppClientPersistenceAdapter(
     private val appClientJpaRepository: AppClientJpaRepository,
     private val appClientMapper: AppClientMapper,
 ) : AppClientRepository {
-    override fun save(appClient: AppClientDomain): AppClientDomain {
+    override fun createAppClient(appClient: AppClientDomain): AppClientDomain {
         val entity = appClientMapper.toEntity(appClient)
         val savedEntity = appClientJpaRepository.save(entity)
         return appClientMapper.toDomain(savedEntity)

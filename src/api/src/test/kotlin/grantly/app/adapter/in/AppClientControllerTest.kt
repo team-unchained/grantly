@@ -390,6 +390,6 @@ class AppClientControllerTest(
                 scopes = mutableListOf(OAuthClientScope.ALL),
                 grantType = OAuthGrantType.AUTHORIZATION_CODE,
             )
-        return appClientRepository.save(appClient)
+        return appClientRepository.createAppClient(appClient)
     }
 }
