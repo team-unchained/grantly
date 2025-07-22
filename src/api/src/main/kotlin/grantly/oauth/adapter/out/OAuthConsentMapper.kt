@@ -1,6 +1,7 @@
 package grantly.oauth.adapter.out
 
 import grantly.common.entity.IsMapper
+import grantly.oauth.adapter.out.enums.OAuthClientScope
 import grantly.oauth.domain.OAuthConsentDomain
 import org.springframework.stereotype.Component
 
@@ -11,7 +12,7 @@ class OAuthConsentMapper : IsMapper<OAuthConsentJpaEntity, OAuthConsentDomain> {
             id = entity.id ?: 0L,
             appClientId = entity.appClientId,
             userId = entity.userId,
-            grantedScopes = entity.grantedScopes.toMutableList(),
+            grantedScopes = entity.grantedScopes.mapNotNull { OAuthClientScope.fromValue(it) }.toMutableList(),
             consentedAt = entity.consentedAt,
             createdAt = entity.createdAt,
             modifiedAt = entity.modifiedAt,
@@ -22,7 +23,7 @@ class OAuthConsentMapper : IsMapper<OAuthConsentJpaEntity, OAuthConsentDomain> {
             id = if (domain.id == 0L) null else domain.id,
             userId = domain.userId,
             appClientId = domain.appClientId,
-            grantedScopes = domain.grantedScopes.toMutableList(),
+            grantedScopes = domain.grantedScopes.map { it.value }.toMutableList(),
             consentedAt = domain.consentedAt,
         )
 }

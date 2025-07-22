@@ -1,5 +1,6 @@
 package grantly.oauth.domain
 
+import grantly.oauth.adapter.out.enums.OAuthClientScope
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.OffsetDateTime
 
@@ -8,7 +9,7 @@ data class OAuthConsentDomain(
     val id: Long = 0L,
     val appClientId: Long,
     val userId: Long,
-    val grantedScopes: MutableList<String> = mutableListOf(),
+    val grantedScopes: MutableList<OAuthClientScope> = mutableListOf(),
     val consentedAt: OffsetDateTime,
     val createdAt: OffsetDateTime = OffsetDateTime.now(),
     var modifiedAt: OffsetDateTime? = null,
